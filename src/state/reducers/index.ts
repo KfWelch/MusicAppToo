@@ -2,9 +2,11 @@ import { combineReducers } from 'redux';
 import { TypedUseSelectorHook, useSelector } from 'react-redux';
 import { DeepPartial } from '../../models/MappedTypes.d';
 import asyncReducer from './asyncAPI';
+import { Albums } from './Albums';
 
 const rootReducer = combineReducers({
-    async: asyncReducer
+    async: asyncReducer,
+    Albums
 });
 
 export default rootReducer;

@@ -28,6 +28,8 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import Home from './src/screens/Home/Home';
 import Toast from 'react-native-toast-message';
+import { Provider } from 'react-redux';
+import store from './src/state/store';
 
 const Section: React.FC<{
   title: string;
@@ -65,19 +67,21 @@ const App = () => {
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-          <Home />
-          <Toast />
-        </View>
-    </SafeAreaView>
+    <Provider store={store}>
+      <SafeAreaView style={backgroundStyle}>
+        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+          <Header />
+          <View
+            style={{
+              backgroundColor: isDarkMode ? Colors.black : Colors.white,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+            <Home />
+            <Toast />
+          </View>
+      </SafeAreaView>
+    </Provider>
   );
 };
 

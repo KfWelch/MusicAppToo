@@ -5,15 +5,15 @@ export interface Artist {
 
 export interface Album {
     albumName: string;
-    category: string;
-    year: number;
+    category?: string;
+    year?: number;
     songs: Song[];
     ordered?: boolean;
 }
 
 export interface Song {
     title: string,
-    length: string,
+    length?: string,
     rating?: string,
     contributingArtist?: string,
     albumName: string;
