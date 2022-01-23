@@ -6,7 +6,7 @@ import { useTypedSelector } from '../../state/reducers';
 
 const ArtistScreen = (): JSX.Element => {
     const artists = useTypedSelector(state => state.Albums);
-    const showPlaybackControl = TrackPlayer.
+    // const showPlaybackControl = TrackPlayer.
 
     return (
         <>
