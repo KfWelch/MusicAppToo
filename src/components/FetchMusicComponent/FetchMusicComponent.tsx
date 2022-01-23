@@ -6,12 +6,14 @@ import { check, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 import Toast from 'react-native-toast-message';
 import * as RNFS from 'react-native-fs';
 import styles from './FetchMusicComponent.style';
-import { Album } from '../../models/MusicModel';
+import { Album, Artist, Song } from '../../models/MusicModel';
+import { useTypedSelector } from '../../state/reducers';
 
 const FetchMusicComponent = () => {
     const [currentFiles, setCurrentFiles] = useState<RNFS.ReadDirItem[]>([]);
     const [filesList, setFilesList] = useState<RNFS.ReadDirItem[]>([]);
     const [foundMusicFiles, setFoundMusicFiles] = useState<Album[]>([]);
+    const artists = useTypedSelector(state => state.Albums);
 
     const getPermission = () => {
         check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
@@ -39,16 +41,39 @@ const FetchMusicComponent = () => {
             })
     };
 
-    const getMusicFiles = async (recursiveFiles: RNFS.ReadDirItem[]) => {
+    const getMusicFiles = async (recursiveFiles: RNFS.ReadDirItem[], artist?: Artist): Artist => {
         const directories = recursiveFiles.filter(item => item.isDirectory());
-        if (directories.length === 0) {
-            
-        }
+        const albums: Album[] = [];
 
+        // 1st iteration, for each artist
+        // 2nd iteration, for each album
         directories.forEach(directory => {
             RNFS.readDir(directory.path)
                 .then(files => {
-
+                    // 1st iteration, we are looking at an artist, and recurse to go through all albums
+                    if (!artist) {
+                        getMusicFiles(files, { artist: directory.name, albums: [] });
+                    // 2nd iteration, we are looking at an album, and we already have all the songs in the files
+                    } else {
+                        const songs: Song[] = [];
+                        files.forEach((songFile, index) => {
+                            const song: Song = {
+                                title: songFile.name,
+                                albumName: directory.name,
+                                numberInAlbum: index,
+                                path: songFile.path
+                            };
+                            songs.push(song);
+                        });
+                        const album: Album = {
+                            albumName: directory.name,
+                            songs
+                        };
+                        const tempArtist: Artist = {
+                            artist: artist.artist,
+                            albums: artist.albums.concat([album])
+                        };
+                    }
                 })
         })
     }
@@ -59,6 +84,7 @@ const FetchMusicComponent = () => {
             .then(files => {
                 setCurrentFiles(files);
                 setFilesList(files.filter(file => file.isFile()));
+                console.log(files);
             })
             .catch(e => {
                 Toast.show({

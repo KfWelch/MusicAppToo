@@ -1,5 +1,5 @@
 import { AxiosError, AxiosResponse } from 'axios';
-import { makeAsyncActionCreators, makeAsyncActionTypes } from './generic/makeAsyncActions.ts';
+import { makeAsyncActionCreators, makeAsyncActionTypes } from './generic/makeAsyncActions';
 
 interface ExampleDataType {
     cetra: boolean;
