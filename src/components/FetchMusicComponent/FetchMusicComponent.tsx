@@ -18,35 +18,34 @@ const FetchMusicComponent = () => {
     const artists = useTypedSelector(state => state.Albums);
     const dispatch = useDispatch();
 
-    const getPermission = () => {
-        check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
-            .then(result => {
-                switch (result) {
-                    case RESULTS.GRANTED: 
+    const getPermission = async (showToast = true) => {
+        const checkResult = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+        switch (checkResult) {
+            case RESULTS.GRANTED: 
+                showToast && Toast.show({
+                    type: 'info',
+                    text1: 'Already have permissions'
+                });
+                break;
+            case RESULTS.UNAVAILABLE:
+                Toast.show({ type: 'error', text1: 'Unable to access external storage' });
+                break;
+            default:
+                const getResult = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+                switch (getResult) {
+                    case 'granted':
                         Toast.show({
-                            type: 'info',
-                            text1: 'Already have permissions'
+                            type: 'success',
+                            text1: 'Successfully got permissions'
                         });
                         break;
-                    case RESULTS.UNAVAILABLE:
-                        Toast.show({ type: 'error', text1: 'Unable to access external storage' });
-                        break;
                     default:
-                        request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
-                            .then(result => {
-                                Toast.show({
-                                    type: 'success',
-                                    text1: 'Successfully got permissions'
-                                });
-                            })
-                            .catch(e => {
-                                Toast.show({
-                                    type: 'error',
-                                    text1: 'Failed to get permissions'
-                                });
-                            });
+                        Toast.show({
+                            type: 'error',
+                            text1: 'Failed to get permissions'
+                        });
                 }
-            })
+        }
     };
 
     const getMusicFiles = async (recursiveFiles: RNFS.ReadDirItem[], artist?: Artist): Promise<Artist[]> => {
@@ -67,7 +66,6 @@ const FetchMusicComponent = () => {
                 const songs: Song[] = [];
                 files.forEach((songFile, index) => {
                     const nameStart = songFile.name.search(/[a-zA-Z]/);
-                    console.log(nameStart);
                     const title = songFile.name.substring(nameStart);
                     // minus one because there's a space between the leading number and the title
                     const leadingNumber = songFile.name.substring(0, nameStart - 1);
@@ -101,12 +99,12 @@ const FetchMusicComponent = () => {
 
     const getFiles = async () => {
         const path = `${RNFS.ExternalStorageDirectoryPath}/Music`
+        await getPermission(false);
         const files = await RNFS.readDir(path)
         const musicFiles = await getMusicFiles(files);
         musicFiles.forEach(artist => dispatch(addArtist(artist)));
         setCurrentFiles(files);
         setFilesList(files.filter(file => file.isFile()));
-        console.log(files);
     };
 
     const itemSeparator = () => (<View style={styles.itemSeparator} />);
@@ -121,15 +119,15 @@ const FetchMusicComponent = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Button onPress={getPermission} title="get folder permission" />
+            <Button onPress={() => getPermission()} title="get folder permission" />
             {itemSeparator()}
             <Button onPress={getFiles} title="scan for music" />
-            <FlatList
+            {/* <FlatList
                 data={filesList}
                 renderItem={renderItem}
                 keyExtractor={item => item.name}
                 ItemSeparatorComponent={itemSeparator}
-            />
+            /> */}
         </SafeAreaView>
     )
 };
