@@ -3,6 +3,8 @@ import { Album, Artist, Song } from "../../models/MusicModel";
 export const ADD_ARTIST = 'ALBUMS/ADD_ARTIST';
 export const ADD_ALBUM = 'ALBUMS/ADD_ALBUM';
 export const ADD_SONGS_TO_ALBUM = 'ALBUMS/ADD_SONGS';
+export const SELECT_ARTIST = 'ALBUMS/SELECT_ARTIST';
+export const DESELECT_ARTIST = 'ALBUMS/DESELECT_ARTIST';
 
 export const addArtist = (artist: Artist) => ({
     type: ADD_ARTIST,
@@ -19,7 +21,18 @@ export const addSongsToAlbum = (artistName: string, albumName: string, songs: So
     payload: { artistName, albumName, songs }
 } as const);
 
+export const selectArtist = (artistName: string) => ({
+    type: SELECT_ARTIST,
+    payload: artistName
+} as const);
+
+export const deselectArtist = () => ({
+    type: DESELECT_ARTIST
+} as const);
+
 export type Actions =
     ReturnType<typeof addArtist>
     | ReturnType<typeof addAlbum>
-    | ReturnType<typeof addSongsToAlbum>;
+    | ReturnType<typeof addSongsToAlbum>
+    | ReturnType<typeof selectArtist>
+    | ReturnType<typeof deselectArtist>;

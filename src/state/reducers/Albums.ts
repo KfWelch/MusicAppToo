@@ -1,12 +1,21 @@
 import { Artist } from "../../models/MusicModel";
-import { Actions, ADD_ALBUM, ADD_ARTIST, ADD_SONGS_TO_ALBUM } from '../actions/Albums';
+import {
+    Actions,
+    ADD_ALBUM,
+    ADD_ARTIST,
+    ADD_SONGS_TO_ALBUM,
+    DESELECT_ARTIST,
+    SELECT_ARTIST
+} from '../actions/Albums';
 
 interface AlbumsState {
     artists: Artist[];
+    selectedArtist?: Artist;
 };
 
 const initialState: AlbumsState = {
-    artists: []
+    artists: [],
+    selectedArtist: undefined
 };
 
 export const Albums = (state = initialState, action: Actions): AlbumsState => {
@@ -38,6 +47,16 @@ export const Albums = (state = initialState, action: Actions): AlbumsState => {
                 artists: newArtists
             }
         }
+        case SELECT_ARTIST:
+            return {
+                ...state,
+                selectedArtist: state.artists.find(artist => artist.artist === action.payload)
+            };
+        case DESELECT_ARTIST:
+            return {
+                ...state,
+                selectedArtist: undefined
+            }
         default:
             return state;
     }
