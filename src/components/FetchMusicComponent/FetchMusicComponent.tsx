@@ -66,10 +66,21 @@ const FetchMusicComponent = () => {
             } else {
                 const songs: Song[] = [];
                 files.forEach((songFile, index) => {
+                    const nameStart = songFile.name.search(/[a-zA-Z]/);
+                    console.log(nameStart);
+                    const title = songFile.name.substring(nameStart);
+                    // minus one because there's a space between the leading number and the title
+                    const leadingNumber = songFile.name.substring(0, nameStart - 1);
+                    let numberInAlbum = 0;
+                    if (leadingNumber.endsWith('--')) {
+                        numberInAlbum = index + 1;
+                    } else {
+                        numberInAlbum = Number.parseInt(leadingNumber.substring(leadingNumber.length - 2), 10);
+                    }
                     const song: Song = {
-                        title: songFile.name,
+                        title,
                         albumName: directories[i].name,
-                        numberInAlbum: index,
+                        numberInAlbum,
                         path: songFile.path
                     };
                     songs.push(song);
@@ -78,7 +89,7 @@ const FetchMusicComponent = () => {
                     albumName: directories[i].name,
                     songs
                 };
-                tempArtist.albums = tempArtist.albums.concat([album])
+                tempArtist.albums = tempArtist.albums.concat([album]);
             }
         }
         if (artist) {
