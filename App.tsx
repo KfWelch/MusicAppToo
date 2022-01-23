@@ -30,6 +30,8 @@ import Home from './src/screens/Home/Home';
 import Toast from 'react-native-toast-message';
 import { Provider } from 'react-redux';
 import store from './src/state/store';
+import { HomeNavigator } from './src/navigators/HomeNavigator';
+import { NavigationContainer } from '@react-navigation/native';
 
 const Section: React.FC<{
   title: string;
@@ -64,22 +66,15 @@ const App = () => {
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    flex: 1
   };
 
   return (
     <Provider store={store}>
       <SafeAreaView style={backgroundStyle}>
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
           <Header />
-          <View
-            style={{
-              backgroundColor: isDarkMode ? Colors.black : Colors.white,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-            <Home />
-            <Toast />
-          </View>
+          <HomeNavigator />
+          <Toast />
       </SafeAreaView>
     </Provider>
   );
