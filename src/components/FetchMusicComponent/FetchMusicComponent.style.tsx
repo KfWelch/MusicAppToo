@@ -8,6 +8,12 @@ const styles = StyleSheet.create({
     },
     itemSeparator: {
         height: 5
+    },
+    itemView: {
+        borderWidth: 1,
+        padding: 15,
+        borderColor: '#000000',
+        borderRadius: 5
     }
 });
 

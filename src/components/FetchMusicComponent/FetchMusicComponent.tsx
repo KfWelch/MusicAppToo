@@ -6,9 +6,12 @@ import { check, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 import Toast from 'react-native-toast-message';
 import * as RNFS from 'react-native-fs';
 import styles from './FetchMusicComponent.style';
+import { Album } from '../../models/MusicModel';
 
 const FetchMusicComponent = () => {
-    const [currentFilesList, setCurrentFilesList] = useState<RNFS.ReadDirItem[]>([]);
+    const [currentFiles, setCurrentFiles] = useState<RNFS.ReadDirItem[]>([]);
+    const [filesList, setFilesList] = useState<RNFS.ReadDirItem[]>([]);
+    const [foundMusicFiles, setFoundMusicFiles] = useState<Album[]>([]);
 
     const getPermission = () => {
         check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
@@ -36,15 +39,26 @@ const FetchMusicComponent = () => {
             })
     };
 
-    const getMusicFiles = async (subFolder: string) => {
+    const getMusicFiles = async (recursiveFiles: RNFS.ReadDirItem[]) => {
+        const directories = recursiveFiles.filter(item => item.isDirectory());
+        if (directories.length === 0) {
+            
+        }
 
+        directories.forEach(directory => {
+            RNFS.readDir(directory.path)
+                .then(files => {
+
+                })
+        })
     }
 
     const getFiles = async () => {
         const path = `${RNFS.ExternalStorageDirectoryPath}/Music`
         RNFS.readDir(path)
             .then(files => {
-                setCurrentFilesList(files);
+                setCurrentFiles(files);
+                setFilesList(files.filter(file => file.isFile()));
             })
             .catch(e => {
                 Toast.show({
@@ -58,7 +72,7 @@ const FetchMusicComponent = () => {
     const itemSeparator = () => (<View style={styles.itemSeparator} />);
 
     const renderItem = ({ item }: { item: RNFS.ReadDirItem }) => (
-        <View>
+        <View style={styles.itemView}>
             <Text>{item.name}</Text>
             <Text>{item.path}</Text>
             <Text>{`type: ${(item.isDirectory() && 'Directory') || (item.isFile() && 'File')}`}</Text>
@@ -71,7 +85,7 @@ const FetchMusicComponent = () => {
             {itemSeparator()}
             <Button onPress={getFiles} title="scan for music" />
             <FlatList
-                data={currentFilesList}
+                data={filesList}
                 renderItem={renderItem}
                 keyExtractor={item => item.name}
                 ItemSeparatorComponent={itemSeparator}
