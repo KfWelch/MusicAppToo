@@ -1,11 +1,10 @@
 import { Album, Song } from '../models/MusicModel';
+import { getSongId } from './musicUtils';
 
 interface songIdPos {
     id: string;
     position: number;
 }
-
-const getSongId = (song: Song): string => `${song.albumName}-${song.numberInAlbum}`;
 
 const songListToPlaylist = (songList: songIdPos[], unorderedPlaylist: Song[]): Song[] => {
     unorderedPlaylist.forEach(song => {
@@ -22,19 +21,33 @@ const songListToPlaylist = (songList: songIdPos[], unorderedPlaylist: Song[]): S
     return orderedPlaylist;    
 }
 
-export const spreadOrderedAlbumShuffle = (albums: Album[]): Song[] => {
+const isRandomNumberUsed = (songList: songIdPos[], pos: number) => (songList.reduce((prevVal, currentVal) => {
+    prevVal.push(currentVal.position);
+    return prevVal;
+}, [] as number [])).includes(pos)
+
+export const spreadOrderedAlbumShuffle = (albums: Album[], individualSongs: Song[]): Song[] => {
     const songList: songIdPos[] = [];
-    const unorderedPlaylist: Song[] = [];
+    let unorderedPlaylist: Song[] = [...individualSongs];
+
+    individualSongs.forEach(song => {
+        let pos = Math.random();
+        while (isRandomNumberUsed(songList, pos)) {
+            pos = Math.random();
+        }
+        songList.push({
+            position: pos,
+            id: getSongId(song)
+        });
+    });
+
     albums.forEach(album => {
-        unorderedPlaylist.concat(album.songs);
+        unorderedPlaylist = unorderedPlaylist.concat(album.songs);
         if (album.ordered) {
             album.songs.forEach(song => {
                 let pos = Math.random();
                 // Need to make sure we aren't using the same number in our positioning
-                while ((songList.reduce((prevVal, currentVal) => {
-                    prevVal.push(currentVal.position);
-                    return prevVal;
-                }, [] as number [])).includes(pos)) {
+                while (isRandomNumberUsed(songList, pos)) {
                     pos = Math.random();
                 }
                 songList.push({
@@ -48,10 +61,7 @@ export const spreadOrderedAlbumShuffle = (albums: Album[]): Song[] => {
             const albumLength = album.songs.length;
             songs.forEach((song, index) => {
                 let pos = (Math.random() + index) / albumLength;
-                while ((songList.reduce((prevVal, currentVal) => {
-                    prevVal.push(currentVal.position);
-                    return prevVal;
-                }, [] as number [])).includes(pos)) {
+                while (isRandomNumberUsed(songList, pos)) {
                     pos = (Math.random() + index) / albumLength;
                 }
                 songList.push({
