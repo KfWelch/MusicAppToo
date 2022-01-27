@@ -1,5 +1,6 @@
+import Slider from "@react-native-community/slider";
 import React from "react";
-import { ProgressBarAndroidBase, SafeAreaView, TouchableOpacity, View } from "react-native";
+import { SafeAreaView, TouchableOpacity, View } from "react-native";
 import TrackPlayer, { State, usePlaybackState, useProgress } from 'react-native-track-player';
 import Icon from "react-native-vector-icons/AntDesign";
 import styles from "./PlaybackControl.style";
@@ -18,20 +19,21 @@ interface PlaybackControlProps {
 
 const PlaybackControl = (props: PlaybackControlProps) => {
     const { play, pause, stop, restart, seek, setVol, skipForward, skipBack, skipTo } = props;
-    const progress = useProgress();
-    const playbackState = usePlaybackState();
-    const playing = playbackState === State.Playing;
+    const progress = useProgress(50);
+    const playing = usePlaybackState() === State.Playing;
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.progressContainer}>
-                <ProgressBarAndroidBase
-                    progress={progress.position / progress.duration}
+                <Slider
+                    value={progress.position}
+                    minimumValue={0}
+                    maximumValue={progress.duration}
                 />
             </View>
             <View style={styles.controlsContainer}>
                 <TouchableOpacity onPress={skipBack}>
-                    <Icon name="stepBackward" size={30}/>
+                    <Icon name="stepbackward" size={30} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => playing ? pause() : play()}>
                     <Icon name={playing ? 'pause' : 'caretright'} size={40} />

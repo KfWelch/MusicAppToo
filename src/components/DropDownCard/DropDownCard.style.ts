@@ -1,9 +1,9 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 
-
+const width = Dimensions.get('window').width;
 const styles = StyleSheet.create({
     container: {
-        width: '95%',
+        width: width * .95,
         flexDirection: 'column',
         borderColor: '#000000',
         borderRadius: 7,
@@ -16,8 +16,14 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center'
     },
+    mainItem: {
+        flexDirection: 'column'
+    },
     text: {
         fontSize: 16
+    },
+    subText: {
+        fontSize: 14
     },
     dropDownButton: {
         height: 60,

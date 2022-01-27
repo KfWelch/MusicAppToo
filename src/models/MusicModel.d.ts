@@ -5,6 +5,7 @@ export interface Artist {
 
 export interface Album {
     albumName: string;
+    artistName: string;
     category?: string;
     year?: number;
     songs: Song[];
@@ -21,4 +22,11 @@ export interface Song {
     path?: string;
     position?: number;
     weight?: number
+}
+
+export interface Playlist {
+    name: string;
+    albums: Album[];
+    songs: Song[];
+    playArray: Song[];
 }

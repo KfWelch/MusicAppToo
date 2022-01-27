@@ -12,12 +12,16 @@ const AlbumList = () => {
     const currentArtist = albums.selectedArtist;
     const currentAlbums = albums.artists.find(artist => artist.artist === currentArtist?.artist)?.albums;
 
-    const selectSong = (albumName: string, songText: string) => {
+    const selectSong = async (albumName: string, songText: string) => {
         const tracks: Track[] = [];
+        console.log('albumName and songText', albumName, songText);
         if (songText === albumName) {
-            currentAlbums?.find(album => album.albumName === albumName)?.songs.forEach(song => {
-                tracks.push(convertSongToTrack(song));
-            });
+            const songs = currentAlbums?.find(album => album.albumName === albumName)?.songs;
+            if (songs) {
+                songs.forEach(song => {
+                    tracks.push(convertSongToTrack(song));
+                });
+            }
         } else {
             const song = currentAlbums?.find(album => album.albumName === albumName)?.songs.find(song => song.title === songText);
             if (song) {
@@ -29,7 +33,8 @@ const AlbumList = () => {
 
     const renderItem = ({ item }: { item: Album }) => (
         <DropDownCard
-            mainItem={`${item.albumName} - ${item.songs.length} songs`}
+            mainItem={item.albumName}
+            mainItemHelperText={`${item.songs.length} songs`}
             subItems={item.songs.reduce((prevVal, currVal) => prevVal.concat(currVal.title), [] as string[])}
             onItemClick={text => selectSong(item.albumName, text)}
         />
@@ -47,4 +52,4 @@ const AlbumList = () => {
     )
 }
 
-export default AlbumList
+export default AlbumList;

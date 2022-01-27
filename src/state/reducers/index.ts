@@ -1,12 +1,33 @@
 import { combineReducers } from 'redux';
 import { TypedUseSelectorHook, useSelector } from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { persistReducer } from 'redux-persist';
 import { DeepPartial } from '../../models/MappedTypes.d';
 import asyncReducer from './asyncAPI';
 import { Albums } from './Albums';
+import { Playlist } from './Playlist';
+import { Options } from './Options';
+
+const persistAlbumsConfig = {
+    key: 'albums',
+    storage: AsyncStorage
+};
+
+const persistPlaylistsConfig = {
+    key: 'playlist',
+    storage: AsyncStorage
+};
+
+const persistOptionsConfig = {
+    key: 'options',
+    storage: AsyncStorage
+};
 
 const rootReducer = combineReducers({
     async: asyncReducer,
-    Albums
+    Albums: persistReducer(persistAlbumsConfig, Albums),
+    Playlist: persistReducer(persistPlaylistsConfig, Playlist),
+    Options: persistReducer(persistOptionsConfig, Options)
 });
 
 export default rootReducer;

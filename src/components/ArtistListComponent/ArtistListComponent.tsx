@@ -21,7 +21,8 @@ const ArtistList = () => {
 
     const renderItem = ({ item }: { item: Artist }) => (
         <DropDownCard
-            mainItem={`${item.artist} - ${item.albums.length} albums`}
+            mainItem={item.artist}
+            mainItemHelperText={`${item.albums.length} albums`}
             onItemClick={(text) => selectArtistFromList(item.artist, text)}
             subItems={item.albums.reduce((prevVal, currVal) => prevVal.concat(currVal.albumName), [] as string[])}
         />
