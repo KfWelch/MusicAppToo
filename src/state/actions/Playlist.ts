@@ -10,8 +10,12 @@ export const REMOVE_SONG_FROM_PLAYLIST = 'PLAYLIST/REMOVE_SONG_FROM_PLAYLIST';
 export const ADD_ALBUM_TO_PLAYLIST = 'PLAYLIST/ADD_ALBUM_TO_PLAYLIST';
 export const REMOVE_ALBUM_FROM_PLAYLIST = 'PLAYLIST/REMOVE_ALBUM_FROM_PLAYLIST';
 export const SET_CURRENT_PLAYLIST = 'PLAYLIST/SET_CURRENT';
+export const SET_ALBUM_AS_PLAYLIST = 'PLAYLIST/SET_ALBUM_AS';
+export const SET_ALBUM_ORDERED = 'PLAYLIST/SET_ALBUM_ORDERED';
+export const SET_SONG_WEIGHT = 'PLAYLIST/SET_SONG_WEIGHT';
 export const SHUFFLE_CURRENT_PLAYLIST = 'PLAYLIST/SHUFFLE_CURRENT';
 export const SET_SAVED_PLAYLISTS = 'PLAYLIST/SET_SAVED_LISTS';
+export const REMOVE_PLAYLIST = 'PLAYLIST/REMOVE';
 
 export enum OrderedType {
     NONE,
@@ -65,9 +69,9 @@ export const addAlbumToPlaylist = (album: Album, playlistName: string) => ({
     payload: { album, playlistName }
 } as const);
 
-export const removeAlbumFromPlaylist = (albumName: string, playlistName: string) => ({
+export const removeAlbumFromPlaylist = (albumId: string, playlistName: string) => ({
     type: REMOVE_ALBUM_FROM_PLAYLIST,
-    payload: { albumName, playlistName }
+    payload: { albumId, playlistName }
 } as const);
 
 export const setCurrentPlaylist = (playlist: Playlist) => ({
@@ -75,14 +79,34 @@ export const setCurrentPlaylist = (playlist: Playlist) => ({
     payload: playlist
 } as const);
 
-export const shuffleCurrentPlaylist = (playlistName: string, orderedType: OrderedType) => ({
+export const setAlbumAsCurrentPlaylist = (album: Album) => ({
+    type: SET_ALBUM_AS_PLAYLIST,
+    payload: album
+} as const);
+
+export const setAlbumOrdered = (albumId: string, ordered: boolean, playlistName?: string) => ({
+    type: SET_ALBUM_ORDERED,
+    payload: { playlistName, albumId, ordered }
+} as const);
+
+export const setSongWeight = (songId: string, weight: number, playlistName?: string) => ({
+    type: SET_SONG_WEIGHT,
+    payload: { playlistName, songId, weight }
+} as const);
+
+export const shuffleCurrentPlaylist = (orderedType: OrderedType) => ({
     type: SHUFFLE_CURRENT_PLAYLIST,
-    payload: { playlistName, orderedType }
+    payload: orderedType
 } as const);
 
 export const setSavedPlaylists = (playlists: Playlist[]) => ({
     type: SET_SAVED_PLAYLISTS,
     payload: playlists
+} as const);
+
+export const removePlaylist = (playlistName: string) => ({
+    type: REMOVE_PLAYLIST,
+    payload: playlistName
 } as const);
 
 export type Actions =
@@ -96,5 +120,9 @@ export type Actions =
     | ReturnType<typeof addAlbumToPlaylist>
     | ReturnType<typeof removeAlbumFromPlaylist>
     | ReturnType<typeof setCurrentPlaylist>
+    | ReturnType<typeof setAlbumAsCurrentPlaylist>
+    | ReturnType<typeof setAlbumOrdered>
+    | ReturnType<typeof setSongWeight>
     | ReturnType<typeof shuffleCurrentPlaylist>
-    | ReturnType<typeof setSavedPlaylists>;
+    | ReturnType<typeof setSavedPlaylists>
+    | ReturnType<typeof removePlaylist>;
