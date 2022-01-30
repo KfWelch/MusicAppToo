@@ -79,12 +79,14 @@ const FetchMusicComponent = () => {
                         title,
                         albumName: directories[i].name,
                         numberInAlbum,
-                        path: songFile.path
+                        path: songFile.path,
+                        weight: 1
                     };
                     songs.push(song);
                 });
                 const album: Album = {
                     albumName: directories[i].name,
+                    artistName: artist.artist,
                     songs
                 };
                 tempArtist.albums = tempArtist.albums.concat([album]);
@@ -109,25 +111,11 @@ const FetchMusicComponent = () => {
 
     const itemSeparator = () => (<View style={styles.itemSeparator} />);
 
-    const renderItem = ({ item }: { item: RNFS.ReadDirItem }) => (
-        <View style={styles.itemView}>
-            <Text>{item.name}</Text>
-            <Text>{item.path}</Text>
-            <Text>{`type: ${(item.isDirectory() && 'Directory') || (item.isFile() && 'File')}`}</Text>
-        </View>
-    );
-
     return (
         <SafeAreaView style={styles.container}>
             <Button onPress={() => getPermission()} title="get folder permission" />
             {itemSeparator()}
             <Button onPress={getFiles} title="scan for music" />
-            {/* <FlatList
-                data={filesList}
-                renderItem={renderItem}
-                keyExtractor={item => item.name}
-                ItemSeparatorComponent={itemSeparator}
-            /> */}
         </SafeAreaView>
     )
 };
