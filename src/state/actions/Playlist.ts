@@ -1,33 +1,32 @@
 import { Album, Playlist, Song } from '../../models/MusicModel';
+import { OrderedType, PlaybackMode, RandomizationType } from '../reducers/Playlist';
 
 export const ADD_SONG = 'PLAYLIST/ADD_SONG';
 export const REMOVE_SONG = 'PLAYLIST/REMOVE_SONG';
 export const ADD_ALBUM = 'PLAYLIST/ADD_ALBUM';
 export const REMOVE_ALBUM = 'PLAYLIST/REMOVE_ALBUM';
 export const GENERATE_PLAYLIST = 'PLAYLIST/GENERATE_PLAYLIST';
+
 export const ADD_SONG_TO_PLAYLIST = 'PLAYLIST/ADD_SONG_TO_PLAYLIST';
 export const REMOVE_SONG_FROM_PLAYLIST = 'PLAYLIST/REMOVE_SONG_FROM_PLAYLIST';
 export const ADD_ALBUM_TO_PLAYLIST = 'PLAYLIST/ADD_ALBUM_TO_PLAYLIST';
 export const REMOVE_ALBUM_FROM_PLAYLIST = 'PLAYLIST/REMOVE_ALBUM_FROM_PLAYLIST';
+
 export const SET_CURRENT_PLAYLIST = 'PLAYLIST/SET_CURRENT';
 export const SET_ALBUM_AS_PLAYLIST = 'PLAYLIST/SET_ALBUM_AS';
+
 export const SET_ALBUM_ORDERED = 'PLAYLIST/SET_ALBUM_ORDERED';
 export const SET_SONG_WEIGHT = 'PLAYLIST/SET_SONG_WEIGHT';
 export const SHUFFLE_CURRENT_PLAYLIST = 'PLAYLIST/SHUFFLE_CURRENT';
+
 export const SET_SAVED_PLAYLISTS = 'PLAYLIST/SET_SAVED_LISTS';
 export const REMOVE_PLAYLIST = 'PLAYLIST/REMOVE';
 
-export enum OrderedType {
-    NONE,
-    SPREAD,
-    RANDOM
-};
-
-export enum RandomizationType {
-    NONE,
-    WEIGHTLESS,
-    WEIGHTED
-}
+export const SET_PLAYBACK_MODE = 'PLAYLIST/SET_PLAYBACK_MODE';
+export const SET_REPEAT = 'PLAYLIST/SET_REPEAT';
+export const SET_ORDERED_TYPE = 'PLAYLIST/SET_ORDERED_TYPE';
+export const SET_RESHUFFLE = 'PLAYLIST/SET_RESHUFFLE';
+export const SET_RANDOMIZE_TYPE = 'PLAYLIST/SET_RANDOMIZE_TYPE';
 
 export const addSong = (song: Song) => ({
     type: ADD_SONG,
@@ -94,9 +93,8 @@ export const setSongWeight = (songId: string, weight: number, playlistName?: str
     payload: { playlistName, songId, weight }
 } as const);
 
-export const shuffleCurrentPlaylist = (orderedType: OrderedType) => ({
-    type: SHUFFLE_CURRENT_PLAYLIST,
-    payload: orderedType
+export const shuffleCurrentPlaylist = () => ({
+    type: SHUFFLE_CURRENT_PLAYLIST
 } as const);
 
 export const setSavedPlaylists = (playlists: Playlist[]) => ({
@@ -107,6 +105,31 @@ export const setSavedPlaylists = (playlists: Playlist[]) => ({
 export const removePlaylist = (playlistName: string) => ({
     type: REMOVE_PLAYLIST,
     payload: playlistName
+} as const);
+
+export const setPlaybackMode = (playbackMode: PlaybackMode) => ({
+    type: SET_PLAYBACK_MODE,
+    payload: playbackMode
+} as const);
+
+export const setRepeat = (repeat: boolean) => ({
+    type: SET_REPEAT,
+    payload: repeat
+} as const);
+
+export const setOrderedType = (orderedType: OrderedType) => ({
+    type: SET_ORDERED_TYPE,
+    payload: orderedType
+} as const);
+
+export const setReshuffle = (reshuffle: boolean) => ({
+    type: SET_RESHUFFLE,
+    payload: reshuffle
+} as const);
+
+export const setRandomizeType = (randomizeType: RandomizationType) => ({
+    type: SET_RANDOMIZE_TYPE,
+    payload: randomizeType
 } as const);
 
 export type Actions =
@@ -125,4 +148,9 @@ export type Actions =
     | ReturnType<typeof setSongWeight>
     | ReturnType<typeof shuffleCurrentPlaylist>
     | ReturnType<typeof setSavedPlaylists>
-    | ReturnType<typeof removePlaylist>;
+    | ReturnType<typeof removePlaylist>
+    | ReturnType<typeof setPlaybackMode>
+    | ReturnType<typeof setRepeat>
+    | ReturnType<typeof setOrderedType>
+    | ReturnType<typeof setReshuffle>
+    | ReturnType<typeof setRandomizeType>;

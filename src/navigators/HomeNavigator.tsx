@@ -5,9 +5,14 @@ import React from "react";
 import { Pressable, useColorScheme, View } from "react-native";
 import TrackPlayer, { State, usePlaybackState } from "react-native-track-player";
 import Icon from "react-native-vector-icons/AntDesign";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ArtistScreen from "../screens/ArtistScreen/ArtistScreen";
 import Home from "../screens/Home/Home";
+import NewPlaylist from "../screens/NewPlaylist/NewPlaylist";
 import Options from "../screens/Options/Options";
+import Playback from "../screens/PlaybackScreen/Playback";
+import Playlist from "../screens/Playlist/Playlist";
+import PlaylistList from "../screens/PlaylistList/PlaylistList";
 import { useTypedSelector } from "../state/reducers";
 import styles from "./HomeNavigator.style";
 
@@ -15,14 +20,19 @@ export type HomeStackNavigatorParams = {
     Home: undefined;
     ArtistScreen: undefined;
     Options: undefined;
+    NewPlaylist: undefined;
+    Playback: undefined;
+    Playlist: undefined;
+    PlaylistList: undefined;
 };
 const Stack = createNativeStackNavigator<HomeStackNavigatorParams>();
 
 export const HomeNavigator = () => {
     const options = useTypedSelector(state => state.Options);
+    const currentArtist = useTypedSelector(state => state.Albums.selectedArtist);
+    const savedPlaylists = useTypedSelector(state => state.Playlist.savedPlaylists);
     const colorScheme = useColorScheme();
     const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : colorScheme === 'dark';
-    const currentArtist = useTypedSelector(state => state.Albums.selectedArtist);
     const playbackState = usePlaybackState();
     const playing = playbackState === State.Playing;
 
@@ -53,6 +63,18 @@ export const HomeNavigator = () => {
         </Pressable>
     );
 
+    const playlistButton = (navigation: NavigationProp<any>) => (
+        <Pressable onPress={() => navigation.navigate(savedPlaylists.length ? 'PlaylistList' : 'NewPlaylist')}>
+            <MaterialCommunityIcons name={savedPlaylists.length ? 'playlist-music' : 'playlist-plus'} size={25} />
+        </Pressable>
+    );
+
+    const addPlaylistButton = (navigation: NavigationProp<any>) => (
+        <Pressable onPress={() => navigation.navigate('NewPlaylist')}>
+            <MaterialCommunityIcons name="playlist-plus" size={30} />
+        </Pressable>
+    );
+
     return (
         <NavigationContainer theme={isDarkMode ? DarkTheme : DefaultTheme}>
             <Stack.Navigator initialRouteName="Home">
@@ -64,6 +86,7 @@ export const HomeNavigator = () => {
                         headerRight: () => (
                             <View style={styles.headerContainer}>
                                 {optionsButton(navigation)}
+                                {playlistButton(navigation)}
                                 {playbackButton()}
                             </View>
                         )
@@ -81,6 +104,39 @@ export const HomeNavigator = () => {
                     component={Options}
                     options={{
                         headerTitle: 'Options'
+                    }}
+                />
+                <Stack.Screen
+                    name="NewPlaylist"
+                    component={NewPlaylist}
+                    options={{
+                        headerTitle: 'New Playlist'
+                    }}
+                />
+                <Stack.Screen
+                    name="PlaylistList"
+                    component={PlaylistList}
+                    options={({ navigation }) => ({
+                        headerTitle: 'Saved Playlists',
+                        headerRight: () => (
+                            <View>
+                                {addPlaylistButton(navigation)}
+                            </View>
+                        )
+                    })}
+                />
+                <Stack.Screen
+                    name="Playback"
+                    component={Playback}
+                    options={{
+                        headerTitle: 'Playback'
+                    }}
+                />
+                <Stack.Screen
+                    name="Playlist"
+                    component={Playlist}
+                    options={{
+                        headerTitle: 'Playlist'
                     }}
                 />
             </Stack.Navigator>

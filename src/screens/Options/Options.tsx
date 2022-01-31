@@ -23,7 +23,6 @@ const Options = () => {
         <View style={styles.cardView}>
             <Text style={styles.text}>{name}</Text>
             <Switch value={value} onValueChange={value => {
-                console.log(value)
                 dispatch(setOptionByName(name, value));
             }} />
         </View>

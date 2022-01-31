@@ -8,7 +8,6 @@ import {
     ADD_SONG,
     ADD_SONG_TO_PLAYLIST,
     GENERATE_PLAYLIST,
-    OrderedType,
     REMOVE_ALBUM,
     REMOVE_ALBUM_FROM_PLAYLIST,
     REMOVE_PLAYLIST,
@@ -17,9 +16,31 @@ import {
     SET_ALBUM_AS_PLAYLIST,
     SET_ALBUM_ORDERED,
     SET_CURRENT_PLAYLIST,
+    SET_ORDERED_TYPE,
+    SET_PLAYBACK_MODE,
+    SET_RANDOMIZE_TYPE,
+    SET_REPEAT,
+    SET_RESHUFFLE,
     SET_SONG_WEIGHT,
     SHUFFLE_CURRENT_PLAYLIST
 } from '../actions/Playlist';
+
+export enum PlaybackMode {
+    NORMAL = 'Normal',
+    SHUFFLE = 'Shuffle',
+    RANDOMIZE = 'Randomize'
+}
+
+export enum OrderedType {
+    NONE = 'None',
+    SPREAD = 'Spread',
+    RANDOM = 'Random'
+};
+
+export enum RandomizationType {
+    WEIGHTLESS = 'Weightless',
+    WEIGHTED = 'Weighted'
+}
 
 interface PlaylistState {
     currentPlaylist: PlaylistModel | null;
@@ -28,6 +49,15 @@ interface PlaylistState {
         individualSongs: Song[];
         albums: Album[];
     };
+    playbackOptions: {
+        mode: PlaybackMode;
+        repeat: boolean;
+        shuffleOptions: {
+            orderedType: OrderedType;
+            reshuffleOnRepeat: boolean;
+        };
+        randomizeOptions: RandomizationType
+    }
 };
 
 const initialState: PlaylistState = {
@@ -36,6 +66,15 @@ const initialState: PlaylistState = {
     newPlaylist: {
         individualSongs: [],
         albums: []
+    },
+    playbackOptions: {
+        mode: PlaybackMode.NORMAL,
+        repeat: false,
+        shuffleOptions: {
+            orderedType: OrderedType.NONE,
+            reshuffleOnRepeat: false
+        },
+        randomizeOptions: RandomizationType.WEIGHTLESS
     }
 };
 
@@ -237,7 +276,7 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
             return state;
         }
         case SHUFFLE_CURRENT_PLAYLIST: {
-            switch (action.payload) {
+            switch (state.playbackOptions.shuffleOptions.orderedType) {
                 case OrderedType.NONE:
                     // TODO implement normal shuffle
                     break;
@@ -265,6 +304,52 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                 savedPlaylists: state.savedPlaylists.splice(playlistIndex, 1)
             };
         }
+        case SET_PLAYBACK_MODE:
+            return {
+                ...state,
+                playbackOptions: {
+                    ...state.playbackOptions,
+                    mode: action.payload
+                }
+            };
+        case SET_REPEAT:
+            return {
+                ...state,
+                playbackOptions: {
+                    ...state.playbackOptions,
+                    repeat: action.payload
+                }
+            };
+        case SET_ORDERED_TYPE:
+            return {
+                ...state,
+                playbackOptions: {
+                    ...state.playbackOptions,
+                    shuffleOptions: {
+                        ...state.playbackOptions.shuffleOptions,
+                        orderedType: action.payload
+                    }
+                }
+            };
+        case SET_RESHUFFLE:
+            return {
+                ...state,
+                playbackOptions: {
+                    ...state.playbackOptions,
+                    shuffleOptions: {
+                        ...state.playbackOptions.shuffleOptions,
+                        reshuffleOnRepeat: action.payload
+                    }
+                }
+            };
+        case SET_RANDOMIZE_TYPE:
+            return {
+                ...state,
+                playbackOptions: {
+                    ...state.playbackOptions,
+                    randomizeOptions: action.payload
+                }
+            }
         default:
             return state;
     }

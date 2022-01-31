@@ -35,6 +35,7 @@ const AlbumCard = (props: AlbumCardProps) => {
 
     return (
         <View style={styles.cardView}>
+            <MaterialCommunityIcons name="music-box-multiple-outline" size={40} />
             <View style={styles.infoView}>
                 <Text style={styles.title}>{album.albumName}</Text>
                 <Text style={styles.subtitle}>{album.artistName}</Text>

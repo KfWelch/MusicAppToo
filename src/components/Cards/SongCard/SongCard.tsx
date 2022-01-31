@@ -36,10 +36,11 @@ const SongCard = (props: SongCardProps) => {
 
     return (
         <View style={styles.cardView}>
+            <MaterialCommunityIcons name="music-box-outline" size={40} />
             <Text style={styles.indexNumber}>{`${song.position || song.numberInAlbum})`}</Text>
             <View style={styles.infoView}>
                 <Text style={styles.title}>{song.title}</Text>
-                <Text style={styles.subtitle}>{song.length}</Text>
+                <Text style={styles.subtitle}>{song.length || ''}</Text>
             </View>
             {weightView()}
             {addView()}
