@@ -48,29 +48,29 @@ export const HomeNavigator = () => {
     };
 
     const playbackButton = () => playable() && (playing ? (
-        <Pressable onPress={TrackPlayer.pause} onLongPress={TrackPlayer.stop}>
+        <Pressable style={styles.optionButton} onPress={TrackPlayer.pause} onLongPress={TrackPlayer.stop}>
             <Icon name="caretright" size={20} />
         </Pressable>
     ) : (
-        <Pressable onPress={TrackPlayer.play}>
+        <Pressable style={styles.optionButton} onPress={TrackPlayer.play}>
             <Icon name="pause" size={20} />
         </Pressable>
     ));
 
     const optionsButton = (navigation: NavigationProp<any>) => (
-        <Pressable onPress={() => navigation.navigate('Options')}>
+        <Pressable style={styles.optionButton} onPress={() => navigation.navigate('Options')}>
             <Icon name="setting" size={20} />
         </Pressable>
     );
 
     const playlistButton = (navigation: NavigationProp<any>) => (
-        <Pressable onPress={() => navigation.navigate(savedPlaylists.length ? 'PlaylistList' : 'NewPlaylist')}>
+        <Pressable style={styles.optionButton} onPress={() => navigation.navigate(savedPlaylists.length ? 'PlaylistList' : 'NewPlaylist')}>
             <MaterialCommunityIcons name={savedPlaylists.length ? 'playlist-music' : 'playlist-plus'} size={25} />
         </Pressable>
     );
 
     const addPlaylistButton = (navigation: NavigationProp<any>) => (
-        <Pressable onPress={() => navigation.navigate('NewPlaylist')}>
+        <Pressable style={styles.optionButton} onPress={() => navigation.navigate('NewPlaylist')}>
             <MaterialCommunityIcons name="playlist-plus" size={30} />
         </Pressable>
     );
@@ -81,7 +81,7 @@ export const HomeNavigator = () => {
                 <Stack.Screen
                     name="Home"
                     component={Home}
-                    options={({ navigation }) => ({
+                    options={({ navigation }: { navigation: NavigationProp<any> }) => ({
                         headerTitle: 'Home',
                         headerRight: () => (
                             <View style={styles.headerContainer}>
@@ -116,7 +116,7 @@ export const HomeNavigator = () => {
                 <Stack.Screen
                     name="PlaylistList"
                     component={PlaylistList}
-                    options={({ navigation }) => ({
+                    options={({ navigation }: { navigation: NavigationProp<any> }) => ({
                         headerTitle: 'Saved Playlists',
                         headerRight: () => (
                             <View>

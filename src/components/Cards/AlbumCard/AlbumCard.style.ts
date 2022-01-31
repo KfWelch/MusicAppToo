@@ -2,7 +2,8 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
     title: {
-        fontSize: 16
+        fontSize: 16,
+        flexWrap: 'nowrap'
     },
     subtitle: {
         fontSize: 14
@@ -12,11 +13,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 15,
-        height: 75
+        padding: 10,
+        height: 100,
+        alignSelf: 'stretch',
+        alignContent: 'center'
     },
     infoView: {
-        flexDirection: 'column'
+        flexDirection: 'column',
+        width: '50%'
     }
 });
 

@@ -16,7 +16,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 15,
-        height: 75
+        height: 85,
+        alignSelf: 'stretch'
     },
     infoView: {
         flexDirection: 'column'

@@ -22,6 +22,8 @@ const PlaylistCard = (props: PlaylistCardProps) => {
     const { playlist } = props;
     const dispatch = useDispatch();
 
+    const flatListItemSeparator = () => (<View style={styles.flatlistSeparator} />);
+
     const renderAlbumSong = ({ item }: { item: Song }) => (
         <SongCard
             song={item}
@@ -34,6 +36,7 @@ const PlaylistCard = (props: PlaylistCardProps) => {
             <FlatList
                 data={album.songs}
                 renderItem={renderAlbumSong}
+                ItemSeparatorComponent={flatListItemSeparator}
             />
         </View>
     );
@@ -43,7 +46,6 @@ const PlaylistCard = (props: PlaylistCardProps) => {
             mainItemCard={(
                 <AlbumCard
                     album={item}
-                    setAlbumOrdered={ordered => dispatch(setAlbumOrdered(getAlbumId(item), ordered, playlist.name))}
                     onRemove={() => dispatch(removeAlbumFromPlaylist(getAlbumId(item), playlist.name))}
                 />
             )}
@@ -64,10 +66,14 @@ const PlaylistCard = (props: PlaylistCardProps) => {
             <FlatList
                 data={playlist.albums}
                 renderItem={renderPlaylistAlbums}
+                key="Albums"
+                ItemSeparatorComponent={flatListItemSeparator}
             />
             <FlatList
                 data={playlist.songs}
                 renderItem={renderPlaylistSongs}
+                key="Songs"
+                ItemSeparatorComponent={flatListItemSeparator}
             />
         </View>
     );

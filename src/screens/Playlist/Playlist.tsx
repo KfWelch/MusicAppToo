@@ -104,14 +104,18 @@ const Playlist = () => {
 
     const detailsView = () => (
         <SafeAreaView style={styles.container}>
-            <FlatList
-                data={currentPlaylist?.albums}
-                renderItem={albumView}
-            />
-            <FlatList
-                data={currentPlaylist?.songs}
-                renderItem={songView}
-            />
+            <View style={styles.albumsView}>
+                <FlatList
+                    data={currentPlaylist?.albums}
+                    renderItem={albumView}
+                />
+            </View>
+            <View style={styles.songsView}>
+                <FlatList
+                    data={currentPlaylist?.songs}
+                    renderItem={songView}
+                />
+            </View>
             {controlBar()}
         </SafeAreaView>
     );

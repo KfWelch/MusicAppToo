@@ -66,7 +66,7 @@ const FetchMusicComponent = () => {
                 const songs: Song[] = [];
                 files.forEach((songFile, index) => {
                     const nameStart = songFile.name.search(/[a-zA-Z]/);
-                    const title = songFile.name.substring(nameStart);
+                    const title = songFile.name.substring(nameStart, songFile.name.lastIndexOf('.'));
                     // minus one because there's a space between the leading number and the title
                     const leadingNumber = songFile.name.substring(0, nameStart - 1);
                     let numberInAlbum = 0;

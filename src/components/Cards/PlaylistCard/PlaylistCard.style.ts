@@ -20,10 +20,14 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 15,
-        height: 70
+        height: 70,
+        alignSelf: 'stretch'
     },
     infoView: {
         flexDirection: 'column'
+    },
+    flatlistSeparator: {
+        height: 3
     }
 });
 

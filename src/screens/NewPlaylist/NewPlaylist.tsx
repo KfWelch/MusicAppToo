@@ -9,10 +9,11 @@ import SongCard from '../../components/Cards/SongCard/SongCard';
 import { addAlbum, addSong, generatePlaylist, removeAlbum, removeSong } from '../../state/actions/Playlist';
 import ComponentDropDown from '../../components/Cards/ComponentDropDown/ComponentDropDown';
 import AlbumCard from '../../components/Cards/AlbumCard/AlbumCard';
-import { Button, FlatList, SafeAreaView, Text } from 'react-native';
+import { Button, FlatList, SafeAreaView, Text, View } from 'react-native';
 import ArtistCard from '../../components/Cards/ArtistCard/ArtistCard';
 import { getAlbumId, getSongId } from '../../utils/musicUtils';
 import { TextInput } from 'react-native-gesture-handler';
+import styles from './NewPlaylist.style';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -54,7 +55,7 @@ const NewPlaylist = () => {
     );
 
     const availableMusicView = () => (
-        <SafeAreaView>
+        <SafeAreaView style={styles.flatListView}>
             <FlatList
                 data={artists}
                 renderItem={availableArtistView}
@@ -81,19 +82,23 @@ const NewPlaylist = () => {
     );
 
     const selectedMusicView = () => (
-        <SafeAreaView>
+        <SafeAreaView style={styles.container}>
             <Text>Enter playlist name</Text>
             <TextInput value={playlistName} onChangeText={setPlaylistName} />
-            <Text>Albums</Text>
-            <FlatList
-                data={newPlaylist.albums}
-                renderItem={selectedAlbumView}
-            />
-            <Text>Individual songs</Text>
-            <FlatList
-                data={newPlaylist.individualSongs}
-                renderItem={selectedSongView}
-            />
+            <View style={styles.selectedAlbums}>
+                <Text>Albums</Text>
+                <FlatList
+                    data={newPlaylist.albums}
+                    renderItem={selectedAlbumView}
+                />
+            </View>
+            <View style={styles.selectedSongs}>
+                <Text>Individual songs</Text>
+                <FlatList
+                    data={newPlaylist.individualSongs}
+                    renderItem={selectedSongView}
+                />
+            </View>
             <Button
                 onPress={() => {
                     if (savedPlaylists.some(playlist => playlist.name === playlistName)) {

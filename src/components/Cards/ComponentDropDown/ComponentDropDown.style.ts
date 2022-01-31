@@ -9,7 +9,6 @@ const styles = StyleSheet.create({
         borderWidth: 1
     },
     lineContainer: {
-        height: 75,
         padding: 15,
         flexDirection: 'row',
         justifyContent: 'space-between',
