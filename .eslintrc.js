@@ -18,6 +18,9 @@ module.exports = {
         '@typescript-eslint/no-shadow': ['error'],
         'no-shadow': 'off',
         'no-undef': 'off',
+        'import/prefer-default-export': 0,
+        'no-extra-semi': 0,
+        'semi': 1
       },
     },
   ],
