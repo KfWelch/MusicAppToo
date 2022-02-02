@@ -3,7 +3,8 @@ import { StyleSheet } from "react-native";
 const styles = StyleSheet.create({
     container: {
         width: '95%',
-        flexDirection:'column'
+        flexDirection:'column',
+        alignSelf: 'center'
     },
     indexNumber: {
         fontSize: 18
@@ -15,7 +16,7 @@ const styles = StyleSheet.create({
         fontSize: 14
     },
     cardView: {
-        width: '100%',
+        width: '85%',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',

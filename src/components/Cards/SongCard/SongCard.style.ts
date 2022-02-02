@@ -2,7 +2,8 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
     indexNumber: {
-        fontSize: 18
+        fontSize: 18,
+        flexWrap: 'wrap'
     },
     title: {
         fontSize: 16

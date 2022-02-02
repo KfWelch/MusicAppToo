@@ -5,7 +5,8 @@ export const convertSongToTrack = (song: Song): Track => {
     return {
         url: song.path || '',
         album: song.albumName,
-        title: song.title
+        title: song.title,
+        artist: song.contributingArtist
     }
 };
 

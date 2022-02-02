@@ -3,7 +3,7 @@ import { Dimensions, StyleSheet } from "react-native";
 const width = Dimensions.get('window').width;
 const styles = StyleSheet.create({
     container: {
-        width: width * .95,
+        width: '100%',
         flexDirection: 'column',
         borderRadius: 7,
         borderWidth: 1

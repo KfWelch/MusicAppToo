@@ -24,12 +24,7 @@ const PlaylistCard = (props: PlaylistCardProps) => {
 
     const flatListItemSeparator = () => (<View style={styles.flatlistSeparator} />);
 
-    const renderAlbumSong = ({ item }: { item: Song }) => (
-        <SongCard
-            song={item}
-            onWeightChange={weight => dispatch(setSongWeight(getSongId(item), weight, playlist.name))}
-        />
-    );
+    const renderAlbumSong = ({ item }: { item: Song }) => (<SongCard song={item} />);
 
     const renderAlbumFlatlist = (album: Album) => (
         <View>
@@ -56,7 +51,6 @@ const PlaylistCard = (props: PlaylistCardProps) => {
     const renderPlaylistSongs = ({ item }: { item: Song}) => (
         <SongCard
             song={item}
-            onWeightChange={weight => dispatch(setSongWeight(getSongId(item), weight, playlist.name))}
             onRemove={() => dispatch(removeSongFromPlaylist(getSongId(item), playlist.name))}
         />
     );

@@ -5,6 +5,7 @@ export const ADD_ALBUM = 'ALBUMS/ADD_ALBUM';
 export const ADD_SONGS_TO_ALBUM = 'ALBUMS/ADD_SONGS';
 export const SELECT_ARTIST = 'ALBUMS/SELECT_ARTIST';
 export const DESELECT_ARTIST = 'ALBUMS/DESELECT_ARTIST';
+export const RESET = 'ALBUMS/RESET';
 
 export const addArtist = (artist: Artist) => ({
     type: ADD_ARTIST,
@@ -30,9 +31,14 @@ export const deselectArtist = () => ({
     type: DESELECT_ARTIST
 } as const);
 
+export const resetSavedAlbums = () => ({
+    type: RESET
+} as const);
+
 export type Actions =
     ReturnType<typeof addArtist>
     | ReturnType<typeof addAlbum>
     | ReturnType<typeof addSongsToAlbum>
     | ReturnType<typeof selectArtist>
-    | ReturnType<typeof deselectArtist>;
+    | ReturnType<typeof deselectArtist>
+    | ReturnType<typeof resetSavedAlbums>;

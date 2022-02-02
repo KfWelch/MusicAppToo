@@ -39,6 +39,7 @@ const AlbumCard = (props: AlbumCardProps) => {
             <View style={styles.infoView}>
                 <Text style={styles.title}>{album.albumName}</Text>
                 <Text style={styles.subtitle}>{album.artistName}</Text>
+                <Text style={styles.subtitle}>{`${album.songs.length} songs`}</Text>
             </View>
             {orderedAlbumSelectorView(album.ordered)}
             {addView()}

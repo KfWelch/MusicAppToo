@@ -9,7 +9,7 @@ import styles from './FetchMusicComponent.style';
 import { Album, Artist, Song } from '../../models/MusicModel';
 import { useTypedSelector } from '../../state/reducers';
 import { useDispatch } from 'react-redux';
-import { addArtist } from '../../state/actions/Albums';
+import { addArtist, resetSavedAlbums } from '../../state/actions/Albums';
 
 const FetchMusicComponent = () => {
     const [currentFiles, setCurrentFiles] = useState<RNFS.ReadDirItem[]>([]);
@@ -78,6 +78,7 @@ const FetchMusicComponent = () => {
                     const song: Song = {
                         title,
                         albumName: directories[i].name,
+                        contributingArtist: artist.artist,
                         numberInAlbum,
                         path: songFile.path,
                         weight: 1
@@ -109,6 +110,10 @@ const FetchMusicComponent = () => {
         setFilesList(files.filter(file => file.isFile()));
     };
 
+    const reloadMusic = () => {
+        dispatch(resetSavedAlbums());
+    };
+
     const itemSeparator = () => (<View style={styles.itemSeparator} />);
 
     return (
@@ -116,6 +121,8 @@ const FetchMusicComponent = () => {
             <Button onPress={() => getPermission()} title="get folder permission" />
             {itemSeparator()}
             <Button onPress={getFiles} title="scan for music" />
+            {itemSeparator()}
+            <Button onPress={reloadMusic} title="Reload music" />
         </SafeAreaView>
     )
 };
