@@ -15,7 +15,8 @@ const persistAlbumsConfig = {
 
 const persistPlaylistsConfig = {
     key: 'playlist',
-    storage: AsyncStorage
+    storage: AsyncStorage,
+    blacklist: ['newPlaylist']
 };
 
 const persistOptionsConfig = {

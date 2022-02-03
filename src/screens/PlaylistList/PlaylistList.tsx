@@ -5,6 +5,7 @@ import { useTypedSelector } from '../../state/reducers';
 import { FlatList, SafeAreaView } from 'react-native';
 import { Playlist } from '../../models/MusicModel';
 import PlaylistCard from '../../components/Cards/PlaylistCard/PlaylistCard';
+import styles from './PlaylistList.style';
 
 const PlaylistList = () => {
     const dispatch = useDispatch();
@@ -19,7 +20,7 @@ const PlaylistList = () => {
     );
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={styles.container}>
             <FlatList
                 data={playlists}
                 renderItem={renderPlaylistItem}

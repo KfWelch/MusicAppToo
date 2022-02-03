@@ -21,7 +21,7 @@ const ArtistCard = (props: ArtistCardProps) => {
 
     const addView = () => onAdd && (
         <Pressable onPress={onAdd}>
-            <MaterialCommunityIcons name="plus-box-multiple-outline" size={30} />
+            <MaterialCommunityIcons name="plus-box-multiple" size={30} />
         </Pressable>
     );
 

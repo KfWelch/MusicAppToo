@@ -9,11 +9,12 @@ import SongCard from '../../components/Cards/SongCard/SongCard';
 import { addAlbum, addSong, generatePlaylist, removeAlbum, removeSong } from '../../state/actions/Playlist';
 import ComponentDropDown from '../../components/Cards/ComponentDropDown/ComponentDropDown';
 import AlbumCard from '../../components/Cards/AlbumCard/AlbumCard';
-import { Button, FlatList, SafeAreaView, Text, View } from 'react-native';
+import { Button, FlatList, SafeAreaView, Text, useColorScheme, View } from 'react-native';
 import ArtistCard from '../../components/Cards/ArtistCard/ArtistCard';
 import { getAlbumId, getSongId } from '../../utils/musicUtils';
 import { TextInput } from 'react-native-gesture-handler';
 import styles from './NewPlaylist.style';
+import color, { colorScheme } from '../../constant/Color';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -23,8 +24,13 @@ const NewPlaylist = () => {
     const savedPlaylists = useTypedSelector(state => state.Playlist.savedPlaylists);
     const dispatch = useDispatch();
     const navigation = useNavigation();
+    const options = useTypedSelector(state => state.Options);
+    const systemColorScheme = useColorScheme();
+    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
 
     const [playlistName, setPlaylistName] = useState('');
+
+    const songsInPlaylist = () => !!(newPlaylist.individualSongs.length || newPlaylist.albums.length);
     
     const availableSongView = ({ item }: { item: Song }) => (
         <SongCard song={item} onAdd={() => dispatch(addSong(item))} />
@@ -44,7 +50,7 @@ const NewPlaylist = () => {
 
     const availableArtistView = ({ item }: { item: Artist }) => (
         <ComponentDropDown
-            mainItemCard={(<ArtistCard artist={item} />)}
+            mainItemCard={(<ArtistCard artist={item} onAdd={() => item.albums.forEach(album => dispatch(addAlbum(album)))} />)}
             subItemFlatlist={(
                 <FlatList
                     data={item.albums}
@@ -55,7 +61,7 @@ const NewPlaylist = () => {
     );
 
     const availableMusicView = () => (
-        <SafeAreaView style={styles.flatListView}>
+        <SafeAreaView style={styles.container}>
             <FlatList
                 data={artists}
                 renderItem={availableArtistView}
@@ -81,24 +87,8 @@ const NewPlaylist = () => {
         <SongCard song={item} onRemove={() => dispatch(removeSong(getSongId(item)))} />
     );
 
-    const selectedMusicView = () => (
-        <SafeAreaView style={styles.container}>
-            <Text>Enter playlist name</Text>
-            <TextInput value={playlistName} onChangeText={setPlaylistName} />
-            <View style={styles.selectedAlbums}>
-                <Text>Albums</Text>
-                <FlatList
-                    data={newPlaylist.albums}
-                    renderItem={selectedAlbumView}
-                />
-            </View>
-            <View style={styles.selectedSongs}>
-                <Text>Individual songs</Text>
-                <FlatList
-                    data={newPlaylist.individualSongs}
-                    renderItem={selectedSongView}
-                />
-            </View>
+    const makePlaylistButton = () => (songsInPlaylist() && playlistName) ? (
+        <View style={styles.makeButtonView}>
             <Button
                 onPress={() => {
                     if (savedPlaylists.some(playlist => playlist.name === playlistName)) {
@@ -117,6 +107,44 @@ const NewPlaylist = () => {
                 }}
                 title="Make playlist"
             />
+        </View>
+    ) : null;
+
+    const selectedMusicView = () => (
+        <SafeAreaView style={styles.container}>
+            <TextInput
+                style={{
+                    ...styles.textInput,
+                    backgroundColor: colorScheme[isDarkMode ? 'dark' : 'light'].contentBackground
+                }}
+                value={playlistName} onChangeText={setPlaylistName}
+                placeholder="Enter Playlist Name"
+                editable={songsInPlaylist()}
+                textAlign='center'
+            />
+            <View style={styles.selectedAlbums}>
+                <ComponentDropDown
+                    mainItemCard={(<Text style={styles.titleText}>Albums</Text>)}
+                    subItemFlatlist={(
+                        <FlatList
+                            data={newPlaylist.albums}
+                            renderItem={selectedAlbumView}
+                        />
+                    )}
+                />
+            </View>
+            <View style={styles.selectedSongs}>
+                <ComponentDropDown
+                    mainItemCard={(<Text style={styles.titleText}>Individual songs</Text>)}
+                    subItemFlatlist={(
+                        <FlatList
+                            data={newPlaylist.individualSongs}
+                            renderItem={selectedSongView}
+                        />
+                    )}
+                />
+            </View>
+            {makePlaylistButton()}
         </SafeAreaView>
     );
 

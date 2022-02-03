@@ -6,6 +6,7 @@ import { Pressable, useColorScheme, View } from "react-native";
 import TrackPlayer, { State, usePlaybackState } from "react-native-track-player";
 import Icon from "react-native-vector-icons/AntDesign";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { colorScheme } from "../constant/Color";
 import ArtistScreen from "../screens/ArtistScreen/ArtistScreen";
 import Home from "../screens/Home/Home";
 import NewPlaylist from "../screens/NewPlaylist/NewPlaylist";
@@ -26,6 +27,30 @@ export type HomeStackNavigatorParams = {
     PlaylistList: undefined;
 };
 const Stack = createNativeStackNavigator<HomeStackNavigatorParams>();
+
+const darkTheme = {
+    dark: true,
+    colors: {
+        primary: 'crimson',
+        background: colorScheme.dark.background,
+        card: 'crimson',
+        text: colorScheme.dark.content,
+        border: colorScheme.dark.outline,
+        notification: 'red'
+    }
+};
+
+const lightTheme = {
+    dark: false,
+    colors: {
+        primary: 'skyblue',
+        background: colorScheme.light.background,
+        card: 'skyblue',
+        text: colorScheme.light.content,
+        border: colorScheme.light.outline,
+        notification: 'royalblue'
+    }
+}
 
 export const HomeNavigator = () => {
     const options = useTypedSelector(state => state.Options);
@@ -76,7 +101,7 @@ export const HomeNavigator = () => {
     );
 
     return (
-        <NavigationContainer theme={isDarkMode ? DarkTheme : DefaultTheme}>
+        <NavigationContainer theme={isDarkMode ? darkTheme : lightTheme}>
             <Stack.Navigator initialRouteName="Home">
                 <Stack.Screen
                     name="Home"

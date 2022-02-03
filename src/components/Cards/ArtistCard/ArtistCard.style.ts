@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
         fontSize: 14
     },
     cardView: {
-        width: '90%',
+        width: '85%',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',

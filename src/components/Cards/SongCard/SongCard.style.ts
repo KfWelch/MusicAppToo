@@ -2,11 +2,11 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
     indexNumber: {
-        fontSize: 18,
-        flexWrap: 'wrap'
+        fontSize: 18
     },
     title: {
-        fontSize: 16
+        fontSize: 16,
+        flexWrap: 'wrap'
     },
     subtitle: {
         fontSize: 14
@@ -21,7 +21,8 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch'
     },
     infoView: {
-        flexDirection: 'column'
+        flexDirection: 'column',
+        width: '60%'
     }
 });
 
