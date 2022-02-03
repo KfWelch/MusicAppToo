@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { Artist } from "../../models/MusicModel";
 import { selectArtist } from "../../state/actions/Albums";
 import { useTypedSelector } from "../../state/reducers";
-import DropDownCard from "../DropDownCard/DropDownCard";
+import DropDownCard from "../Cards/DropDownCard/DropDownCard";
 import styles from "./ArtistListComponent.style";
 
 const ArtistList = () => {

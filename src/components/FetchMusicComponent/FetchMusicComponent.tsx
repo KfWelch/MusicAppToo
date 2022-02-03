@@ -9,7 +9,7 @@ import styles from './FetchMusicComponent.style';
 import { Album, Artist, Song } from '../../models/MusicModel';
 import { useTypedSelector } from '../../state/reducers';
 import { useDispatch } from 'react-redux';
-import { addArtist } from '../../state/actions/Albums';
+import { addArtist, resetSavedAlbums } from '../../state/actions/Albums';
 
 const FetchMusicComponent = () => {
     const [currentFiles, setCurrentFiles] = useState<RNFS.ReadDirItem[]>([]);
@@ -66,7 +66,7 @@ const FetchMusicComponent = () => {
                 const songs: Song[] = [];
                 files.forEach((songFile, index) => {
                     const nameStart = songFile.name.search(/[a-zA-Z]/);
-                    const title = songFile.name.substring(nameStart);
+                    const title = songFile.name.substring(nameStart, songFile.name.lastIndexOf('.'));
                     // minus one because there's a space between the leading number and the title
                     const leadingNumber = songFile.name.substring(0, nameStart - 1);
                     let numberInAlbum = 0;
@@ -78,13 +78,16 @@ const FetchMusicComponent = () => {
                     const song: Song = {
                         title,
                         albumName: directories[i].name,
+                        contributingArtist: artist.artist,
                         numberInAlbum,
-                        path: songFile.path
+                        path: songFile.path,
+                        weight: 1
                     };
                     songs.push(song);
                 });
                 const album: Album = {
                     albumName: directories[i].name,
+                    artistName: artist.artist,
                     songs
                 };
                 tempArtist.albums = tempArtist.albums.concat([album]);
@@ -107,27 +110,19 @@ const FetchMusicComponent = () => {
         setFilesList(files.filter(file => file.isFile()));
     };
 
-    const itemSeparator = () => (<View style={styles.itemSeparator} />);
+    const reloadMusic = () => {
+        dispatch(resetSavedAlbums());
+    };
 
-    const renderItem = ({ item }: { item: RNFS.ReadDirItem }) => (
-        <View style={styles.itemView}>
-            <Text>{item.name}</Text>
-            <Text>{item.path}</Text>
-            <Text>{`type: ${(item.isDirectory() && 'Directory') || (item.isFile() && 'File')}`}</Text>
-        </View>
-    );
+    const itemSeparator = () => (<View style={styles.itemSeparator} />);
 
     return (
         <SafeAreaView style={styles.container}>
             <Button onPress={() => getPermission()} title="get folder permission" />
             {itemSeparator()}
             <Button onPress={getFiles} title="scan for music" />
-            {/* <FlatList
-                data={filesList}
-                renderItem={renderItem}
-                keyExtractor={item => item.name}
-                ItemSeparatorComponent={itemSeparator}
-            /> */}
+            {itemSeparator()}
+            <Button onPress={reloadMusic} title="Reload music" />
         </SafeAreaView>
     )
 };

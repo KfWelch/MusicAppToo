@@ -9,11 +9,18 @@ const color = {
     FLORAL_WHITE: 'floralwhite'
 };
 
-const colorScheme = {
+export const colorScheme = {
     dark: {
-        background: '#404070',
+        background: '#190a10',
         outline: 'darkred',
-        content: 'floralwhite'
+        content: 'floralwhite',
+        contentBackground: 'maroon'
+    },
+    light: {
+        background: 'oldlace',
+        outline: 'rebeccapurple',
+        content: 'midnightblue',
+        contentBackground: 'lightslategrey'
     }
 }
 

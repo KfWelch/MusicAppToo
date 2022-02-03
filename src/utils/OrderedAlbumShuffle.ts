@@ -43,7 +43,7 @@ export const spreadOrderedAlbumShuffle = (albums: Album[], individualSongs: Song
 
     albums.forEach(album => {
         unorderedPlaylist = unorderedPlaylist.concat(album.songs);
-        if (album.ordered) {
+        if (!album.ordered) {
             album.songs.forEach(song => {
                 let pos = Math.random();
                 // Need to make sure we aren't using the same number in our positioning
@@ -71,6 +71,8 @@ export const spreadOrderedAlbumShuffle = (albums: Album[], individualSongs: Song
             });
         }
     });
+
+    console.log(songList);
 
     return songListToPlaylist(songList, unorderedPlaylist);    
 }

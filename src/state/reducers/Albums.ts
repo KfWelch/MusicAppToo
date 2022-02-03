@@ -5,6 +5,7 @@ import {
     ADD_ARTIST,
     ADD_SONGS_TO_ALBUM,
     DESELECT_ARTIST,
+    RESET,
     SELECT_ARTIST
 } from '../actions/Albums';
 
@@ -57,6 +58,11 @@ export const Albums = (state = initialState, action: Actions): AlbumsState => {
                 ...state,
                 selectedArtist: undefined
             }
+        case RESET:
+            return {
+                artists: [],
+                selectedArtist: undefined
+            };
         default:
             return state;
     }

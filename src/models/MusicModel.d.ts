@@ -21,7 +21,7 @@ export interface Song {
     numberInAlbum: number;
     path?: string;
     position?: number;
-    weight?: number
+    weight: number
 }
 
 export interface Playlist {
