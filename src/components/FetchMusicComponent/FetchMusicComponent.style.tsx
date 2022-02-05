@@ -13,6 +13,11 @@ const styles = StyleSheet.create({
         padding: 15,
         borderColor: '#000000',
         borderRadius: 5
+    },
+    loadingLPView: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: 20
     }
 });
 

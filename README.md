@@ -18,3 +18,11 @@ Currently running on a Galaxy Note 10, Android version 12
 
 ## Redux Sagas
 Currently there is no expectations to be using any service calls with this app, but it is there for future reference
+
+# Important to note for running the app
+## Music file types supported:
+    - MP3
+    - MP4 (Possibly)
+    - FLAC
+
+This is due to a restriction with JSMediaTags, as these are the only filetypes that have metadata in a readable form for this package as of yet
