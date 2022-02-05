@@ -33,3 +33,7 @@ export const getPlayArray = (albums: Album[], songs: Song[]): Song[] => {
             []
         );
 };
+
+export const disclessAlbumName = (albumName: string): string => albumName.toLowerCase().includes('disc')
+    ? albumName.substring(0, albumName.lastIndexOf(' ', albumName.toLowerCase().lastIndexOf('disc') - 1))
+    : albumName;

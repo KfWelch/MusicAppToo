@@ -136,52 +136,56 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
         }
         case ADD_SONG_TO_PLAYLIST: {
             const playlistIndex = state.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
-            const playlist = state.savedPlaylists.at(playlistIndex);
-            if (playlist) {
+            const playlist = state.savedPlaylists[playlistIndex];
+            if (playlistIndex >= 0) {
                 playlist.songs.push(action.payload.song);
                 playlist.playArray.push(action.payload.song);
+                state.savedPlaylists.splice(playlistIndex, 1, playlist);
                 return {
                     ...state,
-                    savedPlaylists: state.savedPlaylists.splice(playlistIndex, 1, playlist)
+                    savedPlaylists: state.savedPlaylists
                 };
             }
             return state;
         }
         case REMOVE_SONG_FROM_PLAYLIST: {
             const playlistIndex = state.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
-            const playlist = state.savedPlaylists.at(playlistIndex);
-            if (playlist) {
+            const playlist = state.savedPlaylists[playlistIndex];
+            if (playlistIndex >= 0) {
                 playlist.songs = playlist.songs.splice(playlist.songs.findIndex(song => getSongId(song) === action.payload.songId), 1);
                 playlist.playArray = getPlayArray(playlist.albums, playlist.songs);
+                state.savedPlaylists.splice(playlistIndex, 1, playlist);
                 return {
                     ...state,
-                    savedPlaylists: state.savedPlaylists.splice(playlistIndex, 1, playlist)
+                    savedPlaylists: state.savedPlaylists
                 };
             }
             return state;
         }
         case ADD_ALBUM_TO_PLAYLIST: {
             const playlistIndex = state.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
-            const playlist = state.savedPlaylists.at(playlistIndex);
-            if (playlist) {
+            const playlist = state.savedPlaylists[playlistIndex];
+            if (playlistIndex >= 0) {
                 playlist.albums.push(action.payload.album);
                 playlist.playArray = getPlayArray(playlist.albums, playlist.songs);
+                state.savedPlaylists.splice(playlistIndex, 1, playlist);
                 return {
                     ...state,
-                    savedPlaylists: state.savedPlaylists.splice(playlistIndex, 1, playlist)
+                    savedPlaylists: state.savedPlaylists
                 };
             }
             return state;
         }
         case REMOVE_ALBUM_FROM_PLAYLIST: {
             const playlistIndex = state.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
-            const playlist = state.savedPlaylists.at(playlistIndex);
-            if (playlist) {
+            const playlist = state.savedPlaylists[playlistIndex];
+            if (playlistIndex >= 0) {
                 playlist.albums = playlist.albums.splice(playlist.albums.findIndex(album => getAlbumId(album) === action.payload.albumId), 1);
                 playlist.playArray = getPlayArray(playlist.albums, playlist.songs);
+                state.savedPlaylists.splice(playlistIndex, 1, playlist);
                 return {
                     ...state,
-                    savedPlaylists: state.savedPlaylists.splice(playlistIndex, 1, playlist)
+                    savedPlaylists: state.savedPlaylists
                 };
             }
             return state;
@@ -204,13 +208,14 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
         case SET_ALBUM_ORDERED: {
             if (action.payload.playlistName) {
                 const playlistIndex = state.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
-                const playlist = state.savedPlaylists.at(playlistIndex);
-                if (playlist) {
+                const playlist = state.savedPlaylists[playlistIndex];
+                if (playlistIndex >= 0) {
                     const albumIndex = playlist.albums.findIndex(album => getAlbumId(album) === action.payload.albumId);
                     playlist.albums[albumIndex].ordered = action.payload.ordered;
+                    state.savedPlaylists.splice(playlistIndex, 1, playlist);
                     return {
                         ...state,
-                        savedPlaylists: state.savedPlaylists.splice(playlistIndex, 1, playlist)
+                        savedPlaylists: state.savedPlaylists
                     };
                 }
             } else if (state.currentPlaylist) {
@@ -227,26 +232,28 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
         case SET_SONG_WEIGHT: {
             if (action.payload.playlistName) {
                 const playlistIndex = state.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
-                const playlist = state.savedPlaylists.at(playlistIndex);
-                if (playlist) {
+                const playlist = state.savedPlaylists[playlistIndex];
+                if (playlistIndex >= 0) {
                     const albumName = getAlbumFromSongId(action.payload.songId);
                     const title = getSongTitleFromId(action.payload.songId);
                     const albumIndex = playlist.albums.findIndex(album => album.albumName === albumName);
-                    const album = playlist.albums.at(albumIndex);
-                    if (album) {
+                    const album = playlist.albums[albumIndex];
+                    if (albumIndex >= 0) {
                         const songIndex = album.songs.findIndex(song => song.title === title);
                         album.songs[songIndex].weight = action.payload.weight;
                         playlist.albums.splice(albumIndex, 1, album);
+                        state.savedPlaylists.splice(playlistIndex, 1, playlist);
                         return {
                             ...state,
-                            savedPlaylists: state.savedPlaylists.splice(playlistIndex, 1, playlist)
+                            savedPlaylists: state.savedPlaylists
                         };
                     } else {
                         const songIndex = playlist.songs.findIndex(song => song.title === title);
                         playlist.songs[songIndex].weight = action.payload.weight;
+                        state.savedPlaylists.splice(playlistIndex, 1, playlist);
                         return {
                             ...state,
-                            savedPlaylists: state.savedPlaylists.splice(playlistIndex, 1, playlist)
+                            savedPlaylists: state.savedPlaylists
                         };
                     }
                 }
@@ -255,8 +262,8 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                 const albumName = getAlbumFromSongId(action.payload.songId);
                     const title = getSongTitleFromId(action.payload.songId);
                     const albumIndex = currentPlaylist.albums.findIndex(album => album.albumName === albumName);
-                    const album = currentPlaylist.albums.at(albumIndex);
-                    if (album) {
+                    const album = currentPlaylist.albums[albumIndex];
+                    if (albumIndex >= 0) {
                         const songIndex = album.songs.findIndex(song => song.title === title);
                         album.songs[songIndex].weight = action.payload.weight;
                         currentPlaylist.albums.splice(albumIndex, 1, album);
@@ -299,9 +306,10 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
         }
         case REMOVE_PLAYLIST: {
             const playlistIndex = state.savedPlaylists.findIndex(playlist => playlist.name === action.payload);
+            state.savedPlaylists.splice(playlistIndex, 1);
             return {
                 ...state,
-                savedPlaylists: state.savedPlaylists.splice(playlistIndex, 1)
+                savedPlaylists: state.savedPlaylists
             };
         }
         case SET_PLAYBACK_MODE:

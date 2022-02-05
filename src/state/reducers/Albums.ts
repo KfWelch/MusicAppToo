@@ -1,9 +1,11 @@
-import { Artist } from "../../models/MusicModel";
+import { Album, Artist, Song } from "../../models/MusicModel";
+import { disclessAlbumName } from "../../utils/musicUtils";
 import {
     Actions,
     ADD_ALBUM,
     ADD_ARTIST,
     ADD_SONGS_TO_ALBUM,
+    COMBINE_MULTI_DISC_ALBUMS,
     DESELECT_ARTIST,
     RESET,
     SELECT_ARTIST
@@ -20,6 +22,7 @@ const initialState: AlbumsState = {
 };
 
 export const Albums = (state = initialState, action: Actions): AlbumsState => {
+    const oldState: AlbumsState = { ...state };
     switch (action.type) {
         case ADD_ARTIST:
             return {
@@ -58,6 +61,25 @@ export const Albums = (state = initialState, action: Actions): AlbumsState => {
                 ...state,
                 selectedArtist: undefined
             }
+        case COMBINE_MULTI_DISC_ALBUMS: {
+            const artistIndex = oldState.artists.findIndex(artist => artist.artist === action.payload[0].artistName);
+            const artist: Artist = { ...oldState.artists[artistIndex] };
+            if (artistIndex >= 0) {
+                const newAlbum: Album = {
+                    albumName: disclessAlbumName(action.payload[0].albumName),
+                    artistName: artist.artist,
+                    songs: action.payload.reduce((songs: Song[], album) => songs.concat(album.songs), [])
+                };
+                artist.albums = artist.albums.filter(album => !action.payload.includes(album));
+                artist.albums.push(newAlbum);
+                oldState.artists.splice(artistIndex, 1, artist);
+                return {
+                    ...state,
+                    artists: oldState.artists
+                };
+            }
+            return state;
+        }
         case RESET:
             return {
                 artists: [],

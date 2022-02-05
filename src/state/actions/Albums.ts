@@ -5,6 +5,7 @@ export const ADD_ALBUM = 'ALBUMS/ADD_ALBUM';
 export const ADD_SONGS_TO_ALBUM = 'ALBUMS/ADD_SONGS';
 export const SELECT_ARTIST = 'ALBUMS/SELECT_ARTIST';
 export const DESELECT_ARTIST = 'ALBUMS/DESELECT_ARTIST';
+export const COMBINE_MULTI_DISC_ALBUMS = 'ALBUMS/COMBINE_MULTI_DISC';
 export const RESET = 'ALBUMS/RESET';
 
 export const addArtist = (artist: Artist) => ({
@@ -31,6 +32,16 @@ export const deselectArtist = () => ({
     type: DESELECT_ARTIST
 } as const);
 
+/**
+ * All albums supplied to this must be of the same artist
+ * @param albums 
+ * @returns 
+ */
+export const combineMultiDiscAlbums = (albums: Album[]) => ({
+    type: COMBINE_MULTI_DISC_ALBUMS,
+    payload: albums
+} as const);
+
 export const resetSavedAlbums = () => ({
     type: RESET
 } as const);
@@ -41,4 +52,5 @@ export type Actions =
     | ReturnType<typeof addSongsToAlbum>
     | ReturnType<typeof selectArtist>
     | ReturnType<typeof deselectArtist>
+    | ReturnType<typeof combineMultiDiscAlbums>
     | ReturnType<typeof resetSavedAlbums>;
