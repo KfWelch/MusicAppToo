@@ -46,7 +46,7 @@ const AlbumList = () => {
         <FlatList
             data={currentAlbums}
             renderItem={renderItem}
-            keyExtractor={item => item.albumName}
+            keyExtractor={(item, index) => `${item.albumName}-${index}`}
             ItemSeparatorComponent={itemSeparator}
         />
     )

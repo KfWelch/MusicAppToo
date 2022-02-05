@@ -46,6 +46,7 @@ const Playlist = () => {
                 <FlatList
                     data={item.songs}  
                     renderItem={songView}
+                    keyExtractor={(item, index) => `${item.title}-${index}`}
                 />
             )}
         />
@@ -108,12 +109,14 @@ const Playlist = () => {
                 <FlatList
                     data={currentPlaylist?.albums}
                     renderItem={albumView}
+                    keyExtractor={(item, index) => `${item.albumName}-${index}`}
                 />
             </View>
             <View style={styles.songsView}>
                 <FlatList
                     data={currentPlaylist?.songs}
                     renderItem={songView}
+                    keyExtractor={(item, index) => `${item.title}-${index}`}
                 />
             </View>
             {controlBar()}
@@ -130,6 +133,7 @@ const Playlist = () => {
             <FlatList
                 data={currentPlaylist?.playArray}
                 renderItem={individualSongView}
+                keyExtractor={(item, index) => `${item.title}-${index}`}
             />
             {controlBar()}
         </SafeAreaView>

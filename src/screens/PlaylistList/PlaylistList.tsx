@@ -24,6 +24,7 @@ const PlaylistList = () => {
             <FlatList
                 data={playlists}
                 renderItem={renderPlaylistItem}
+                keyExtractor={(item, index) => `${item.name}-${index}`}
             />
         </SafeAreaView>
     )
