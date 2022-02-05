@@ -17,7 +17,7 @@ export const colorScheme = {
         contentBackground: 'maroon'
     },
     light: {
-        background: 'oldlace',
+        background: 'aliceblue',
         outline: 'rebeccapurple',
         content: 'midnightblue',
         contentBackground: 'lightslategrey'

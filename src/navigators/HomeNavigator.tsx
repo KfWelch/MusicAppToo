@@ -54,10 +54,10 @@ const lightTheme = {
 
 export const HomeNavigator = () => {
     const options = useTypedSelector(state => state.Options);
-    const currentArtist = useTypedSelector(state => state.Albums.selectedArtist);
-    const savedPlaylists = useTypedSelector(state => state.Playlist.savedPlaylists);
     const colorScheme = useColorScheme();
     const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : colorScheme === 'dark';
+    const currentArtist = useTypedSelector(state => state.Albums.selectedArtist);
+    const savedPlaylists = useTypedSelector(state => state.Playlist.savedPlaylists);
     const playbackState = usePlaybackState();
     const playing = playbackState === State.Playing;
 
