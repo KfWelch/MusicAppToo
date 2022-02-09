@@ -260,25 +260,25 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
             } else if (state.currentPlaylist) {
                 const currentPlaylist = { ...state.currentPlaylist };
                 const albumName = getAlbumFromSongId(action.payload.songId);
-                    const title = getSongTitleFromId(action.payload.songId);
-                    const albumIndex = currentPlaylist.albums.findIndex(album => album.albumName === albumName);
-                    const album = currentPlaylist.albums[albumIndex];
-                    if (albumIndex >= 0) {
-                        const songIndex = album.songs.findIndex(song => song.title === title);
-                        album.songs[songIndex].weight = action.payload.weight;
-                        currentPlaylist.albums.splice(albumIndex, 1, album);
-                        return {
-                            ...state,
-                            currentPlaylist
-                        };
-                    } else {
-                        const songIndex = currentPlaylist.songs.findIndex(song => song.title === title);
-                        currentPlaylist.songs[songIndex].weight = action.payload.weight;
-                        return {
-                            ...state,
-                            currentPlaylist
-                        };
-                    }
+                const title = getSongTitleFromId(action.payload.songId);
+                const albumIndex = currentPlaylist.albums.findIndex(album => album.albumName === albumName);
+                const album = currentPlaylist.albums[albumIndex];
+                if (albumIndex >= 0) {
+                    const songIndex = album.songs.findIndex(song => song.title === title);
+                    album.songs[songIndex].weight = action.payload.weight;
+                    currentPlaylist.albums.splice(albumIndex, 1, album);
+                    return {
+                        ...state,
+                        currentPlaylist
+                    };
+                } else {
+                    const songIndex = currentPlaylist.songs.findIndex(song => song.title === title);
+                    currentPlaylist.songs[songIndex].weight = action.payload.weight;
+                    return {
+                        ...state,
+                        currentPlaylist
+                    };
+                }
             }
             return state;
         }

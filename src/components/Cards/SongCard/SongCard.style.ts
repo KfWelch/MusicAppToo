@@ -23,6 +23,9 @@ const styles = StyleSheet.create({
     infoView: {
         flexDirection: 'column',
         width: '60%'
+    },
+    border: {
+        borderWidth: 1
     }
 });
 

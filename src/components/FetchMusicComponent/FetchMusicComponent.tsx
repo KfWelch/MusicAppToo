@@ -18,6 +18,11 @@ import { addArtist, combineMultiDiscAlbums, resetSavedAlbums } from '../../state
 import { colorScheme } from '../../constant/Color';
 import { disclessAlbumName } from '../../utils/musicUtils';
 
+interface Progress {
+    total: number;
+    progress: number;
+}
+
 const FetchMusicComponent = () => {
     const artists = useTypedSelector(state => state.Albums.artists);
     const options = useTypedSelector(state => state.Options);
@@ -31,6 +36,8 @@ const FetchMusicComponent = () => {
     const [totalSongs, setTotalSongs] = useState(1);
     const [songProgress, setSongProgress] = useState(0);
     const [loadingMusic, setLoadingMusic] = useState(false);
+    const [failedSongs, setFailedSongs] = useState(0);
+    const [failedAlbums, setFailedAlbums] = useState(0);
 
     const getProgress = () => {
         const singleArtistProgress = 1 / totalArtists;
@@ -106,6 +113,7 @@ const FetchMusicComponent = () => {
             setTotalArtists(directories.length);
         } else {
             setTotalAlbums(directories.length);
+            setAlbumProgress(0);
         }
         const tempArtist: Artist = { ...(artist || { artist: '', albums: [] }) };
         let artists: Artist[] = [];
@@ -127,11 +135,13 @@ const FetchMusicComponent = () => {
             // 2nd iteration, we are looking at an album, and we already have all the songs in the files
             } else {
                 setTotalSongs(files.length);
+                setSongProgress(0);
+                let albumFailedSongs = 0;
                 const songs: Song[] = [];
                 for (let j = 0; j < files.length; j++) {
                     setSongProgress(j);
                     const filePath = files[j].path;
-                    const tags = await new Promise<TagType | null>((resolve, reject) => {
+                    const tags = await new Promise<TagType | null>(resolve => {
                         try {
                             new Reader(filePath)
                                 .setFileReader(ReactNativeFileReader)
@@ -162,6 +172,8 @@ const FetchMusicComponent = () => {
                             numberInAlbum
                         };
                         songs.push(song);
+                    } else {
+                        albumFailedSongs++;
                     }
                 }
                 /* files.forEach((songFile, index) => {
@@ -193,6 +205,10 @@ const FetchMusicComponent = () => {
                     };
                     tempArtist.albums = tempArtist.albums.concat([album]);
                 }
+                if (albumFailedSongs) {
+                    setFailedSongs(failedSongs + albumFailedSongs);
+                    setFailedAlbums(failedAlbums + 1);
+                }
             }
         }
         if (artist) {
@@ -211,9 +227,18 @@ const FetchMusicComponent = () => {
         await getPermission(false);
         const files = await RNFS.readDir(path)
         setLoadingMusic(true);
+        setFailedAlbums(0);
+        setFailedSongs(0);
         const musicFiles = await getMusicFiles(files);
         musicFiles.forEach(artist => dispatch(addArtist(artist)));
         setLoadingMusic(false);
+        Toast.show({
+            position: 'bottom',
+            type: 'error',
+            text1: `Failed to get ${failedSongs} songs`,
+            text2: `This has affected ${failedAlbums} albums`,
+            visibilityTime: 5000
+        });
     };
 
     const reloadMusic = () => {

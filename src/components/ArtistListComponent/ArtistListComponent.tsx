@@ -6,33 +6,24 @@ import { useDispatch } from "react-redux";
 import { Album, Artist, Song } from "../../models/MusicModel";
 import { selectArtist } from "../../state/actions/Albums";
 import { useTypedSelector } from "../../state/reducers";
+import { getAlbumId, getSongId } from "../../utils/musicUtils";
 import AlbumCard from "../Cards/AlbumCard/AlbumCard";
 import ArtistCard from "../Cards/ArtistCard/ArtistCard";
 import ComponentDropDown from "../Cards/ComponentDropDown/ComponentDropDown";
-import DropDownCard from "../Cards/DropDownCard/DropDownCard";
 import SongCard from "../Cards/SongCard/SongCard";
 import styles from "./ArtistListComponent.style";
 
 const ArtistList = () => {
-    const artists = useTypedSelector(state => state.Albums.artists);
+    const albumsState = useTypedSelector(state => state.Albums);
     const navigation = useNavigation();
     const dispatch = useDispatch();
+    const { artists } = albumsState;
 
     const selectArtistFromList = (artistName: string, pressedTitle: string) => {
         dispatch(selectArtist(artistName));
         // @ts-ignore
         navigation.navigate('ArtistScreen');
     };
-
-    const renderItem = ({ item }: { item: Artist }) => (
-        <DropDownCard
-            mainItem={item.artist}
-            mainItemHelperText={`${item.albums.length} albums`}
-            onItemClick={(text) => selectArtistFromList(item.artist, text)}
-            subItems={item.albums.reduce((prevVal, currVal) => prevVal.concat(currVal.albumName), [] as string[])}
-        />
-    );
-
     const itemSeparator = () => (<View style={styles.itemSeparator} />);
 
     return (
@@ -52,18 +43,21 @@ const ArtistList = () => {
                                             <FlatList
                                                 data={item.songs}
                                                 renderItem={({ item }: { item: Song }) => (<SongCard song={item} />)}
-                                                keyExtractor={(item, index) => `${item.title}-${index}`}
+                                                keyExtractor={(item, index) => `${getSongId(item)}-${index}`}
+                                                extraData={item}
                                             />
                                         )}
                                     />
                                 )}
-                                keyExtractor={(item, index) => `${item.albumName}-${index}`}
+                                keyExtractor={(item, index) => `${getAlbumId(item)}-${index}`}
+                                extraData={item}
                             />
                         )}
                     />
                 )}
                 keyExtractor={(item, index) => `${item.artist}-${index}`}
                 ItemSeparatorComponent={itemSeparator}
+                extraData={albumsState}
             />
         </SafeAreaView>
     );

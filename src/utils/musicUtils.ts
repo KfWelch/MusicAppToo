@@ -18,7 +18,7 @@ export const convertSongListToTracks = (songs: Song[]): Track[] => {
 
 export const getSongId = (song: Song): string => `${song.albumName}§${song.title}`;
 export const getAlbumFromSongId = (songId: string): string => songId.substring(0, songId.indexOf('§'));
-export const getSongTitleFromId = (songId: string): string => songId.substring(songId.indexOf('§'));
+export const getSongTitleFromId = (songId: string): string => songId.substring(songId.indexOf('§') + 1);
 
 export const getAlbumId = (album: Album): string => `${album.artistName}§${album.albumName}`;
 export const getArtistFromAlbumId = (albumId: string): string => albumId.substring(0, albumId.indexOf('§'));
