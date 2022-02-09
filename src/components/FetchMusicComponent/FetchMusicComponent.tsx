@@ -16,7 +16,7 @@ import { useTypedSelector } from '../../state/reducers';
 import { useDispatch } from 'react-redux';
 import { addArtist, combineMultiDiscAlbums, resetSavedAlbums } from '../../state/actions/Albums';
 import { colorScheme } from '../../constant/Color';
-import { disclessAlbumName } from '../../utils/musicUtils';
+import { disclessAlbumName, getAlbumId } from '../../utils/musicUtils';
 
 interface Progress {
     total: number;
@@ -49,6 +49,29 @@ const FetchMusicComponent = () => {
     const condenseAlbums = () => {
         artists.forEach(artist => {
             const uniqueArray = artist.albums.reduce((arrayOfUnique: Array<Array<Album>>, currentAlbum) => {
+                // What if we do it by checking the artist's albums
+                const alreadyMatched = arrayOfUnique
+                    // If the set of unique albums arrays includes an array where the current album already is
+                    .some((uniqueAlbums: Album[]) => uniqueAlbums
+                        .some((album: Album) => currentAlbum.albumName === album.albumName));
+
+                if (alreadyMatched) {
+                    return arrayOfUnique;
+                }
+                /* Then, after we know that the current album is *not* already matched, we filter
+                 * the current artist's albums for any where the current album's discless name
+                 * is present within the album name
+                 * 
+                 * We do it this way to cover the case where sometimes a music provider has an exclusive
+                 * song edition (Amazon with TSO's album Night Castle) and the exclusive song "album"
+                 * has a lower index in the array than the rest of the album(s)
+                */
+                const matchingAlbums = artist.albums.filter(artistAlbum => {
+                    artistAlbum.albumName.includes(disclessAlbumName(currentAlbum.albumName));
+                });
+                arrayOfUnique.push(matchingAlbums);
+                return arrayOfUnique;
+
                 // If we find an index of unique discless album names where it matches,
                 // we need to add this current album to that array of uniques
                 const uniquesIndex = arrayOfUnique

@@ -70,8 +70,9 @@ export const Albums = (state = initialState, action: Actions): AlbumsState => {
                     artistName: artist.artist,
                     songs: action.payload.reduce((songs: Song[], album) => songs.concat(album.songs), [])
                 };
-                artist.albums = artist.albums.filter(album => !action.payload.includes(album));
-                artist.albums.push(newAlbum);
+                const newAlbums = artist.albums.filter(album => !action.payload.includes(album));
+                newAlbums.push(newAlbum);
+                artist.albums = newAlbums;
                 oldState.artists.splice(artistIndex, 1, artist);
                 return {
                     ...state,
