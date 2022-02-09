@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { Album, Artist, Song } from "../../models/MusicModel";
 import { disclessAlbumName } from "../../utils/musicUtils";
 import {
@@ -22,7 +23,7 @@ const initialState: AlbumsState = {
 };
 
 export const Albums = (state = initialState, action: Actions): AlbumsState => {
-    const oldState: AlbumsState = { ...state };
+    const oldState = _.cloneDeep(state);
     switch (action.type) {
         case ADD_ARTIST:
             return {
@@ -63,8 +64,8 @@ export const Albums = (state = initialState, action: Actions): AlbumsState => {
             }
         case COMBINE_MULTI_DISC_ALBUMS: {
             const artistIndex = oldState.artists.findIndex(artist => artist.artist === action.payload[0].artistName);
-            const artist: Artist = { ...oldState.artists[artistIndex] };
             if (artistIndex >= 0) {
+                const artist: Artist = _.cloneDeep(oldState.artists[artistIndex]);
                 const newAlbum: Album = {
                     albumName: disclessAlbumName(action.payload[0].albumName),
                     artistName: artist.artist,
