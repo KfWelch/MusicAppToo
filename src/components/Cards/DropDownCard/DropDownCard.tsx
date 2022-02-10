@@ -32,6 +32,7 @@ const DropDownCard = (props: DropDownCardProps) => {
         <FlatList
             data={subItems}
             renderItem={subItemsItemView}
+            keyExtractor={(item, index) => `${item}-${index}`}
         />
     );
 

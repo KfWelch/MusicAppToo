@@ -1,9 +1,12 @@
-import { Artist } from "../../models/MusicModel";
+import _ from "lodash";
+import { Album, Artist, Song } from "../../models/MusicModel";
+import { disclessAlbumName } from "../../utils/musicUtils";
 import {
     Actions,
     ADD_ALBUM,
     ADD_ARTIST,
     ADD_SONGS_TO_ALBUM,
+    COMBINE_MULTI_DISC_ALBUMS,
     DESELECT_ARTIST,
     RESET,
     SELECT_ARTIST
@@ -20,6 +23,7 @@ const initialState: AlbumsState = {
 };
 
 export const Albums = (state = initialState, action: Actions): AlbumsState => {
+    const oldState = _.cloneDeep(state);
     switch (action.type) {
         case ADD_ARTIST:
             return {
@@ -58,6 +62,26 @@ export const Albums = (state = initialState, action: Actions): AlbumsState => {
                 ...state,
                 selectedArtist: undefined
             }
+        case COMBINE_MULTI_DISC_ALBUMS: {
+            const artistIndex = oldState.artists.findIndex(artist => artist.artist === action.payload[0].artistName);
+            if (artistIndex >= 0) {
+                const artist: Artist = _.cloneDeep(oldState.artists[artistIndex]);
+                const newAlbum: Album = {
+                    albumName: disclessAlbumName(action.payload[0].albumName),
+                    artistName: artist.artist,
+                    songs: action.payload.reduce((songs: Song[], album) => songs.concat(album.songs), [])
+                };
+                const newAlbums = artist.albums.filter(album => !action.payload.some(combineAlbum => _.isEqual(combineAlbum, album)));
+                newAlbums.push(newAlbum);
+                artist.albums = newAlbums;
+                oldState.artists.splice(artistIndex, 1, artist);
+                return {
+                    ...state,
+                    artists: oldState.artists
+                };
+            }
+            return state;
+        }
         case RESET:
             return {
                 artists: [],

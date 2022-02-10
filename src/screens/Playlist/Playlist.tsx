@@ -46,6 +46,7 @@ const Playlist = () => {
                 <FlatList
                     data={item.songs}  
                     renderItem={songView}
+                    keyExtractor={(item, index) => `${item.title}-${index}`}
                 />
             )}
         />
@@ -102,20 +103,30 @@ const Playlist = () => {
         </View>
     );
 
+    const detailsAlbums = () => !!currentPlaylist?.albums.length && (
+        <View style={styles.albumsView}>
+            <FlatList
+                data={currentPlaylist?.albums}
+                renderItem={albumView}
+                keyExtractor={(item, index) => `${item.albumName}-${index}`}
+            />
+        </View>
+    );
+
+    const detailsSongs = () => !!currentPlaylist?.songs.length && (
+        <View style={styles.songsView}>
+            <FlatList
+                data={currentPlaylist?.songs}
+                renderItem={songView}
+                keyExtractor={(item, index) => `${item.title}-${index}`}
+            />
+        </View>
+    );
+
     const detailsView = () => (
         <SafeAreaView style={styles.container}>
-            <View style={styles.albumsView}>
-                <FlatList
-                    data={currentPlaylist?.albums}
-                    renderItem={albumView}
-                />
-            </View>
-            <View style={styles.songsView}>
-                <FlatList
-                    data={currentPlaylist?.songs}
-                    renderItem={songView}
-                />
-            </View>
+            {detailsAlbums()}
+            {detailsSongs()}
             {controlBar()}
         </SafeAreaView>
     );
@@ -130,6 +141,7 @@ const Playlist = () => {
             <FlatList
                 data={currentPlaylist?.playArray}
                 renderItem={individualSongView}
+                keyExtractor={(item, index) => `${item.title}-${index}`}
             />
             {controlBar()}
         </SafeAreaView>

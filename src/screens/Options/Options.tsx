@@ -63,6 +63,7 @@ const Options = () => {
             <FlatList
                 data={optionsArray}
                 renderItem={renderItem}
+                keyExtractor={(item, index) => `${item[0]}-${index}`}
             />
         </SafeAreaView>
     )

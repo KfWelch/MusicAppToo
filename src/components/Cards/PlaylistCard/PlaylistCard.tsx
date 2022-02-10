@@ -32,6 +32,7 @@ const PlaylistCard = (props: PlaylistCardProps) => {
                 data={album.songs}
                 renderItem={renderAlbumSong}
                 ItemSeparatorComponent={flatListItemSeparator}
+                keyExtractor={(item, index) => `${item.title}-${index}`}
             />
         </View>
     );
@@ -62,12 +63,14 @@ const PlaylistCard = (props: PlaylistCardProps) => {
                 renderItem={renderPlaylistAlbums}
                 key="Albums"
                 ItemSeparatorComponent={flatListItemSeparator}
+                keyExtractor={(item, index) => `${item.albumName}-${index}`}
             />
             <FlatList
                 data={playlist.songs}
                 renderItem={renderPlaylistSongs}
                 key="Songs"
                 ItemSeparatorComponent={flatListItemSeparator}
+                keyExtractor={(item, index) => `${item.title}-${index}`}
             />
         </View>
     );

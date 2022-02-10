@@ -14,7 +14,6 @@ const AlbumList = () => {
 
     const selectSong = async (albumName: string, songText: string) => {
         const tracks: Track[] = [];
-        console.log('albumName and songText', albumName, songText);
         if (songText === albumName) {
             const songs = currentAlbums?.find(album => album.albumName === albumName)?.songs;
             if (songs) {
@@ -46,7 +45,7 @@ const AlbumList = () => {
         <FlatList
             data={currentAlbums}
             renderItem={renderItem}
-            keyExtractor={item => item.albumName}
+            keyExtractor={(item, index) => `${item.albumName}-${index}`}
             ItemSeparatorComponent={itemSeparator}
         />
     )

@@ -43,6 +43,7 @@ const NewPlaylist = () => {
                 <FlatList
                     data={item.songs}  
                     renderItem={availableSongView}
+                    keyExtractor={(item, index) => `${item.title}-${index}`}
                 />
             )}
         />
@@ -54,7 +55,8 @@ const NewPlaylist = () => {
             subItemFlatlist={(
                 <FlatList
                     data={item.albums}
-                    renderItem={availableAlbumView}  
+                    renderItem={availableAlbumView}
+                    keyExtractor={(item, index) => `${item.albumName}-${index}`}
                 />
             )}
         />
@@ -65,6 +67,7 @@ const NewPlaylist = () => {
             <FlatList
                 data={artists}
                 renderItem={availableArtistView}
+                keyExtractor={(item, index) => `${item.artist}-${index}`}
             />
         </SafeAreaView>
     );
@@ -78,6 +81,7 @@ const NewPlaylist = () => {
                 <FlatList
                     data={item.songs}  
                     renderItem={selectedSongAlbumView}
+                    keyExtractor={(item, index) => `${item.title}-${index}`}
                 />
             )}
         />
@@ -129,6 +133,7 @@ const NewPlaylist = () => {
                         <FlatList
                             data={newPlaylist.albums}
                             renderItem={selectedAlbumView}
+                            keyExtractor={(item, index) => `${item.albumName}-${index}`}
                         />
                     )}
                 />
@@ -140,6 +145,7 @@ const NewPlaylist = () => {
                         <FlatList
                             data={newPlaylist.individualSongs}
                             renderItem={selectedSongView}
+                            keyExtractor={(item, index) => `${item.title}-${index}`}
                         />
                     )}
                 />

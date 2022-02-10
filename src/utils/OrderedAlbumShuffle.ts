@@ -72,8 +72,6 @@ export const spreadOrderedAlbumShuffle = (albums: Album[], individualSongs: Song
         }
     });
 
-    console.log(songList);
-
     return songListToPlaylist(songList, unorderedPlaylist);    
 }
 
