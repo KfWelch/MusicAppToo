@@ -66,9 +66,7 @@ const FetchMusicComponent = () => {
                  * song edition (Amazon with TSO's album Night Castle) and the exclusive song "album"
                  * has a lower index in the array than the rest of the album(s)
                 */
-                const matchingAlbums = artist.albums.filter(artistAlbum => {
-                    artistAlbum.albumName.includes(disclessAlbumName(currentAlbum.albumName));
-                });
+                const matchingAlbums = artist.albums.filter(artistAlbum => artistAlbum.albumName.includes(disclessAlbumName(currentAlbum.albumName)));
                 arrayOfUnique.push(matchingAlbums);
                 return arrayOfUnique;
 
