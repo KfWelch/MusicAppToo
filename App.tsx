@@ -7,7 +7,7 @@
  *
  * @format
  */
-
+import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
 import {
   SafeAreaView,
@@ -21,9 +21,9 @@ import {
 import Toast from 'react-native-toast-message';
 import { Provider } from 'react-redux';
 import store, { persistor } from './src/state/store';
-import { HomeNavigator } from './src/navigators/HomeNavigator';
 import TrackPlayer, { Capability } from 'react-native-track-player';
 import { PersistGate } from 'redux-persist/integration/react';
+import HomeNavigator from './src/navigators/HomeNavigator';
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
