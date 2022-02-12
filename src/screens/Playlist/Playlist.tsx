@@ -82,7 +82,7 @@ const Playlist = () => {
             await TrackPlayer.add(convertSongListToTracks(currentPlaylist?.playArray));
             TrackPlayer.play();
             // @ts-ignore
-            navigation.navigate('Playback');
+            navigation.navigate('HomeTabs', { screen: 'Playback' });
         }
     }
 

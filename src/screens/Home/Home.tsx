@@ -6,9 +6,9 @@ import styles from "./Home.style";
 
 const Home = () => (
     <SafeAreaView style={styles.container}>
-        <FetchMusicComponent />
         <ArtistList />
     </SafeAreaView>
 );
+
 
 export default Home;
