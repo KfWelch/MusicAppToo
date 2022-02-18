@@ -303,11 +303,16 @@ const FetchMusicComponent = () => {
                 songs = await RNAndroidAudioStore.getSongs({ album: album.album });
             }
 
-            const solomon = songs.filter(
-                (song, index, filteredSongs) => filteredSongs.findIndex(
-                    filteredSong => getMusicTrackId(filteredSong) === getMusicTrackId(song)
-                ) === index && getArtistFromPath(song.path) !== '0'
-            );
+            // We're using reduce instead of filter because it's acting wonky
+            const solomon = songs.reduce((filtered: GetMusicTrack[], currentTrack) => {
+                if (
+                    filtered.find(track => getMusicTrackId(track) === getMusicTrackId(currentTrack))
+                    || getArtistFromPath(currentTrack.path) === '0'
+                ) {
+                    return filtered;
+                }
+                return [...filtered, currentTrack];
+            }, []);
             const albumSongs: Song[] = [];
 
             setSongProgress(0);
