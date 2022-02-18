@@ -291,7 +291,7 @@ const FetchMusicComponent = () => {
                 return [...filtered, currentAlbum];
             }
         }, []);
-        setTotalAlbums(duplicateless.length);
+        setTotalAlbums(duplicateless.length || 1);
 
         const artists: Artist[] = [];
 
@@ -306,12 +306,12 @@ const FetchMusicComponent = () => {
             const solomon = songs.filter(
                 (song, index, filteredSongs) => filteredSongs.findIndex(
                     filteredSong => getMusicTrackId(filteredSong) === getMusicTrackId(song)
-                ) === index && !(getArtistFromPath(song.path) === '0' || getArtistFromPath(song.path) === 'Alarms')
+                ) === index && getArtistFromPath(song.path) !== '0'
             );
             const albumSongs: Song[] = [];
 
             setSongProgress(0);
-            setTotalSongs(solomon.length);
+            setTotalSongs(solomon.length || 1);
             setAlbumProgress(albumIndex);
 
             for (const [songIndex, song] of solomon.entries()) {
