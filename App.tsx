@@ -47,7 +47,7 @@ const App = () => {
         Capability.SeekTo,
         Capability.Skip
       ],
-      compactCapabilities: [Capability.Play, Capability.Pause]
+      compactCapabilities: [Capability.Play, Capability.Pause, Capability.SkipToNext, Capability.SkipToPrevious]
     });
   };
 

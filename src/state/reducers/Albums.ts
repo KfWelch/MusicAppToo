@@ -23,7 +23,7 @@ const initialState: AlbumsState = {
 };
 
 export const Albums = (state = initialState, action: Actions): AlbumsState => {
-    const oldState = _.cloneDeep(state);
+    const newState = _.cloneDeep(state);
     switch (action.type) {
         case ADD_ARTIST:
             return {
@@ -31,13 +31,9 @@ export const Albums = (state = initialState, action: Actions): AlbumsState => {
                 artists: [...state.artists, action.payload]
             };
         case ADD_ALBUM: {
-            const index = state.artists.findIndex(artist => artist.artist === action.payload.artistName);
-            const newArtists = [...state.artists];
-            newArtists[index].albums.push(action.payload.album);
-            return {
-                ...state,
-                artists: newArtists
-            };
+            const index = newState.artists.findIndex(artist => artist.artist === action.payload.artistName);
+            newState.artists[index].albums.push(action.payload.album);
+            return newState;
         }
         case ADD_SONGS_TO_ALBUM: {
             const artistIndex = state.artists.findIndex(artist => artist.artist === action.payload.artistName);
@@ -63,9 +59,9 @@ export const Albums = (state = initialState, action: Actions): AlbumsState => {
                 selectedArtist: undefined
             }
         case COMBINE_MULTI_DISC_ALBUMS: {
-            const artistIndex = oldState.artists.findIndex(artist => artist.artist === action.payload[0].artistName);
+            const artistIndex = newState.artists.findIndex(artist => artist.artist === action.payload[0].artistName);
             if (artistIndex >= 0) {
-                const artist: Artist = _.cloneDeep(oldState.artists[artistIndex]);
+                const artist: Artist = _.cloneDeep(newState.artists[artistIndex]);
                 const newAlbum: Album = {
                     albumName: disclessAlbumName(action.payload[0].albumName),
                     artistName: artist.artist,
@@ -74,10 +70,10 @@ export const Albums = (state = initialState, action: Actions): AlbumsState => {
                 const newAlbums = artist.albums.filter(album => !action.payload.some(combineAlbum => _.isEqual(combineAlbum, album)));
                 newAlbums.push(newAlbum);
                 artist.albums = newAlbums;
-                oldState.artists.splice(artistIndex, 1, artist);
+                newState.artists.splice(artistIndex, 1, artist);
                 return {
                     ...state,
-                    artists: oldState.artists
+                    artists: newState.artists
                 };
             }
             return state;

@@ -1,7 +1,7 @@
 
-import _, { indexOf } from 'lodash';
-import React, { useEffect, useState } from 'react';
-import { Button, FlatList, SafeAreaView, Text, useColorScheme, View } from 'react-native';
+import _ from 'lodash';
+import React, { useState } from 'react';
+import { Button, SafeAreaView, useColorScheme, View } from 'react-native';
 import { check, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 import Toast from 'react-native-toast-message';
 import * as RNFS from 'react-native-fs';
@@ -10,13 +10,17 @@ import { Reader } from 'jsmediatags';
 // @ts-ignore
 import ReactNativeFileReader from 'jsmediatags/build2/ReactNativeFileReader';
 import { Circle } from 'react-native-progress';
+// @ts-ignore
+import RNAndroidAudioStore from '@yajanarao/react-native-get-music-files';
 import styles from './FetchMusicComponent.style';
 import { Album, Artist, Song } from '../../models/MusicModel';
 import { useTypedSelector } from '../../state/reducers';
 import { useDispatch } from 'react-redux';
-import { addArtist, combineMultiDiscAlbums, resetSavedAlbums } from '../../state/actions/Albums';
+import { addAlbum, addArtist, combineMultiDiscAlbums, resetSavedAlbums } from '../../state/actions/Albums';
 import { colorScheme } from '../../constant/Color';
-import { disclessAlbumName, getAlbumId } from '../../utils/musicUtils';
+import { disclessAlbumName, getAlbumId, getArtistFromPath, getMusicAlbumId, getMusicTrackId } from '../../utils/musicUtils';
+import { useNavigation } from '@react-navigation/native';
+import { GetMusicAlbum, GetMusicTrack } from '../../models/GetMusicFiles';
 
 interface Progress {
     total: number;
@@ -29,13 +33,14 @@ const FetchMusicComponent = () => {
     const systemColorScheme = useColorScheme();
     const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
     const dispatch = useDispatch();
+    const navigation = useNavigation();
     const [totalArtists, setTotalArtists] = useState(1);
     const [artistProgress, setArtistProgress] = useState(0);
     const [totalAlbums, setTotalAlbums] = useState(1);
     const [albumProgress, setAlbumProgress] = useState(0);
     const [totalSongs, setTotalSongs] = useState(1);
     const [songProgress, setSongProgress] = useState(0);
-    const [loadingMusic, setLoadingMusic] = useState(false);
+    const [loadingMusic, setLoadingMusic] = useState(0);
     const [failedSongs, setFailedSongs] = useState(0);
     const [failedAlbums, setFailedAlbums] = useState(0);
 
@@ -44,6 +49,12 @@ const FetchMusicComponent = () => {
         const singleAlbumProgress = singleArtistProgress / totalAlbums;
         const singleSongProgress = singleAlbumProgress / totalSongs;
         return singleSongProgress * songProgress + singleAlbumProgress * albumProgress + singleArtistProgress * artistProgress;
+    };
+
+    const getMusicProgress = () => {
+        const singleAlbumProgress = 1 / totalAlbums;
+        const singleSongProgress = singleAlbumProgress / totalSongs;
+        return singleSongProgress * songProgress + singleAlbumProgress * albumProgress;
     };
 
     const condenseAlbums = () => {
@@ -68,21 +79,6 @@ const FetchMusicComponent = () => {
                 */
                 const matchingAlbums = artist.albums.filter(artistAlbum => artistAlbum.albumName.includes(disclessAlbumName(currentAlbum.albumName)));
                 arrayOfUnique.push(matchingAlbums);
-                return arrayOfUnique;
-
-                // If we find an index of unique discless album names where it matches,
-                // we need to add this current album to that array of uniques
-                const uniquesIndex = arrayOfUnique
-                    .findIndex(uniqueNamedAlbums => uniqueNamedAlbums
-                        .some(album => currentAlbum.albumName.includes(disclessAlbumName(album.albumName))));
-                if (uniquesIndex !== -1) {
-                    // If we find one where there's matching after removing the disc part of the title,
-                    // we need to add this album to that list of uniques
-                    arrayOfUnique[uniquesIndex].push(currentAlbum);
-                } else {
-                    // Otherwise, we add it as its own new unique
-                    arrayOfUnique.push([currentAlbum]);
-                }
                 return arrayOfUnique;
             }, []);
 
@@ -128,6 +124,25 @@ const FetchMusicComponent = () => {
         }
     };
 
+    const getSongTags = (path: string) => new Promise<TagType | null>(resolve => {
+        try {
+            new Reader(path)
+                .setFileReader(ReactNativeFileReader)
+                .read({
+                    onSuccess: tag => {
+                        resolve(tag);
+                    },
+                    onError: e => {
+                        console.error('Error getting tags for file %o, error %o', path, e);
+                        resolve(null);
+                    }
+                });
+        } catch (e) {
+            console.error('Error getting tags for file %o, error %o', path, e);
+            resolve(null);
+        }
+    });
+
     const getMusicFiles = async (recursiveFiles: RNFS.ReadDirItem[], artist?: Artist): Promise<Artist[]> => {
         const directories = recursiveFiles.filter(item => item.isDirectory() && !item.name.startsWith('.'));
         if (!artist) {
@@ -162,24 +177,7 @@ const FetchMusicComponent = () => {
                 for (let j = 0; j < files.length; j++) {
                     setSongProgress(j);
                     const filePath = files[j].path;
-                    const tags = await new Promise<TagType | null>(resolve => {
-                        try {
-                            new Reader(filePath)
-                                .setFileReader(ReactNativeFileReader)
-                                .read({
-                                    onSuccess: tag => {
-                                        resolve(tag);
-                                    },
-                                    onError: e => {
-                                        console.error('Error getting tags for file %o, error %o', files[j], e);
-                                        resolve(null);
-                                    }
-                                });
-                        } catch (e) {
-                            console.error('Error getting tags for file %o, error %o', files[j], e);
-                            resolve(null);
-                        }
-                    });
+                    const tags = await getSongTags(filePath);
                     
                     if (tags) {
                         const track = tags.tags.track;
@@ -247,18 +245,138 @@ const FetchMusicComponent = () => {
         const path = `${RNFS.ExternalStorageDirectoryPath}/Music`
         await getPermission(false);
         const files = await RNFS.readDir(path)
-        setLoadingMusic(true);
+        setLoadingMusic(1);
         setFailedAlbums(0);
         setFailedSongs(0);
         const musicFiles = await getMusicFiles(files);
         musicFiles.forEach(artist => dispatch(addArtist(artist)));
-        setLoadingMusic(false);
+        setLoadingMusic(0);
         Toast.show({
             position: 'bottom',
             type: 'error',
             text1: `Failed to get ${failedSongs} songs`,
             text2: `This has affected ${failedAlbums} albums`,
             visibilityTime: 5000
+        });
+
+        // @ts-ignore
+        navigation.navigate('HomeStack');
+    };
+
+    const getMusic = async () => {
+        console.log('Getting music files')
+        setTotalAlbums(1);
+        setTotalSongs(1);
+        setSongProgress(0);
+        setAlbumProgress(0);
+        setLoadingMusic(2);
+        /* const musicFiles: GetMusicFileType[] = await MusicFiles.getAll({
+            artist: true,
+            duration: true,
+            cover: true,
+            icon: true,
+            genre: true,
+            title: true,
+            album: true,
+            fields : ['title','albumTitle','genre','lyrics','artwork','duration'] // for iOs Version
+        }); */
+
+        const albums: GetMusicAlbum[] = await RNAndroidAudioStore.getAlbums();
+
+        const duplicateless = albums.reduce((filtered: GetMusicAlbum[], currentAlbum) => {
+            if (filtered.some(album => getMusicAlbumId(album) === getMusicAlbumId(currentAlbum))) {
+                console.log('Found duplicate album', currentAlbum.album);
+                return filtered;
+            } else {
+                return [...filtered, currentAlbum];
+            }
+        }, []);
+        setTotalAlbums(duplicateless.length || 1);
+
+        const artists: Artist[] = [];
+
+        for (const [albumIndex, album] of duplicateless.entries()) {
+            let songs: GetMusicTrack[] = await RNAndroidAudioStore.getSongs({ artist: album.author, album: album.album });
+            // We do this because artist & album will not get everything for some
+            // various artist albums
+            if (songs.length < Number.parseInt(album.numberOfSongs, 10)) {
+                songs = await RNAndroidAudioStore.getSongs({ album: album.album });
+            }
+
+            // We're using reduce instead of filter because it's acting wonky
+            const solomon = songs.reduce((filtered: GetMusicTrack[], currentTrack) => {
+                if (
+                    filtered.find(track => getMusicTrackId(track) === getMusicTrackId(currentTrack))
+                    || getArtistFromPath(currentTrack.path) === '0'
+                ) {
+                    return filtered;
+                }
+                return [...filtered, currentTrack];
+            }, []);
+            const albumSongs: Song[] = [];
+
+            setSongProgress(0);
+            setTotalSongs(solomon.length || 1);
+            setAlbumProgress(albumIndex);
+
+            for (const [songIndex, song] of solomon.entries()) {
+                setSongProgress(songIndex);
+                const filePath = song.path;
+                const tags = await getSongTags(filePath);
+                
+                if (tags) {
+                    const track = tags.tags.track;
+                    const numberInAlbum = parseInt(track?.includes('/') ? track.substring(0, track?.indexOf('/')) : track || '0') || 1;
+                    const albumSong: Song = {
+                        albumName: album.album,
+                        contributingArtist: song.artist,
+                        title: song.title,
+                        path: song.path,
+                        weight: 1,
+                        numberInAlbum
+                    };
+                    albumSongs.push(albumSong);
+                }
+            }
+            
+            if (albumSongs.length) {
+                // Have to do this because some albums have various artists
+                // So we use filepath
+                const folderArtist = getArtistFromPath(albumSongs[0].path || `a/b/${album.author}/album/song`).replace('_', ' ');
+                if (!artists.some(artist => artist.artist === folderArtist)) {
+                    const newArtist: Artist = {
+                        albums: [{
+                            albumName: album.album,
+                            artistName: folderArtist,
+                            songs: albumSongs
+                        }],
+                        artist: folderArtist
+                    };
+                    dispatch(addArtist(newArtist));
+                    artists.push(newArtist);
+                } else {
+                    const newAlbum: Album = {
+                        albumName: album.album,
+                        artistName: folderArtist,
+                        songs: albumSongs
+                    };
+                    dispatch(addAlbum(folderArtist, newAlbum));
+                    const artistIndex = artists.findIndex(artist => _.isEqual(artist.artist, newAlbum.artistName));
+                    artists[artistIndex].albums.push(newAlbum);
+                    if (!artists.some(artist => artist.albums.some(album => getAlbumId(album) === getAlbumId(newAlbum)))) {
+                    }
+                }
+            } else {
+                console.log('Not adding album with no songs');
+            }
+        }
+
+        // console.log(albums);
+        setLoadingMusic(0);
+        Toast.show({
+            type: 'success',
+            position: 'bottom',
+            text1: 'Finished loading music'
         });
     };
 
@@ -267,12 +385,16 @@ const FetchMusicComponent = () => {
         getFiles();
     };
 
+    const clearMusic = () => {
+        dispatch(resetSavedAlbums());
+    };
+
     const itemSeparator = () => (<View style={styles.itemSeparator} />);
 
-    const progressView = () => loadingMusic && (
+    const progressView = () => !!loadingMusic && (
         <View style={styles.loadingLPView}>
             <Circle
-                progress={getProgress()}
+                progress={loadingMusic === 1 ? getProgress() : getMusicProgress()}
                 size={300}
                 thickness={100}
                 showsText
@@ -294,6 +416,10 @@ const FetchMusicComponent = () => {
             <Button onPress={reloadMusic} title="Reload music" color={colorScheme[isDarkMode ? 'dark' : 'light'].contentBackground} />
             {itemSeparator()}
             <Button onPress={condenseAlbums} title="Condense albums by discs" color={colorScheme[isDarkMode ? 'dark' : 'light'].contentBackground} />
+            {itemSeparator()}
+            <Button onPress={getMusic} title="Scan for music with get-music-files" color={colorScheme[isDarkMode ? 'dark' : 'light'].contentBackground} />
+            {itemSeparator()}
+            <Button onPress={clearMusic} title="Clear saved music" color={colorScheme[isDarkMode ? 'dark' : 'light'].contentBackground} />
             {progressView()}
         </SafeAreaView>
     );
