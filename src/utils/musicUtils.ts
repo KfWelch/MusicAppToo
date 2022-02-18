@@ -1,4 +1,5 @@
 import { Track } from "react-native-track-player";
+import { GetMusicAlbum, GetMusicTrack } from "../models/GetMusicFiles";
 import { Album, Song } from "../models/MusicModel";
 
 export const convertSongToTrack = (song: Song): Track => {
@@ -16,12 +17,15 @@ export const convertSongListToTracks = (songs: Song[]): Track[] => {
     return trackList;
 }
 
-export const getSongId = (song: Song): string => `${song.albumName}§${song.title}`;
+export const getSongId = (song: Song): string => `${song.contributingArtist}§${song.albumName}§${song.title}`;
 export const getAlbumFromSongId = (songId: string): string => songId.substring(0, songId.indexOf('§'));
 export const getSongTitleFromId = (songId: string): string => songId.substring(songId.indexOf('§') + 1);
 
 export const getAlbumId = (album: Album): string => `${album.artistName}§${album.albumName}`;
 export const getArtistFromAlbumId = (albumId: string): string => albumId.substring(0, albumId.indexOf('§'));
+
+export const getMusicTrackId = (track: GetMusicTrack) => `${track.artist}§${track.album}§${track.title}`;
+export const getMusicAlbumId = (album: GetMusicAlbum) => `${album.author}§${album.album}`;
 
 export const getPlayArray = (albums: Album[], songs: Song[]): Song[] => {
     const playArray = albums.reduce((prevVal: Song[], currVal) => prevVal.concat(currVal.songs), []);
@@ -37,3 +41,8 @@ export const getPlayArray = (albums: Album[], songs: Song[]): Song[] => {
 export const disclessAlbumName = (albumName: string): string => albumName.toLowerCase().includes('disc')
     ? albumName.substring(0, albumName.lastIndexOf(' ', albumName.toLowerCase().lastIndexOf('disc') - 1))
     : albumName;
+
+export const getArtistFromPath = (filePath: string): string => {
+    const folders = filePath.split(/\\.|(\/)/g);
+    return folders[folders.length - 5];
+};
