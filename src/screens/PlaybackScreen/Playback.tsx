@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Text, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TrackPlayer, { Event, useTrackPlayerEvents } from "react-native-track-player";
+import TrackPlayer, { Event, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player";
 import SmoothPicker from 'react-native-smooth-picker';
 import SongCard from "../../components/Cards/SongCard/SongCard";
 import PlaybackControl from "../../components/PlaybackControl/PlaybackControl";
@@ -10,12 +10,17 @@ import { useTypedSelector } from "../../state/reducers";
 import { getSongId } from "../../utils/musicUtils";
 import styles from "./Playback.style";
 import { colorScheme } from "../../constant/Color";
+import { useDispatch } from "react-redux";
+import { setLastSongPlayed } from "../../state/actions/Playlist";
+import { playable } from "../../utils/trackPlayUtils";
 
 const Playback = () => {
     const currentPlaylist = useTypedSelector(state => state.Playlist.currentPlaylist);
+    const options = useTypedSelector(state => state.Options);
+    const dispatch = useDispatch();
+    const playbackState = usePlaybackState();
     const [currentTrack, setCurrentTrack] = useState(0);
     const [currentSong, setCurrentSong] = useState<Song | undefined>(undefined);
-    const options = useTypedSelector(state => state.Options);
     const systemColorScheme = useColorScheme();
     const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
 
@@ -23,6 +28,7 @@ const Playback = () => {
         if (event.type === Event.PlaybackTrackChanged) {
             TrackPlayer.getCurrentTrack().then(value => {
                 setCurrentTrack(value);
+                dispatch(setLastSongPlayed(value));
             });
         }
     });
@@ -32,6 +38,19 @@ const Playback = () => {
     );
 
     const pickerRef = useRef(null);
+
+    const startPlayback = async () => {
+        const tracks = await TrackPlayer.getQueue();
+        if (currentPlaylist) {
+            if (!tracks.length) {
+                await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
+                if (currentPlaylist.lastSongPlayed && !playable(playbackState)) {
+                    await TrackPlayer.skip(currentPlaylist.lastSongPlayed);
+                }
+            }
+            TrackPlayer.play();
+        }
+    }
 
     useEffect(() => {
         setCurrentSong(currentPlaylist?.playArray[currentTrack]);
@@ -63,7 +82,7 @@ const Playback = () => {
         <SafeAreaView style={styles.container}>
             {songView()}
             <PlaybackControl
-                play={() => TrackPlayer.play()}
+                play={() => startPlayback()}
                 pause={() => TrackPlayer.pause()}
                 restart={() => {}}
                 seek={() => {}}

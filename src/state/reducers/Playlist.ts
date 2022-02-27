@@ -17,6 +17,7 @@ import {
     SET_ALBUM_AS_PLAYLIST,
     SET_ALBUM_ORDERED,
     SET_CURRENT_PLAYLIST,
+    SET_LAST_SONG_PLAYED,
     SET_ORDERED_TYPE,
     SET_PLAYBACK_MODE,
     SET_RANDOMIZE_TYPE,
@@ -45,6 +46,7 @@ export enum RandomizationType {
 
 interface PlaylistState {
     currentPlaylist: PlaylistModel | null;
+    currentPlaylistTrack: number;
     savedPlaylists: PlaylistModel[];
     newPlaylist: {
         individualSongs: Song[];
@@ -63,6 +65,7 @@ interface PlaylistState {
 
 const initialState: PlaylistState = {
     currentPlaylist: null,
+    currentPlaylistTrack: -1,
     savedPlaylists: [],
     newPlaylist: {
         individualSongs: [],
@@ -359,7 +362,18 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                     ...state.playbackOptions,
                     randomizeOptions: action.payload
                 }
+            };
+        case SET_LAST_SONG_PLAYED:
+            if (state.currentPlaylist) {
+                return {
+                    ...state,
+                    currentPlaylist: {
+                        ...state.currentPlaylist,
+                        lastSongPlayed: action.payload
+                    }
+                };
             }
+            return state;
         default:
             return state;
     }

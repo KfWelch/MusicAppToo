@@ -1,12 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import React, { useEffect } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import TrackPlayer from "react-native-track-player";
 import { useDispatch } from "react-redux";
 import { Album, Artist, Song } from "../../models/MusicModel";
 import { selectArtist } from "../../state/actions/Albums";
+import { setAlbumAsCurrentPlaylist } from "../../state/actions/Playlist";
 import { useTypedSelector } from "../../state/reducers";
-import { getAlbumId, getSongId } from "../../utils/musicUtils";
+import { convertSongListToTracks, getAlbumId, getSongId } from "../../utils/musicUtils";
 import AlbumCard from "../Cards/AlbumCard/AlbumCard";
 import ArtistCard from "../Cards/ArtistCard/ArtistCard";
 import ComponentDropDown from "../Cards/ComponentDropDown/ComponentDropDown";
@@ -15,6 +17,8 @@ import styles from "./ArtistListComponent.style";
 
 const ArtistList = () => {
     const albumsState = useTypedSelector(state => state.Albums);
+    const currentPlaylist = useTypedSelector(state => state.Playlist.currentPlaylist);
+    const autoPlay = useTypedSelector(state => state.Options.autoPlayOnReload);
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const { artists } = albumsState;
@@ -24,6 +28,22 @@ const ArtistList = () => {
         // @ts-ignore
         navigation.navigate('ArtistScreen');
     };
+
+    useEffect(() => {
+        if (autoPlay) {
+            TrackPlayer.reset().then(() => {
+                if (navigation.isFocused() && currentPlaylist) {
+                    TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray))
+                        .then(() => {
+                            TrackPlayer.play();
+                            // @ts-ignore
+                            navigation.navigate('Playback');
+                        });
+                }
+            });
+        }
+    }, []);
+
     const itemSeparator = () => (<View style={styles.itemSeparator} />);
 
     return (
@@ -38,7 +58,16 @@ const ArtistList = () => {
                                 data={item.albums}
                                 renderItem={({ item }: { item: Album }) => (
                                     <ComponentDropDown
-                                        mainItemCard={(<AlbumCard album={item} />)}  
+                                        mainItemCard={(<AlbumCard album={item} onPlay={async () => {
+                                            dispatch(setAlbumAsCurrentPlaylist(item));
+                                            await TrackPlayer.reset();
+                                            if (currentPlaylist) {
+                                                await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
+                                                TrackPlayer.play();
+                                                // @ts-ignore
+                                                navigation.navigate('Playback')
+                                            }
+                                        }} />)}  
                                         subItemFlatlist={(
                                             <FlatList
                                                 data={item.songs}
