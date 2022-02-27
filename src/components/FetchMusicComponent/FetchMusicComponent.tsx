@@ -264,22 +264,12 @@ const FetchMusicComponent = () => {
     };
 
     const getMusic = async () => {
-        console.log('Getting music files')
+        await getPermission(false);
         setTotalAlbums(1);
         setTotalSongs(1);
         setSongProgress(0);
         setAlbumProgress(0);
         setLoadingMusic(2);
-        /* const musicFiles: GetMusicFileType[] = await MusicFiles.getAll({
-            artist: true,
-            duration: true,
-            cover: true,
-            icon: true,
-            genre: true,
-            title: true,
-            album: true,
-            fields : ['title','albumTitle','genre','lyrics','artwork','duration'] // for iOs Version
-        }); */
 
         const albums: GetMusicAlbum[] = await RNAndroidAudioStore.getAlbums();
 
@@ -333,7 +323,8 @@ const FetchMusicComponent = () => {
                         title: song.title,
                         path: song.path,
                         weight: 1,
-                        numberInAlbum
+                        numberInAlbum,
+                        length: song.duration
                     };
                     albumSongs.push(albumSong);
                 }
