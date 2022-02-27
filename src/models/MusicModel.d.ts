@@ -29,4 +29,5 @@ export interface Playlist {
     albums: Album[];
     songs: Song[];
     playArray: Song[];
+    lastSongPlayed?: number;
 }
