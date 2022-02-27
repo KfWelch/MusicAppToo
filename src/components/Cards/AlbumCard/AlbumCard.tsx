@@ -9,10 +9,11 @@ interface AlbumCardProps {
     setAlbumOrdered?: (value: boolean) => void;
     onRemove?: () => void;
     onAdd?: () => void;
+    onPlay?: () => void;
 }
 
 const AlbumCard = (props: AlbumCardProps) => {
-    const { album, setAlbumOrdered, onAdd, onRemove } = props;
+    const { album, setAlbumOrdered, onAdd, onRemove, onPlay } = props;
 
     const orderedAlbumSelectorView = (ordered = false) => setAlbumOrdered && (
         <View style={styles.infoView}>
@@ -24,6 +25,12 @@ const AlbumCard = (props: AlbumCardProps) => {
     const removeView = () => onRemove && (
         <Pressable onLongPress={onRemove}>
             <MaterialCommunityIcons name="music-off" size={30} />
+        </Pressable>
+    );
+
+    const playView = () => onPlay && (
+        <Pressable onPress={onPlay}>
+            <MaterialCommunityIcons name="play-outline" size={30} />
         </Pressable>
     );
 
@@ -42,6 +49,7 @@ const AlbumCard = (props: AlbumCardProps) => {
                 <Text style={styles.subtitle}>{`${album.songs.length} songs`}</Text>
             </View>
             {orderedAlbumSelectorView(album.ordered)}
+            {playView()}
             {addView()}
             {removeView()}
         </View>
