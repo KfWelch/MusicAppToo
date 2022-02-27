@@ -28,6 +28,8 @@ export const SET_ORDERED_TYPE = 'PLAYLIST/SET_ORDERED_TYPE';
 export const SET_RESHUFFLE = 'PLAYLIST/SET_RESHUFFLE';
 export const SET_RANDOMIZE_TYPE = 'PLAYLIST/SET_RANDOMIZE_TYPE';
 
+export const SET_LAST_SONG_PLAYED = 'PLAYLIST/SET_LAST_SONG';
+
 export const addSong = (song: Song) => ({
     type: ADD_SONG,
     payload: song
@@ -132,6 +134,11 @@ export const setRandomizeType = (randomizeType: RandomizationType) => ({
     payload: randomizeType
 } as const);
 
+export const setLastSongPlayed = (index: number) => ({
+    type: SET_LAST_SONG_PLAYED,
+    payload: index
+} as const);
+
 export type Actions =
     ReturnType<typeof addSong>
     | ReturnType<typeof removeSong>
@@ -153,4 +160,5 @@ export type Actions =
     | ReturnType<typeof setRepeat>
     | ReturnType<typeof setOrderedType>
     | ReturnType<typeof setReshuffle>
-    | ReturnType<typeof setRandomizeType>;
+    | ReturnType<typeof setRandomizeType>
+    | ReturnType<typeof setLastSongPlayed>;

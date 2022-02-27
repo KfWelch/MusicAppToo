@@ -1,13 +1,20 @@
-import { Actions, OVERRIDE_APPEARANCE, SET_DARKMODE, SET_OPTION } from '../actions/Options';
+import {
+    Actions,
+    OVERRIDE_APPEARANCE,
+    SET_DARKMODE,
+    SET_OPTION
+} from '../actions/Options';
 
 interface OptionsState {
     overrideSystemAppearance: boolean;
     isDarkmode: boolean;
+    autoPlayOnReload: boolean;
 };
 
 const initialState: OptionsState = {
     overrideSystemAppearance: false,
-    isDarkmode: false
+    isDarkmode: false,
+    autoPlayOnReload: false
 };
 
 export const Options = (state = initialState, action: Actions): OptionsState => {
