@@ -7,12 +7,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-evenly'
     },
     scrollView: {
-        height: 300,
+        height: '70%',
         alignSelf: 'center'
     },
-    songCardView: {
-        borderWidth: 1,
-        borderRadius: 10
+    itemSeparator: {
+        height: 1
     }
 });
 

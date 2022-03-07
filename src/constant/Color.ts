@@ -9,7 +9,16 @@ const color = {
     FLORAL_WHITE: 'floralwhite'
 };
 
-export const colorScheme = {
+interface ColorScheme {
+    [key: string]: {
+        background: string;
+        outline: string;
+        content: string;
+        contentBackground: string;
+    }
+}
+
+export const colorScheme: ColorScheme = {
     dark: {
         background: '#190a10',
         outline: 'darkred',

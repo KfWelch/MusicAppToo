@@ -1,7 +1,7 @@
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import { Button, FlatList, Pressable, Switch, Text, View } from "react-native";
+import { Button, FlatList, Pressable, Switch, Text, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
 import ModalDropdown from 'react-native-modal-dropdown';
@@ -28,10 +28,17 @@ const Playlist = () => {
     const playerOptions = useTypedSelector(state => state.Playlist.playbackOptions);
     const dispatch = useDispatch();
     const navigation = useNavigation();
+    const options = useTypedSelector(state => state.Options);
+    const systemColorScheme = useColorScheme();
+    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
 
 
     const songView = ({ item }: { item: Song }) => (
-        <SongCard song={item} onWeightChange={value => dispatch(setSongWeight(getSongId(item), value))}/>
+        <SongCard
+            song={item}
+            onWeightChange={value => dispatch(setSongWeight(getSongId(item), value))}
+            colorScheme={isDarkMode ? 'dark' : 'light'}
+        />
     );
 
     const albumView = ({ item }: { item: Album }) => (
@@ -132,7 +139,11 @@ const Playlist = () => {
     );
 
     const individualSongView = ({ item }: { item: Song }) => (
-        <SongCard song={item} onWeightChange={newWeight => dispatch(setSongWeight(getSongId(item), newWeight))} />
+        <SongCard
+            song={item}
+            onWeightChange={newWeight => dispatch(setSongWeight(getSongId(item), newWeight))}
+            colorScheme={isDarkMode ? 'dark' : 'light'}
+        />
     );
 
     const songsView = () => (

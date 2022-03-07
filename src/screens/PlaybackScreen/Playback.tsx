@@ -1,18 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Text, useColorScheme, View } from "react-native";
+import { useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TrackPlayer, { Event, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player";
-import SmoothPicker from 'react-native-smooth-picker';
 import SongCard from "../../components/Cards/SongCard/SongCard";
 import PlaybackControl from "../../components/PlaybackControl/PlaybackControl";
 import { Song } from "../../models/MusicModel";
 import { useTypedSelector } from "../../state/reducers";
-import { getSongId } from "../../utils/musicUtils";
+import { convertSongListToTracks, getSongId } from "../../utils/musicUtils";
 import styles from "./Playback.style";
-import { colorScheme } from "../../constant/Color";
 import { useDispatch } from "react-redux";
 import { setLastSongPlayed } from "../../state/actions/Playlist";
 import { playable } from "../../utils/trackPlayUtils";
+import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 
 const Playback = () => {
     const currentPlaylist = useTypedSelector(state => state.Playlist.currentPlaylist);
@@ -24,6 +23,11 @@ const Playback = () => {
     const systemColorScheme = useColorScheme();
     const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
 
+    const translationY = useSharedValue(0);
+    const scrollHandler = useAnimatedScrollHandler((event) => {
+        translationY.value = event.contentOffset.y;
+    });
+
     useTrackPlayerEvents([Event.PlaybackTrackChanged], event => {
         if (event.type === Event.PlaybackTrackChanged) {
             TrackPlayer.getCurrentTrack().then(value => {
@@ -33,11 +37,7 @@ const Playback = () => {
         }
     });
 
-    const currentSongView = () => currentSong && (
-        <SongCard song={currentSong} />
-    );
-
-    const pickerRef = useRef(null);
+    const pickerRef = useRef<Animated.FlatList<Song>>(null);
 
     const startPlayback = async () => {
         const tracks = await TrackPlayer.getQueue();
@@ -57,23 +57,29 @@ const Playback = () => {
         // @ts-ignore
         pickerRef.current?.scrollToIndex({
             animated: true,
-            index: currentTrack
+            index: currentTrack,
+            viewPosition: 0.5
         });
     }, [currentTrack]);
 
+    const renderSongCard = ({ item, index }: { item: Song, index: number }) => (
+        <SongCard
+            song={item}
+            colorScheme={isDarkMode ? 'dark' : 'light' }
+            isPlaying={currentSong && currentTrack === index}
+            animated={{ index, yOffset: translationY }}
+        />
+    );
+
     const songView = () => !!(currentPlaylist && currentSong) && (
         <View style={styles.scrollView}>
-            <SmoothPicker
+            <Animated.FlatList
                 data={currentPlaylist.playArray}
-                keyExtractor={(item, index) => `${getSongId(item)}-${index}`}
-                renderItem={({ item, index }: { item: Song, index: number }) => (
-                    <View style={{ ...styles.songCardView, borderColor: colorScheme[isDarkMode ? 'dark' : 'light'].outline}}>
-                        <SongCard song={item} distFromCurrent={Math.abs(index - currentTrack)} />
-                    </View>
-                )}
-                initialScrollToIndex={currentTrack}
-                scrollAnimation
-                refFlatList={pickerRef}
+                renderItem={renderSongCard}
+                keyExtractor={item => getSongId(item)}
+                onScroll={scrollHandler}
+                scrollEventThrottle={16}
+                ref={pickerRef}
             />
         </View>
     );
@@ -85,12 +91,12 @@ const Playback = () => {
                 play={() => startPlayback()}
                 pause={() => TrackPlayer.pause()}
                 restart={() => {}}
-                seek={() => {}}
+                seek={pos => TrackPlayer.seekTo(pos)}
                 setVol={() => {}}
                 skipBack={() => TrackPlayer.skipToPrevious()}
                 skipForward={() => TrackPlayer.skipToNext()}
                 skipTo={() => {}}
-                stop={() => {}}
+                stop={() => TrackPlayer.stop()}
             />
         </SafeAreaView>
     )
