@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TrackPlayer from "react-native-track-player";
 import { useDispatch } from "react-redux";
@@ -21,6 +21,9 @@ const ArtistList = () => {
     const autoPlay = useTypedSelector(state => state.Options.autoPlayOnReload);
     const navigation = useNavigation();
     const dispatch = useDispatch();
+    const options = useTypedSelector(state => state.Options);
+    const systemColorScheme = useColorScheme();
+    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
     const { artists } = albumsState;
 
     const selectArtistFromList = (artistName: string, pressedTitle: string) => {
@@ -71,7 +74,7 @@ const ArtistList = () => {
                                         subItemFlatlist={(
                                             <FlatList
                                                 data={item.songs}
-                                                renderItem={({ item }: { item: Song }) => (<SongCard song={item} />)}
+                                                renderItem={({ item }: { item: Song }) => (<SongCard song={item} colorScheme={isDarkMode ? 'dark' : 'light'} />)}
                                                 keyExtractor={(item, index) => `${getSongId(item)}-${index}`}
                                                 extraData={item}
                                             />

@@ -1,5 +1,8 @@
 import { StyleSheet } from "react-native";
 
+export const SongCardHeight = 85;
+export const MARGIN = 5;
+
 const styles = StyleSheet.create({
     indexNumber: {
         fontSize: 18
@@ -17,8 +20,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 15,
-        height: 85,
-        alignSelf: 'stretch'
+        height: SongCardHeight,
+        alignSelf: 'center',
+        borderWidth: 1,
+        borderRadius: 8,
+        marginVertical: MARGIN
     },
     infoView: {
         flexDirection: 'column',
