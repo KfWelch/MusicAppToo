@@ -12,6 +12,9 @@ import { useDispatch } from "react-redux";
 import { setLastSongPlayed } from "../../state/actions/Playlist";
 import { playable } from "../../utils/trackPlayUtils";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+import { MARGIN, SongCardHeight } from "../../components/Cards/SongCard/SongCard.style";
+
+const CARD_HEIGHT = SongCardHeight + MARGIN * 2;
 
 const Playback = () => {
     const currentPlaylist = useTypedSelector(state => state.Playlist.currentPlaylist);
@@ -78,10 +81,13 @@ const Playback = () => {
             <Animated.FlatList
                 data={currentPlaylist.playArray}
                 renderItem={renderSongCard}
-                keyExtractor={item => getSongId(item)}
+                keyExtractor={(item, index) => getSongId(item) + index}
                 onScroll={scrollHandler}
                 scrollEventThrottle={16}
                 ref={pickerRef}
+                getItemLayout={(data, index) => (
+                    {length: CARD_HEIGHT, offset: CARD_HEIGHT * index, index}
+                )}
             />
         </View>
     );
