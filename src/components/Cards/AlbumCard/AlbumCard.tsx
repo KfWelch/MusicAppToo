@@ -23,7 +23,7 @@ const AlbumCard = (props: AlbumCardProps) => {
     );
 
     const removeView = () => onRemove && (
-        <Pressable onLongPress={onRemove}>
+        <Pressable onPress={onRemove}>
             <MaterialCommunityIcons name="music-off" size={30} />
         </Pressable>
     );

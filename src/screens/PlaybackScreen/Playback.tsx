@@ -63,12 +63,14 @@ const Playback = () => {
     }, [currentTrack]);
 
     const renderSongCard = ({ item, index }: { item: Song, index: number }) => (
-        <SongCard
-            song={item}
-            colorScheme={isDarkMode ? 'dark' : 'light' }
-            isPlaying={currentSong && currentTrack === index}
-            animated={{ index, yOffset: translationY }}
-        />
+        <Pressable onPress={async () => await TrackPlayer.skip(index)}>
+            <SongCard
+                song={item}
+                colorScheme={isDarkMode ? 'dark' : 'light'}
+                isPlaying={currentSong && currentTrack === index}
+                animated={{ index, yOffset: translationY }}
+            />
+        </Pressable>
     );
 
     const songView = () => !!(currentPlaylist && currentSong) && (

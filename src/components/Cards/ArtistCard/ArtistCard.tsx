@@ -15,7 +15,7 @@ const ArtistCard = (props: ArtistCardProps) => {
 
     const removeView = () => onRemove && (
         <Pressable onPress={onRemove}>
-            <MaterialCommunityIcons name="head-minus-outline" size={30} />
+            <MaterialCommunityIcons name="minus-box-multiple" size={30} />
         </Pressable>
     );
 

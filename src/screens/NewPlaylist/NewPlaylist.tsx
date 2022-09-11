@@ -31,14 +31,28 @@ const NewPlaylist = () => {
     const [playlistName, setPlaylistName] = useState('');
 
     const songsInPlaylist = () => !!(newPlaylist.individualSongs.length || newPlaylist.albums.length);
+
+    const albumInPlaylist = (album: Album) => newPlaylist.albums.includes(album);
+    const songInPlaylist = (song: Song) => newPlaylist.individualSongs.includes(song);
     
     const availableSongView = ({ item }: { item: Song }) => (
-        <SongCard song={item} onAdd={() => dispatch(addSong(item))} />
+        <SongCard
+            song={item}
+            onAdd={!songInPlaylist(item) ? (() => dispatch(addSong(item))) : undefined}
+            onRemove={songInPlaylist(item) ? (() => dispatch(removeSong(getSongId(item)))) : undefined}
+            colorScheme={isDarkMode ? 'dark' : 'light'}
+        />
     );
 
     const availableAlbumView = ({ item }: { item: Album }) => (
         <ComponentDropDown
-            mainItemCard={(<AlbumCard album={item} onAdd={() => dispatch(addAlbum(item))} />)}
+            mainItemCard={(
+                <AlbumCard
+                    album={item}
+                    onAdd={!albumInPlaylist(item) ? (() => dispatch(addAlbum(item))) : undefined}
+                    onRemove={albumInPlaylist(item) ? (() => dispatch(removeAlbum(getAlbumId(item)))) : undefined}
+                />
+            )}
             subItemFlatlist={(
                 <FlatList
                     data={item.songs}  
@@ -72,7 +86,7 @@ const NewPlaylist = () => {
         </SafeAreaView>
     );
 
-    const selectedSongAlbumView = ({ item }: { item: Song }) => (<SongCard song={item} />);
+    const selectedSongAlbumView = ({ item }: { item: Song }) => (<SongCard song={item} colorScheme={isDarkMode ? 'dark' : 'light'} />);
 
     const selectedAlbumView = ({ item }: { item: Album }) => (
         <ComponentDropDown
@@ -88,7 +102,7 @@ const NewPlaylist = () => {
     );
 
     const selectedSongView = ({ item }: { item: Song }) => (
-        <SongCard song={item} onRemove={() => dispatch(removeSong(getSongId(item)))} />
+        <SongCard song={item} onRemove={() => dispatch(removeSong(getSongId(item)))} colorScheme={isDarkMode ? 'dark' : 'light'} />
     );
 
     const makePlaylistButton = () => (songsInPlaylist() && playlistName) ? (

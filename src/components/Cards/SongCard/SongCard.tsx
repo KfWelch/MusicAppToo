@@ -85,7 +85,7 @@ const SongCard = (props: SongCardAnimatedProps) => {
     );
 
     const removeView = () => onRemove && (
-        <Pressable onLongPress={onRemove}>
+        <Pressable onPress={onRemove}>
             <MaterialCommunityIcons name="music-note-off" size={30} />
         </Pressable>
     );
