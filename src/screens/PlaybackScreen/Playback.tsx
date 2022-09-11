@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useColorScheme, View } from "react-native";
+import { Pressable, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TrackPlayer, { Event, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player";
 import SongCard from "../../components/Cards/SongCard/SongCard";
