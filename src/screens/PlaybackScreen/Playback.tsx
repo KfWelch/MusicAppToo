@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useColorScheme, View } from "react-native";
+import { Pressable, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TrackPlayer, { Event, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player";
 import SongCard from "../../components/Cards/SongCard/SongCard";
@@ -12,6 +12,9 @@ import { useDispatch } from "react-redux";
 import { setLastSongPlayed } from "../../state/actions/Playlist";
 import { playable } from "../../utils/trackPlayUtils";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+import { MARGIN, SongCardHeight } from "../../components/Cards/SongCard/SongCard.style";
+
+const CARD_HEIGHT = SongCardHeight + MARGIN * 2;
 
 const Playback = () => {
     const currentPlaylist = useTypedSelector(state => state.Playlist.currentPlaylist);
@@ -63,12 +66,14 @@ const Playback = () => {
     }, [currentTrack]);
 
     const renderSongCard = ({ item, index }: { item: Song, index: number }) => (
-        <SongCard
-            song={item}
-            colorScheme={isDarkMode ? 'dark' : 'light' }
-            isPlaying={currentSong && currentTrack === index}
-            animated={{ index, yOffset: translationY }}
-        />
+        <Pressable onPress={async () => await TrackPlayer.skip(index)}>
+            <SongCard
+                song={item}
+                colorScheme={isDarkMode ? 'dark' : 'light'}
+                isPlaying={currentSong && currentTrack === index}
+                animated={{ index, yOffset: translationY }}
+            />
+        </Pressable>
     );
 
     const songView = () => !!(currentPlaylist && currentSong) && (
@@ -76,10 +81,13 @@ const Playback = () => {
             <Animated.FlatList
                 data={currentPlaylist.playArray}
                 renderItem={renderSongCard}
-                keyExtractor={item => getSongId(item)}
+                keyExtractor={(item, index) => getSongId(item) + index}
                 onScroll={scrollHandler}
                 scrollEventThrottle={16}
                 ref={pickerRef}
+                getItemLayout={(data, index) => (
+                    {length: CARD_HEIGHT, offset: CARD_HEIGHT * index, index}
+                )}
             />
         </View>
     );
