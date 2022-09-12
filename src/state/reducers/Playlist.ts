@@ -21,6 +21,7 @@ import {
     SET_ORDERED_TYPE,
     SET_PLAYBACK_MODE,
     SET_RANDOMIZE_TYPE,
+    SET_RANDOM_NEXT_SONG,
     SET_REPEAT,
     SET_RESHUFFLE,
     SET_SONG_WEIGHT,
@@ -308,6 +309,19 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                     return state;
             }
             return state;
+        }
+        case SET_RANDOM_NEXT_SONG: {
+            if (state.currentPlaylist) {
+                return {
+                    ...state,
+                    currentPlaylist: {
+                        ...state.currentPlaylist,
+                        playArray: [...state.currentPlaylist.playArray, action.payload]
+                    }
+                }
+            } else {
+                return {...state};
+            }
         }
         case REMOVE_PLAYLIST: {
             const playlistIndex = oldState.savedPlaylists.findIndex(playlist => playlist.name === action.payload);
