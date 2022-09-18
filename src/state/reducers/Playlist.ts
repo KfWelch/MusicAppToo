@@ -11,6 +11,7 @@ import {
     GENERATE_PLAYLIST,
     REMOVE_ALBUM,
     REMOVE_ALBUM_FROM_PLAYLIST,
+    REMOVE_OLDEST_RANDOM_SONG,
     REMOVE_PLAYLIST,
     REMOVE_SONG,
     REMOVE_SONG_FROM_PLAYLIST,
@@ -334,13 +335,25 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                     ...state,
                     currentPlaylist: {
                         ...state.currentPlaylist,
-                        playArray: [...state.currentPlaylist.playArray, action.payload]
+                        playArray: [...state.currentPlaylist.playArray, ...action.payload]
                     }
                 }
             } else {
                 return {...state};
             }
         }
+        case REMOVE_OLDEST_RANDOM_SONG:
+            if (state.currentPlaylist) {
+                return {
+                    ...state,
+                    currentPlaylist: {
+                        ...state.currentPlaylist,
+                        playArray: state.currentPlaylist.playArray.slice(action.payload)
+                    }
+                };
+            } else {
+                return {...state};
+            }
         case REMOVE_PLAYLIST: {
             const playlistIndex = oldState.savedPlaylists.findIndex(playlist => playlist.name === action.payload);
             oldState.savedPlaylists.splice(playlistIndex, 1);

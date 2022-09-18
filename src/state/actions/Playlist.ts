@@ -20,6 +20,7 @@ export const SET_SONG_WEIGHT = 'PLAYLIST/SET_SONG_WEIGHT';
 export const SHUFFLE_CURRENT_PLAYLIST = 'PLAYLIST/SHUFFLE_CURRENT';
 export const SET_CURRENT_PLAY_ARRAY = 'PLAYLIST/SET_PLAY_ARRAY';
 export const SET_RANDOM_NEXT_SONG = 'PLAYLIST/SET_RANDOM_NEXT_SONG';
+export const REMOVE_OLDEST_RANDOM_SONG = 'PLAYLIST/REMOVE_OLDEST_RANDOM';
 
 export const SET_SAVED_PLAYLISTS = 'PLAYLIST/SET_SAVED_LISTS';
 export const REMOVE_PLAYLIST = 'PLAYLIST/REMOVE';
@@ -106,9 +107,14 @@ export const setCurrentPlayArray = (songs: Song[]) => ({
     payload: songs
 } as const);
 
-export const setRandomNextSong = (song: Song) => ({
+export const setRandomNextSongs = (songs: Song[]) => ({
     type: SET_RANDOM_NEXT_SONG,
-    payload: song
+    payload: songs
+} as const);
+
+export const removeOldestRandomSongs = (numberToRemove = 1) => ({
+    type: REMOVE_OLDEST_RANDOM_SONG,
+    payload: numberToRemove
 } as const);
 
 export const setSavedPlaylists = (playlists: Playlist[]) => ({
@@ -167,7 +173,8 @@ export type Actions =
     | ReturnType<typeof setSongWeight>
     | ReturnType<typeof shuffleCurrentPlaylist>
     | ReturnType<typeof setCurrentPlayArray>
-    | ReturnType<typeof setRandomNextSong>
+    | ReturnType<typeof setRandomNextSongs>
+    | ReturnType<typeof removeOldestRandomSongs>
     | ReturnType<typeof setSavedPlaylists>
     | ReturnType<typeof removePlaylist>
     | ReturnType<typeof setPlaybackMode>
