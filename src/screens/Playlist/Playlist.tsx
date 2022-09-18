@@ -100,7 +100,7 @@ const Playlist = () => {
                     break;
                 case PlaybackMode.RANDOMIZE:
                     const initialSongs: Song[] = [];
-                    for (let i = 0; i < options.randomizationBuffer; i++) {
+                    for (let i = 0; i < options.randomizationForwardBuffer; i++) {
                         initialSongs.push(getRandomizedNextSong(
                             currentPlaylist,
                             playbackOptions.randomizeOptions.weighted
