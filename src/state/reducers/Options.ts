@@ -11,6 +11,7 @@ interface OptionsState {
     autoPlayOnReload: boolean;
     randomizationForwardBuffer: number;
     randomizationBackwardBuffer: number;
+    randomizationShouldNotRepeatSongs: boolean;
 };
 
 const initialState: OptionsState = {
@@ -18,7 +19,8 @@ const initialState: OptionsState = {
     isDarkmode: false,
     autoPlayOnReload: false,
     randomizationForwardBuffer: 10,
-    randomizationBackwardBuffer: 25
+    randomizationBackwardBuffer: 25,
+    randomizationShouldNotRepeatSongs: true
 };
 
 export const Options = (state = initialState, action: Actions): OptionsState => {
