@@ -6,15 +6,15 @@ import SongCard from "../../components/Cards/SongCard/SongCard";
 import PlaybackControl from "../../components/PlaybackControl/PlaybackControl";
 import { Song } from "../../models/MusicModel";
 import { useTypedSelector } from "../../state/reducers";
-import { convertSongListToTracks, convertSongToTrack, getSongId } from "../../utils/musicUtils";
+import { convertSongListToTracks, getSongId } from "../../utils/musicUtils";
 import styles from "./Playback.style";
 import { useDispatch } from "react-redux";
 import { removeOldestRandomSongs, setCurrentPlayArray, setLastSongPlayed, setRandomNextSongs } from "../../state/actions/Playlist";
 import { playable } from "../../utils/trackPlayUtils";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { MARGIN, SongCardHeight } from "../../components/Cards/SongCard/SongCard.style";
-import { PlaybackMode, RandomizationType } from "../../state/reducers/Playlist";
-import { getRandomizedNextSong } from "../../utils/PlaylistRandomization";
+import { PlaybackMode } from "../../state/reducers/Playlist";
+import { getRandomizedNextSong, getRandomizedSongs } from "../../utils/PlaylistRandomization";
 
 const CARD_HEIGHT = SongCardHeight + MARGIN * 2;
 
@@ -46,11 +46,29 @@ const Playback = () => {
                     if (currentForwardBuffer < randomizationForwardBuffer) {
                         const bufferNeeded = randomizationForwardBuffer - currentForwardBuffer;
                         const songsToAdd: Song[] = [];
-                        for (let i = 0; i < bufferNeeded; i++) {
-                            const nextSong: Song = getRandomizedNextSong(
+                        if (options.randomizationShouldNotRepeatSongs) {
+                            songsToAdd.push(getRandomizedNextSong(
                                 currentPlaylist,
-                                playbackOptions.randomizeOptions.weighted
-                            );
+                                playbackOptions.randomizeOptions.weighted,
+                                currentPlaylist.playArray[currentPlaylist.playArray.length - 1]
+                            ));
+                        } else {
+                            songsToAdd.push(getRandomizedNextSong(currentPlaylist, playbackOptions.randomizeOptions.weighted));
+                        }
+                        for (let i = 1; i < bufferNeeded; i++) {
+                            let nextSong: Song;
+                            if (options.randomizationShouldNotRepeatSongs) {
+                                nextSong = getRandomizedNextSong(
+                                    currentPlaylist,
+                                    playbackOptions.randomizeOptions.weighted,
+                                    songsToAdd[i - 1]
+                                );
+                            } else {
+                                nextSong = getRandomizedNextSong(
+                                    currentPlaylist,
+                                    playbackOptions.randomizeOptions.weighted
+                                );
+                            }
                             songsToAdd.push(nextSong);
                         }
                         dispatch(setRandomNextSongs(songsToAdd));
@@ -79,13 +97,12 @@ const Playback = () => {
         if (currentPlaylist) {
             if (!tracks.length) {
                 if (playbackOptions.mode === PlaybackMode.RANDOMIZE) {
-                    const initialSongs: Song[] = [];
-                    for (let i = 0; i < options.randomizationForwardBuffer; i++) {
-                        initialSongs.push(getRandomizedNextSong(
-                            currentPlaylist,
-                            playbackOptions.randomizeOptions.weighted
-                        ));
-                    }
+                    const initialSongs = getRandomizedSongs(
+                        currentPlaylist,
+                        options.randomizationForwardBuffer,
+                        playbackOptions.randomizeOptions.weighted,
+                        options.randomizationShouldNotRepeatSongs
+                    );
                     dispatch(setCurrentPlayArray(initialSongs));
                     await TrackPlayer.add(convertSongListToTracks(initialSongs));
                 } else {

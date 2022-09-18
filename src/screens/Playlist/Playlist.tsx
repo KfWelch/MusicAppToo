@@ -16,8 +16,7 @@ import { OrderedType, PlaybackMode, RandomizationType } from "../../state/reduce
 import { convertSongListToTracks, getAlbumId, getPlayArray, getSongId } from "../../utils/musicUtils";
 import styles from "./Playlist.style";
 import TrackPlayer from "react-native-track-player";
-import { getRandomizedNextSong } from "../../utils/PlaylistRandomization";
-import { spreadOrderedAlbumShuffle } from "../../utils/OrderedAlbumShuffle";
+import { getRandomizedSongs } from "../../utils/PlaylistRandomization";
 
     const playbackModeOptions: PlaybackMode[] = [PlaybackMode.NORMAL, PlaybackMode.SHUFFLE, PlaybackMode.RANDOMIZE];
     const orderedTypeOptions: OrderedType[] = [OrderedType.NONE, OrderedType.SPREAD, OrderedType.RANDOM];
@@ -99,13 +98,12 @@ const Playlist = () => {
                     await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
                     break;
                 case PlaybackMode.RANDOMIZE:
-                    const initialSongs: Song[] = [];
-                    for (let i = 0; i < options.randomizationForwardBuffer; i++) {
-                        initialSongs.push(getRandomizedNextSong(
-                            currentPlaylist,
-                            playbackOptions.randomizeOptions.weighted
-                        ));
-                    }
+                    const initialSongs = getRandomizedSongs(
+                        currentPlaylist,
+                        options.randomizationForwardBuffer,
+                        playbackOptions.randomizeOptions.weighted,
+                        options.randomizationShouldNotRepeatSongs
+                    );
                     dispatch(setCurrentPlayArray(initialSongs));
                     await TrackPlayer.add(convertSongListToTracks(initialSongs));
                     break;

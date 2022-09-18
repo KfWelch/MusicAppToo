@@ -14,8 +14,7 @@ import ComponentDropDown from "../ComponentDropDown/ComponentDropDown";
 import styles from "./PlaylistCard.style";
 import { useTypedSelector } from "../../../state/reducers";
 import { PlaybackMode } from "../../../state/reducers/Playlist";
-import { getRandomizedNextSong } from "../../../utils/PlaylistRandomization";
-import { spreadOrderedAlbumShuffle } from "../../../utils/OrderedAlbumShuffle";
+import { getRandomizedSongs } from "../../../utils/PlaylistRandomization";
 
 interface PlaylistCardProps {
     playlist: Playlist,
@@ -107,13 +106,12 @@ const PlaylistCard = (props: PlaylistCardProps) => {
                 }
                 break;
             case PlaybackMode.RANDOMIZE:
-                const initialSongs: Song[] = [];
-                for (let i = 0; i < options.randomizationForwardBuffer; i++) {
-                    initialSongs.push(getRandomizedNextSong(
-                        playlist,
-                        playbackOptions.randomizeOptions.weighted
-                    ));
-                }
+                const initialSongs = getRandomizedSongs(
+                    playlist,
+                    options.randomizationForwardBuffer,
+                    playbackOptions.randomizeOptions.weighted,
+                    options.randomizationShouldNotRepeatSongs
+                );
                 dispatch(setCurrentPlayArray(initialSongs));
                 await TrackPlayer.add(convertSongListToTracks(initialSongs));
                 break;

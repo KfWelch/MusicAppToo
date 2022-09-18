@@ -1,6 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect } from "react";
-import { FlatList, Text, TouchableOpacity, useColorScheme, View } from "react-native";
+import { FlatList, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TrackPlayer from "react-native-track-player";
 import { useDispatch } from "react-redux";
@@ -8,9 +8,9 @@ import { Album, Artist, Song } from "../../models/MusicModel";
 import { selectArtist } from "../../state/actions/Albums";
 import { setAlbumAsCurrentPlaylist, setCurrentPlayArray, shuffleCurrentPlaylist } from "../../state/actions/Playlist";
 import { useTypedSelector } from "../../state/reducers";
-import { PlaybackMode, RandomizationType } from "../../state/reducers/Playlist";
+import { PlaybackMode } from "../../state/reducers/Playlist";
 import { convertSongListToTracks, getAlbumId, getPlayArray, getSongId } from "../../utils/musicUtils";
-import { getRandomizedNextSong } from "../../utils/PlaylistRandomization";
+import { getRandomizedSongs } from "../../utils/PlaylistRandomization";
 import AlbumCard from "../Cards/AlbumCard/AlbumCard";
 import ArtistCard from "../Cards/ArtistCard/ArtistCard";
 import ComponentDropDown from "../Cards/ComponentDropDown/ComponentDropDown";
@@ -39,13 +39,12 @@ const ArtistList = () => {
             TrackPlayer.reset().then(() => {
                 if (navigation.isFocused() && currentPlaylist) {
                     if (playbackOptions.mode === PlaybackMode.RANDOMIZE) {
-                        const initialSongs: Song[] = [];
-                        for (let i = 0; i < options.randomizationForwardBuffer; i++) {
-                            initialSongs.push(getRandomizedNextSong(
-                                currentPlaylist,
-                                playbackOptions.randomizeOptions.weighted
-                            ));
-                        }
+                        const initialSongs = getRandomizedSongs(
+                            currentPlaylist,
+                            options.randomizationForwardBuffer,
+                            playbackOptions.randomizeOptions.weighted,
+                            options.randomizationShouldNotRepeatSongs
+                        );
                         dispatch(setCurrentPlayArray(initialSongs));
                         TrackPlayer.add(convertSongListToTracks(initialSongs))
                             .then(() => {
@@ -97,19 +96,19 @@ const ArtistList = () => {
                                                         await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
                                                         break;
                                                     case PlaybackMode.RANDOMIZE:
-                                                        const initialSongs: Song[] = [];
-                                                        for (let i = 0; i < options.randomizationForwardBuffer; i++) {
-                                                            initialSongs.push(getRandomizedNextSong(
-                                                                currentPlaylist,
-                                                                playbackOptions.randomizeOptions.weighted
-                                                            ));
-                                                        }
+                                                        const initialSongs = getRandomizedSongs(
+                                                            currentPlaylist,
+                                                            options.randomizationForwardBuffer,
+                                                            playbackOptions.randomizeOptions.weighted,
+                                                            options.randomizationShouldNotRepeatSongs
+                                                        );
                                                         dispatch(setCurrentPlayArray(initialSongs));
                                                         await TrackPlayer.add(convertSongListToTracks(initialSongs));
                                                         break;
                                                     default:
                                                         return;
-                                                }                                                TrackPlayer.play();
+                                                }
+                                                TrackPlayer.play();
                                                 // @ts-ignore
                                                 navigation.navigate('Playback')
                                             }
