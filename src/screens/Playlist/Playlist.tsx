@@ -10,12 +10,14 @@ import ComponentDropDown from "../../components/Cards/ComponentDropDown/Componen
 import AlbumCard from "../../components/Cards/AlbumCard/AlbumCard";
 import SongCard from "../../components/Cards/SongCard/SongCard";
 import { Album, Song } from "../../models/MusicModel";
-import { setAlbumOrdered, setOrderedType, setPlaybackMode, setRandomizeType, setReshuffle, setSongWeight, shuffleCurrentPlaylist } from "../../state/actions/Playlist";
+import { setAlbumOrdered, setCurrentPlayArray, setOrderedType, setPlaybackMode, setRandomizeType, setReshuffle, setSongWeight, shuffleCurrentPlaylist } from "../../state/actions/Playlist";
 import { useTypedSelector } from "../../state/reducers";
 import { OrderedType, PlaybackMode, RandomizationType } from "../../state/reducers/Playlist";
-import { convertSongListToTracks, getAlbumId, getSongId } from "../../utils/musicUtils";
+import { convertSongListToTracks, getAlbumId, getPlayArray, getSongId } from "../../utils/musicUtils";
 import styles from "./Playlist.style";
 import TrackPlayer from "react-native-track-player";
+import { getRandomizedNextSong } from "../../utils/PlaylistRandomization";
+import { spreadOrderedAlbumShuffle } from "../../utils/OrderedAlbumShuffle";
 
     const playbackModeOptions: PlaybackMode[] = [PlaybackMode.NORMAL, PlaybackMode.SHUFFLE, PlaybackMode.RANDOMIZE];
     const orderedTypeOptions: OrderedType[] = [OrderedType.NONE, OrderedType.SPREAD, OrderedType.RANDOM];
@@ -24,7 +26,7 @@ import TrackPlayer from "react-native-track-player";
 const Tab = createMaterialTopTabNavigator();
 
 const Playlist = () => {
-    const currentPlaylist = useTypedSelector(state => state.Playlist.currentPlaylist);
+    const { currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
     const playerOptions = useTypedSelector(state => state.Playlist.playbackOptions);
     const dispatch = useDispatch();
     const navigation = useNavigation();
@@ -79,14 +81,37 @@ const Playlist = () => {
             onSelect={(index, option) => {
                 dispatch(setRandomizeType(option));
             }}
-            disabled
         />
     );
 
     const handlePlay = async () => {
         await TrackPlayer.reset();
         if (currentPlaylist) {
-            await TrackPlayer.add(convertSongListToTracks(currentPlaylist?.playArray));
+            switch (playbackOptions.mode) {
+                case PlaybackMode.NORMAL:
+                    const playArray = getPlayArray(currentPlaylist);
+                    setCurrentPlayArray(playArray);
+                    await TrackPlayer.add(convertSongListToTracks(playArray));
+                    break;
+                case PlaybackMode.SHUFFLE:
+                    dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
+                    dispatch(shuffleCurrentPlaylist());
+                    await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
+                    break;
+                case PlaybackMode.RANDOMIZE:
+                    const initialSongs: Song[] = [];
+                    for (let i = 0; i < options.randomizationBuffer; i++) {
+                        initialSongs.push(getRandomizedNextSong(
+                            currentPlaylist,
+                            playbackOptions.randomizeOptions.weighted
+                        ));
+                    }
+                    dispatch(setCurrentPlayArray(initialSongs));
+                    await TrackPlayer.add(convertSongListToTracks(initialSongs));
+                    break;
+                default:
+                    return;
+            }
             TrackPlayer.play();
             // @ts-ignore
             navigation.navigate('HomeTabs', { screen: 'Playback' });
@@ -163,7 +188,12 @@ const Playlist = () => {
             <Tab.Screen name="Details">
                 {() => detailsView()}
             </Tab.Screen>
-            <Tab.Screen name="Songs">
+            <Tab.Screen
+                name="Songs"
+                listeners={{
+                    focus: () => currentPlaylist && dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)))
+                }}
+            >
                 {() => songsView()}
             </Tab.Screen>
         </Tab.Navigator>

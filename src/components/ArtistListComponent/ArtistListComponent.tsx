@@ -6,9 +6,11 @@ import TrackPlayer from "react-native-track-player";
 import { useDispatch } from "react-redux";
 import { Album, Artist, Song } from "../../models/MusicModel";
 import { selectArtist } from "../../state/actions/Albums";
-import { setAlbumAsCurrentPlaylist } from "../../state/actions/Playlist";
+import { setAlbumAsCurrentPlaylist, setCurrentPlayArray, shuffleCurrentPlaylist } from "../../state/actions/Playlist";
 import { useTypedSelector } from "../../state/reducers";
-import { convertSongListToTracks, getAlbumId, getSongId } from "../../utils/musicUtils";
+import { PlaybackMode, RandomizationType } from "../../state/reducers/Playlist";
+import { convertSongListToTracks, getAlbumId, getPlayArray, getSongId } from "../../utils/musicUtils";
+import { getRandomizedNextSong } from "../../utils/PlaylistRandomization";
 import AlbumCard from "../Cards/AlbumCard/AlbumCard";
 import ArtistCard from "../Cards/ArtistCard/ArtistCard";
 import ComponentDropDown from "../Cards/ComponentDropDown/ComponentDropDown";
@@ -17,7 +19,7 @@ import styles from "./ArtistListComponent.style";
 
 const ArtistList = () => {
     const albumsState = useTypedSelector(state => state.Albums);
-    const currentPlaylist = useTypedSelector(state => state.Playlist.currentPlaylist);
+    const { currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
     const autoPlay = useTypedSelector(state => state.Options.autoPlayOnReload);
     const navigation = useNavigation();
     const dispatch = useDispatch();
@@ -36,12 +38,29 @@ const ArtistList = () => {
         if (autoPlay) {
             TrackPlayer.reset().then(() => {
                 if (navigation.isFocused() && currentPlaylist) {
-                    TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray))
-                        .then(() => {
-                            TrackPlayer.play();
-                            // @ts-ignore
-                            navigation.navigate('Playback');
-                        });
+                    if (playbackOptions.mode === PlaybackMode.RANDOMIZE) {
+                        const initialSongs: Song[] = [];
+                        for (let i = 0; i < options.randomizationBuffer; i++) {
+                            initialSongs.push(getRandomizedNextSong(
+                                currentPlaylist,
+                                playbackOptions.randomizeOptions.weighted
+                            ));
+                        }
+                        dispatch(setCurrentPlayArray(initialSongs));
+                        TrackPlayer.add(convertSongListToTracks(initialSongs))
+                            .then(() => {
+                                TrackPlayer.play();
+                                // @ts-ignore
+                                navigation.navigate('Playback');
+                            });
+                    } else {
+                        TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray))
+                            .then(() => {
+                                TrackPlayer.play();
+                                // @ts-ignore
+                                navigation.navigate('Playback');
+                            });
+                    }
                 }
             });
         }
@@ -64,9 +83,33 @@ const ArtistList = () => {
                                         mainItemCard={(<AlbumCard album={item} onPlay={async () => {
                                             dispatch(setAlbumAsCurrentPlaylist(item));
                                             await TrackPlayer.reset();
+                                            await TrackPlayer.removeUpcomingTracks();
                                             if (currentPlaylist) {
-                                                await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
-                                                TrackPlayer.play();
+                                                switch (playbackOptions.mode) {
+                                                    case PlaybackMode.NORMAL:
+                                                        const playArray = getPlayArray(currentPlaylist);
+                                                        setCurrentPlayArray(playArray);
+                                                        await TrackPlayer.add(convertSongListToTracks(playArray));
+                                                        break;
+                                                    case PlaybackMode.SHUFFLE:
+                                                        dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
+                                                        dispatch(shuffleCurrentPlaylist());
+                                                        await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
+                                                        break;
+                                                    case PlaybackMode.RANDOMIZE:
+                                                        const initialSongs: Song[] = [];
+                                                        for (let i = 0; i < options.randomizationBuffer; i++) {
+                                                            initialSongs.push(getRandomizedNextSong(
+                                                                currentPlaylist,
+                                                                playbackOptions.randomizeOptions.weighted
+                                                            ));
+                                                        }
+                                                        dispatch(setCurrentPlayArray(initialSongs));
+                                                        await TrackPlayer.add(convertSongListToTracks(initialSongs));
+                                                        break;
+                                                    default:
+                                                        return;
+                                                }                                                TrackPlayer.play();
                                                 // @ts-ignore
                                                 navigation.navigate('Playback')
                                             }

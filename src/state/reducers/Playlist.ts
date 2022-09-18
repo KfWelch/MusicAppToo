@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { Album, Playlist as PlaylistModel, Song } from '../../models/MusicModel.d';
-import { getAlbumFromSongId, getAlbumId, getPlayArray, getSongId, getSongTitleFromId } from '../../utils/musicUtils';
+import { getAlbumIdFromSongId, getAlbumId, getPlayArray, getSongId, getSongTitleFromId, getNewPlayArray } from '../../utils/musicUtils';
 import { spreadOrderedAlbumShuffle } from '../../utils/OrderedAlbumShuffle';
 import {
     Actions,
@@ -17,6 +17,7 @@ import {
     SET_ALBUM_AS_PLAYLIST,
     SET_ALBUM_ORDERED,
     SET_CURRENT_PLAYLIST,
+    SET_CURRENT_PLAY_ARRAY,
     SET_LAST_SONG_PLAYED,
     SET_ORDERED_TYPE,
     SET_PLAYBACK_MODE,
@@ -60,8 +61,10 @@ interface PlaylistState {
             orderedType: OrderedType;
             reshuffleOnRepeat: boolean;
         };
-        randomizeOptions: RandomizationType
-    }
+        randomizeOptions: {
+            weighted: boolean;
+        };
+    };
 };
 
 const initialState: PlaylistState = {
@@ -79,7 +82,9 @@ const initialState: PlaylistState = {
             orderedType: OrderedType.NONE,
             reshuffleOnRepeat: false
         },
-        randomizeOptions: RandomizationType.WEIGHTLESS
+        randomizeOptions: {
+            weighted: false
+        }
     }
 };
 
@@ -265,9 +270,9 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                 }
             } else if (oldState.currentPlaylist) {
                 const currentPlaylist = { ...oldState.currentPlaylist };
-                const albumName = getAlbumFromSongId(action.payload.songId);
+                const albumId = getAlbumIdFromSongId(action.payload.songId);
                 const title = getSongTitleFromId(action.payload.songId);
-                const albumIndex = currentPlaylist.albums.findIndex(album => album.albumName === albumName);
+                const albumIndex = currentPlaylist.albums.findIndex(album => getAlbumId(album) === albumId);
                 const album = currentPlaylist.albums[albumIndex];
                 if (albumIndex >= 0) {
                     const songIndex = album.songs.findIndex(song => song.title === title);
@@ -294,7 +299,7 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                     // TODO implement normal shuffle
                     break;
                 case OrderedType.RANDOM:
-                    // TODO implement normal shuffle
+                    // TODO implement random ordered shuffle
                     break;
                 case OrderedType.SPREAD:
                     if (state.currentPlaylist) {
@@ -309,6 +314,19 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                     return state;
             }
             return state;
+        }
+        case SET_CURRENT_PLAY_ARRAY: {
+            if (state.currentPlaylist) {
+                return {
+                    ...state,
+                    currentPlaylist: {
+                        ...state.currentPlaylist,
+                        playArray: action.payload
+                    }
+                };
+            } else {
+                return {...state};
+            }
         }
         case SET_RANDOM_NEXT_SONG: {
             if (state.currentPlaylist) {
@@ -374,7 +392,9 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                 ...state,
                 playbackOptions: {
                     ...state.playbackOptions,
-                    randomizeOptions: action.payload
+                    randomizeOptions: {
+                        weighted: action.payload === RandomizationType.WEIGHTED
+                    }
                 }
             };
         case SET_LAST_SONG_PLAYED:
