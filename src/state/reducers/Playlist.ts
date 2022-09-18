@@ -129,7 +129,7 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                 name: action.payload,
                 albums: state.newPlaylist.albums,
                 songs: state.newPlaylist.individualSongs,
-                playArray: getPlayArray(state.newPlaylist.albums, state.newPlaylist.individualSongs)
+                playArray: getNewPlayArray(state.newPlaylist.albums, state.newPlaylist.individualSongs)
             };
             return {
                 ...state,
@@ -159,7 +159,7 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
             if (playlistIndex >= 0) {
                 const playlist = oldState.savedPlaylists[playlistIndex];
                 playlist.songs = playlist.songs.splice(playlist.songs.findIndex(song => getSongId(song) === action.payload.songId), 1);
-                playlist.playArray = getPlayArray(playlist.albums, playlist.songs);
+                playlist.playArray = getPlayArray(playlist);
                 oldState.savedPlaylists.splice(playlistIndex, 1, playlist);
                 return {
                     ...oldState,
@@ -173,7 +173,7 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
             if (playlistIndex >= 0) {
                 const playlist = oldState.savedPlaylists[playlistIndex];
                 playlist.albums.push(action.payload.album);
-                playlist.playArray = getPlayArray(playlist.albums, playlist.songs);
+                playlist.playArray = getPlayArray(playlist);
                 oldState.savedPlaylists.splice(playlistIndex, 1, playlist);
                 return {
                     ...oldState,
@@ -187,7 +187,7 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
             if (playlistIndex >= 0) {
                 const playlist = oldState.savedPlaylists[playlistIndex];
                 playlist.albums = playlist.albums.splice(playlist.albums.findIndex(album => getAlbumId(album) === action.payload.albumId), 1);
-                playlist.playArray = getPlayArray(playlist.albums, playlist.songs);
+                playlist.playArray = getPlayArray(playlist);
                 oldState.savedPlaylists.splice(playlistIndex, 1, playlist);
                 return {
                     ...oldState,
@@ -240,9 +240,9 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                 const playlistIndex = oldState.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
                 const playlist = oldState.savedPlaylists[playlistIndex];
                 if (playlistIndex >= 0) {
-                    const albumName = getAlbumFromSongId(action.payload.songId);
+                    const albumId = getAlbumIdFromSongId(action.payload.songId);
                     const title = getSongTitleFromId(action.payload.songId);
-                    const albumIndex = playlist.albums.findIndex(album => album.albumName === albumName);
+                    const albumIndex = playlist.albums.findIndex(album => getAlbumId(album) === albumId);
                     const album = playlist.albums[albumIndex];
                     if (albumIndex >= 0) {
                         const songIndex = album.songs.findIndex(song => song.title === title);

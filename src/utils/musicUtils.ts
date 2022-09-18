@@ -1,6 +1,6 @@
 import { Track } from "react-native-track-player";
 import { GetMusicAlbum, GetMusicTrack } from "../models/GetMusicFiles";
-import { Album, Song } from "../models/MusicModel";
+import { Album, Playlist, Song } from "../models/MusicModel";
 
 export const convertSongToTrack = (song: Song): Track => {
     return {
@@ -27,7 +27,19 @@ export const getArtistFromAlbumId = (albumId: string): string => albumId.substri
 export const getMusicTrackId = (track: GetMusicTrack) => `${track.artist}§${track.album}§${track.title}`;
 export const getMusicAlbumId = (album: GetMusicAlbum) => `${album.author}§${album.album}`;
 
-export const getPlayArray = (albums: Album[], songs: Song[]): Song[] => {
+export const getPlayArray = (playlist: Playlist): Song[] => {
+    const { albums, songs } = playlist;
+    const playArray = albums.reduce((prevVal: Song[], currVal) => prevVal.concat(currVal.songs), []);
+
+    return playArray
+        .concat(songs)
+        .reduce(
+            (prevVal: Song[], currVal) => prevVal.includes(currVal) ? prevVal : prevVal.concat([currVal]),
+            []
+        );
+};
+
+export const getNewPlayArray = (albums: Album[], songs: Song[]) => {
     const playArray = albums.reduce((prevVal: Song[], currVal) => prevVal.concat(currVal.songs), []);
 
     return playArray
