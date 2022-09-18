@@ -6,18 +6,20 @@ import SongCard from "../../components/Cards/SongCard/SongCard";
 import PlaybackControl from "../../components/PlaybackControl/PlaybackControl";
 import { Song } from "../../models/MusicModel";
 import { useTypedSelector } from "../../state/reducers";
-import { convertSongListToTracks, getSongId } from "../../utils/musicUtils";
+import { convertSongListToTracks, convertSongToTrack, getSongId } from "../../utils/musicUtils";
 import styles from "./Playback.style";
 import { useDispatch } from "react-redux";
-import { setLastSongPlayed } from "../../state/actions/Playlist";
+import { setCurrentPlayArray, setLastSongPlayed, setRandomNextSong } from "../../state/actions/Playlist";
 import { playable } from "../../utils/trackPlayUtils";
 import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { MARGIN, SongCardHeight } from "../../components/Cards/SongCard/SongCard.style";
+import { PlaybackMode, RandomizationType } from "../../state/reducers/Playlist";
+import { getRandomizedNextSong } from "../../utils/PlaylistRandomization";
 
 const CARD_HEIGHT = SongCardHeight + MARGIN * 2;
 
 const Playback = () => {
-    const currentPlaylist = useTypedSelector(state => state.Playlist.currentPlaylist);
+    const { currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
     const options = useTypedSelector(state => state.Options);
     const dispatch = useDispatch();
     const playbackState = usePlaybackState();
@@ -37,6 +39,14 @@ const Playback = () => {
                 setCurrentTrack(value);
                 dispatch(setLastSongPlayed(value));
             });
+            if (playbackOptions.mode === PlaybackMode.RANDOMIZE && currentPlaylist) {
+                const nextSong: Song = getRandomizedNextSong(
+                    currentPlaylist,
+                    playbackOptions.randomizeOptions.weighted
+                );
+                dispatch(setRandomNextSong(nextSong));
+                TrackPlayer.add(convertSongToTrack(nextSong));
+            }
         }
     });
 
@@ -46,9 +56,23 @@ const Playback = () => {
         const tracks = await TrackPlayer.getQueue();
         if (currentPlaylist) {
             if (!tracks.length) {
-                await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
-                if (currentPlaylist.lastSongPlayed && !playable(playbackState)) {
-                    await TrackPlayer.skip(currentPlaylist.lastSongPlayed);
+                if (playbackOptions.mode === PlaybackMode.RANDOMIZE) {
+                    const initialSongs: Song[] = [];
+                    for (let i = 0; i < options.randomizationBuffer; i++) {
+                        initialSongs.push(getRandomizedNextSong(
+                            currentPlaylist,
+                            playbackOptions.randomizeOptions.weighted
+                        ));
+                    }
+                    dispatch(setCurrentPlayArray(initialSongs));
+                    await TrackPlayer.add(convertSongListToTracks(initialSongs));
+                } else {
+                    // Here we need to take back from the play array because we are resuming,
+                    // not playing a new playlist
+                    await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
+                    if (currentPlaylist.lastSongPlayed && !playable(playbackState)) {
+                        await TrackPlayer.skip(currentPlaylist.lastSongPlayed);
+                    }
                 }
             }
             TrackPlayer.play();

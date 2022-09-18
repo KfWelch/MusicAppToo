@@ -74,7 +74,3 @@ export const spreadOrderedAlbumShuffle = (albums: Album[], individualSongs: Song
 
     return songListToPlaylist(songList, unorderedPlaylist);    
 }
-
-export const randomOrderedAlbumShuffle = (albums: Album[]): Song[] => {
-
-}

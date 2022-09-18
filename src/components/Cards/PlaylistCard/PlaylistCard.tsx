@@ -1,17 +1,21 @@
 import { NavigationProp } from "@react-navigation/native";
 import React from "react";
-import { FlatList, Pressable, SafeAreaView, Switch, Text, View } from "react-native";
+import { FlatList, Pressable, SafeAreaView, Switch, Text, useColorScheme, View } from "react-native";
 import NumericInput from "react-native-numeric-input";
 import TrackPlayer from "react-native-track-player";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch } from "react-redux";
 import { Album, Playlist, Song } from "../../../models/MusicModel";
-import { removeAlbumFromPlaylist, removePlaylist, removeSongFromPlaylist, setAlbumOrdered, setCurrentPlaylist, setSongWeight } from "../../../state/actions/Playlist";
-import { convertSongListToTracks, getAlbumId, getSongId } from "../../../utils/musicUtils";
+import { removeAlbumFromPlaylist, removePlaylist, removeSongFromPlaylist, setAlbumOrdered, setCurrentPlayArray, setCurrentPlaylist, setSongWeight, shuffleCurrentPlaylist } from "../../../state/actions/Playlist";
+import { convertSongListToTracks, getAlbumId, getPlayArray, getSongId } from "../../../utils/musicUtils";
 import AlbumCard from "../AlbumCard/AlbumCard";
 import SongCard from "../SongCard/SongCard";
 import ComponentDropDown from "../ComponentDropDown/ComponentDropDown";
 import styles from "./PlaylistCard.style";
+import { useTypedSelector } from "../../../state/reducers";
+import { PlaybackMode } from "../../../state/reducers/Playlist";
+import { getRandomizedNextSong } from "../../../utils/PlaylistRandomization";
+import { spreadOrderedAlbumShuffle } from "../../../utils/OrderedAlbumShuffle";
 
 interface PlaylistCardProps {
     playlist: Playlist,
@@ -21,10 +25,15 @@ interface PlaylistCardProps {
 const PlaylistCard = (props: PlaylistCardProps) => {
     const { playlist } = props;
     const dispatch = useDispatch();
+    const options = useTypedSelector(state => state.Options);
+    const { currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
+    const systemColorScheme = useColorScheme();
+    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
+    const scheme = isDarkMode ? 'dark' : 'light';
 
     const flatListItemSeparator = () => (<View style={styles.flatlistSeparator} />);
 
-    const renderAlbumSong = ({ item }: { item: Song }) => (<SongCard song={item} />);
+    const renderAlbumSong = ({ item }: { item: Song }) => (<SongCard song={item} colorScheme={scheme} />);
 
     const renderAlbumFlatlist = (album: Album) => (
         <View>
@@ -53,6 +62,7 @@ const PlaylistCard = (props: PlaylistCardProps) => {
         <SongCard
             song={item}
             onRemove={() => dispatch(removeSongFromPlaylist(getSongId(item), playlist.name))}
+            colorScheme={scheme}
         />
     );
 
@@ -81,9 +91,35 @@ const PlaylistCard = (props: PlaylistCardProps) => {
     };
 
     const playPlaylist = async () => {
-        dispatch(setCurrentPlaylist(playlist));
         await TrackPlayer.reset();
-        await TrackPlayer.add(convertSongListToTracks(playlist.playArray));
+        dispatch(setCurrentPlaylist(playlist));
+        switch (playbackOptions.mode) {
+            case PlaybackMode.NORMAL:
+                const playArray = getPlayArray(playlist);
+                setCurrentPlayArray(playArray);
+                await TrackPlayer.add(convertSongListToTracks(playArray));
+                break;
+            case PlaybackMode.SHUFFLE:
+                if (currentPlaylist) {
+                    dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
+                    dispatch(shuffleCurrentPlaylist());
+                    await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
+                }
+                break;
+            case PlaybackMode.RANDOMIZE:
+                const initialSongs: Song[] = [];
+                for (let i = 0; i < options.randomizationBuffer; i++) {
+                    initialSongs.push(getRandomizedNextSong(
+                        playlist,
+                        playbackOptions.randomizeOptions.weighted
+                    ));
+                }
+                dispatch(setCurrentPlayArray(initialSongs));
+                await TrackPlayer.add(convertSongListToTracks(initialSongs));
+                break;
+            default:
+                return;
+        }
         TrackPlayer.play();
         props.navigation.navigate('Playback');
     }

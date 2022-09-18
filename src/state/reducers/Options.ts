@@ -9,12 +9,14 @@ interface OptionsState {
     overrideSystemAppearance: boolean;
     isDarkmode: boolean;
     autoPlayOnReload: boolean;
+    randomizationBuffer: number;
 };
 
 const initialState: OptionsState = {
     overrideSystemAppearance: false,
     isDarkmode: false,
-    autoPlayOnReload: false
+    autoPlayOnReload: false,
+    randomizationBuffer: 10
 };
 
 export const Options = (state = initialState, action: Actions): OptionsState => {

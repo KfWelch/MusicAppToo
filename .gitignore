@@ -60,3 +60,4 @@ buck-out/
 /ios/Pods/
 
 package-lock.json
+android/app/release/
