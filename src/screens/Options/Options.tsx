@@ -1,7 +1,8 @@
 import React from "react";
-import { FlatList, SafeAreaView, Switch, Text, TextInput, View } from "react-native";
+import { FlatList, SafeAreaView, Switch, Text, TextInput, useColorScheme, View } from "react-native";
 import NumericInput from "react-native-numeric-input";
 import { useDispatch } from "react-redux";
+import { colorScheme } from "../../constant/Color";
 import { setOptionByName } from "../../state/actions/Options";
 import { useTypedSelector } from "../../state/reducers";
 import styles from "./Options.style";
@@ -18,6 +19,10 @@ const Options = () => {
     const optionsArray = Object.entries(options);
     // This is to remove the _persist "option" that is present due to redux-persist
     optionsArray.pop();
+    const systemColorScheme = useColorScheme();
+    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
+    const scheme = isDarkMode ? 'dark' : 'light';
+
 
     const boolSettingCard = (name: string, value: boolean) => (
         <View style={styles.cardView}>
@@ -31,18 +36,39 @@ const Options = () => {
     const numberSettingCard = (name: string, value: number) => (
         <View style={styles.cardView}>
             <Text style={styles.text}>{name}</Text>
-            <NumericInput value={value} onChange={value => {
-                dispatch(setOptionByName(name, value));
-            }} />
+            <NumericInput
+                value={value}
+                onChange={value => {
+                    dispatch(setOptionByName(name, value));
+                }} 
+                textColor={colorScheme[scheme].content}
+                inputStyle={{
+                    backgroundColor: colorScheme[scheme].contentBackground
+                }}
+                borderColor={colorScheme[scheme].outline}
+                rightButtonBackgroundColor={colorScheme[scheme].outline}
+                leftButtonBackgroundColor={colorScheme[scheme].outline}
+                rounded
+            />
         </View>
     );
 
     const stringSettingCard = (name: string, value: string) => (
         <View style={styles.cardView}>
             <Text style={styles.text}>{name}</Text>
-            <TextInput value={value} onChange={value => {
-                dispatch(setOptionByName(name, value));
-            }} />
+            <TextInput
+                value={value}
+                onChange={value => {
+                    dispatch(setOptionByName(name, value));
+                }}
+                autoCorrect={false}
+                style={{
+                    color: colorScheme[scheme].content,
+                    backgroundColor: colorScheme[scheme].contentBackground,
+                    borderColor: colorScheme[scheme].outline,
+                    borderWidth: 1
+                }}
+            />
         </View>
     );
 
