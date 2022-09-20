@@ -1,5 +1,5 @@
 import { Album, Playlist, Song } from '../../models/MusicModel';
-import { OrderedType, PlaybackMode, RandomizationType } from '../reducers/Playlist';
+import { ShuffleType, PlaybackMode, RandomizationType } from '../reducers/Playlist';
 
 export const ADD_SONG = 'PLAYLIST/ADD_SONG';
 export const REMOVE_SONG = 'PLAYLIST/REMOVE_SONG';
@@ -137,7 +137,7 @@ export const setRepeat = (repeat: boolean) => ({
     payload: repeat
 } as const);
 
-export const setOrderedType = (orderedType: OrderedType) => ({
+export const setOrderedType = (orderedType: ShuffleType) => ({
     type: SET_ORDERED_TYPE,
     payload: orderedType
 } as const);

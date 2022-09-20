@@ -12,14 +12,14 @@ import SongCard from "../../components/Cards/SongCard/SongCard";
 import { Album, Song } from "../../models/MusicModel";
 import { setAlbumOrdered, setCurrentPlayArray, setOrderedType, setPlaybackMode, setRandomizeType, setReshuffle, setSongWeight, shuffleCurrentPlaylist } from "../../state/actions/Playlist";
 import { useTypedSelector } from "../../state/reducers";
-import { OrderedType, PlaybackMode, RandomizationType } from "../../state/reducers/Playlist";
+import { ShuffleType, PlaybackMode, RandomizationType } from "../../state/reducers/Playlist";
 import { convertSongListToTracks, getAlbumId, getPlayArray, getSongId } from "../../utils/musicUtils";
 import styles from "./Playlist.style";
 import TrackPlayer from "react-native-track-player";
 import { getRandomizedSongs } from "../../utils/PlaylistRandomization";
 
     const playbackModeOptions: PlaybackMode[] = [PlaybackMode.NORMAL, PlaybackMode.SHUFFLE, PlaybackMode.RANDOMIZE];
-    const orderedTypeOptions: OrderedType[] = [OrderedType.NONE, OrderedType.SPREAD, OrderedType.RANDOM];
+    const orderedTypeOptions: ShuffleType[] = [ShuffleType.STANDARD, ShuffleType.SPREAD, ShuffleType.SPREAD_ORDERED, ShuffleType.STANDARD_ORDERED];
     const randomizationType: RandomizationType[] = [RandomizationType.WEIGHTED, RandomizationType.WEIGHTLESS];
 
 const Tab = createMaterialTopTabNavigator();
