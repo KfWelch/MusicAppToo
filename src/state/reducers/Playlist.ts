@@ -20,7 +20,7 @@ import {
     SET_CURRENT_PLAYLIST,
     SET_CURRENT_PLAY_ARRAY,
     SET_LAST_SONG_PLAYED,
-    SET_ORDERED_TYPE,
+    SET_SHUFFLE_TYPE,
     SET_PLAYBACK_MODE,
     SET_RANDOMIZE_TYPE,
     SET_RANDOM_NEXT_SONG,
@@ -389,7 +389,7 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                     repeat: action.payload
                 }
             };
-        case SET_ORDERED_TYPE:
+        case SET_SHUFFLE_TYPE:
             return {
                 ...state,
                 playbackOptions: {

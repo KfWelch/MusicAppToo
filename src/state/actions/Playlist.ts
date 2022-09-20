@@ -27,7 +27,7 @@ export const REMOVE_PLAYLIST = 'PLAYLIST/REMOVE';
 
 export const SET_PLAYBACK_MODE = 'PLAYLIST/SET_PLAYBACK_MODE';
 export const SET_REPEAT = 'PLAYLIST/SET_REPEAT';
-export const SET_ORDERED_TYPE = 'PLAYLIST/SET_ORDERED_TYPE';
+export const SET_SHUFFLE_TYPE = 'PLAYLIST/SET_ORDERED_TYPE';
 export const SET_RESHUFFLE = 'PLAYLIST/SET_RESHUFFLE';
 export const SET_RANDOMIZE_TYPE = 'PLAYLIST/SET_RANDOMIZE_TYPE';
 
@@ -137,8 +137,8 @@ export const setRepeat = (repeat: boolean) => ({
     payload: repeat
 } as const);
 
-export const setOrderedType = (orderedType: ShuffleType) => ({
-    type: SET_ORDERED_TYPE,
+export const setShuffleType = (orderedType: ShuffleType) => ({
+    type: SET_SHUFFLE_TYPE,
     payload: orderedType
 } as const);
 
@@ -179,7 +179,7 @@ export type Actions =
     | ReturnType<typeof removePlaylist>
     | ReturnType<typeof setPlaybackMode>
     | ReturnType<typeof setRepeat>
-    | ReturnType<typeof setOrderedType>
+    | ReturnType<typeof setShuffleType>
     | ReturnType<typeof setReshuffle>
     | ReturnType<typeof setRandomizeType>
     | ReturnType<typeof setLastSongPlayed>;
