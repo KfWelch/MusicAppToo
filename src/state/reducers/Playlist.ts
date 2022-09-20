@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { Album, Playlist as PlaylistModel, Song } from '../../models/MusicModel.d';
 import { getAlbumIdFromSongId, getAlbumId, getPlayArray, getSongId, getSongTitleFromId, getNewPlayArray } from '../../utils/musicUtils';
-import { spreadOrderedAlbumShuffle } from '../../utils/OrderedAlbumShuffle';
+import { spreadOrderedAlbumShuffle, standardShuffle } from '../../utils/PlaylistShuffle';
 import {
     Actions,
     ADD_ALBUM,
@@ -20,7 +20,7 @@ import {
     SET_CURRENT_PLAYLIST,
     SET_CURRENT_PLAY_ARRAY,
     SET_LAST_SONG_PLAYED,
-    SET_ORDERED_TYPE,
+    SET_SHUFFLE_TYPE,
     SET_PLAYBACK_MODE,
     SET_RANDOMIZE_TYPE,
     SET_RANDOM_NEXT_SONG,
@@ -36,10 +36,11 @@ export enum PlaybackMode {
     RANDOMIZE = 'Randomize'
 }
 
-export enum OrderedType {
-    NONE = 'None',
+export enum ShuffleType {
+    SPREAD_ORDERED = 'SpreadOrdered',
+    STANDARD_ORDERED = 'RandomOrdered',
     SPREAD = 'Spread',
-    RANDOM = 'Random'
+    STANDARD = 'Standard'
 };
 
 export enum RandomizationType {
@@ -59,7 +60,7 @@ interface PlaylistState {
         mode: PlaybackMode;
         repeat: boolean;
         shuffleOptions: {
-            orderedType: OrderedType;
+            orderedType: ShuffleType;
             reshuffleOnRepeat: boolean;
         };
         randomizeOptions: {
@@ -80,7 +81,7 @@ const initialState: PlaylistState = {
         mode: PlaybackMode.NORMAL,
         repeat: false,
         shuffleOptions: {
-            orderedType: OrderedType.NONE,
+            orderedType: ShuffleType.STANDARD,
             reshuffleOnRepeat: false
         },
         randomizeOptions: {
@@ -296,13 +297,21 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
         }
         case SHUFFLE_CURRENT_PLAYLIST: {
             switch (state.playbackOptions.shuffleOptions.orderedType) {
-                case OrderedType.NONE:
-                    // TODO implement normal shuffle
+                case ShuffleType.STANDARD:
+                    if (state.currentPlaylist) {
+                        return {
+                            ...state,
+                            currentPlaylist: {
+                                ...state.currentPlaylist,
+                                playArray: standardShuffle(state.currentPlaylist.albums, state.currentPlaylist.songs)
+                            }
+                        };
+                    }
                     break;
-                case OrderedType.RANDOM:
+                case ShuffleType.STANDARD_ORDERED:
                     // TODO implement random ordered shuffle
                     break;
-                case OrderedType.SPREAD:
+                case ShuffleType.SPREAD_ORDERED:
                     if (state.currentPlaylist) {
                         return {
                             ...state,
@@ -312,7 +321,9 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                             }
                         };
                     }
-                    return state;
+                    break;
+                default:
+                    break;
             }
             return state;
         }
@@ -378,7 +389,7 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                     repeat: action.payload
                 }
             };
-        case SET_ORDERED_TYPE:
+        case SET_SHUFFLE_TYPE:
             return {
                 ...state,
                 playbackOptions: {

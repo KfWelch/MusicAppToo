@@ -28,6 +28,9 @@ const styles = StyleSheet.create({
     },
     songsView: {
         flex: 1
+    },
+    songsFlatlist: {
+        height: '60%'
     }
 });
 
