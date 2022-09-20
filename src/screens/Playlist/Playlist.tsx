@@ -32,7 +32,14 @@ const Playlist = () => {
     const options = useTypedSelector(state => state.Options);
     const systemColorScheme = useColorScheme();
     const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
+    const [isAlreadyShuffled, setIsAlreadyShuffled] = useState(false);
 
+    navigation.addListener('focus', () => {
+        if (currentPlaylist) {
+            setIsAlreadyShuffled(false);
+            dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
+        }
+    });
 
     const songView = ({ item }: { item: Song }) => (
         <SongCard
@@ -93,8 +100,10 @@ const Playlist = () => {
                     await TrackPlayer.add(convertSongListToTracks(playArray));
                     break;
                 case PlaybackMode.SHUFFLE:
-                    dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
-                    dispatch(shuffleCurrentPlaylist());
+                    if (!isAlreadyShuffled) {
+                        dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
+                        dispatch(shuffleCurrentPlaylist());
+                    }
                     await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
                     break;
                 case PlaybackMode.RANDOMIZE:
@@ -171,7 +180,13 @@ const Playlist = () => {
 
     const songsView = () => (
         <SafeAreaView style={styles.container}>
-            <Button onPress={() => dispatch(shuffleCurrentPlaylist())} title="Shuffle Playlist" />
+            {playbackOptions.mode === PlaybackMode.SHUFFLE && <Button
+                onPress={() => {
+                    dispatch(shuffleCurrentPlaylist());
+                    setIsAlreadyShuffled(true);
+                }}
+                title="Shuffle Playlist"
+            />}
             <FlatList
                 data={currentPlaylist?.playArray}
                 renderItem={individualSongView}
