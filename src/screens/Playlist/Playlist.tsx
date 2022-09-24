@@ -1,6 +1,6 @@
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { useNavigation } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, FlatList, Pressable, Switch, Text, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch } from "react-redux";
@@ -33,13 +33,27 @@ const Playlist = () => {
     const systemColorScheme = useColorScheme();
     const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
     const [isAlreadyShuffled, setIsAlreadyShuffled] = useState(false);
+    const [startPlayback, setStartPlayback] = useState(false);
 
     navigation.addListener('focus', () => {
         if (currentPlaylist) {
             setIsAlreadyShuffled(false);
+            setStartPlayback(false);
             dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
         }
     });
+
+    useEffect(() => {
+        if (navigation.isFocused() && currentPlaylist && startPlayback) {
+            setStartPlayback(false);
+            TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray))
+                .then(() => {
+                    TrackPlayer.play();
+                    // @ts-ignore
+                    navigation.navigate('HomeTabs', { screen: 'Playback' });
+                });
+        }
+    }, [currentPlaylist, startPlayback]);
 
     const songView = ({ item }: { item: Song }) => (
         <SongCard
@@ -101,15 +115,13 @@ const Playlist = () => {
             switch (playbackOptions.mode) {
                 case PlaybackMode.NORMAL:
                     const playArray = getPlayArray(currentPlaylist);
-                    setCurrentPlayArray(playArray);
-                    await TrackPlayer.add(convertSongListToTracks(playArray));
+                    dispatch(setCurrentPlayArray(playArray));
                     break;
                 case PlaybackMode.SHUFFLE:
                     if (!isAlreadyShuffled) {
                         dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
                         dispatch(shuffleCurrentPlaylist());
                     }
-                    await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
                     break;
                 case PlaybackMode.RANDOMIZE:
                     const initialSongs = getRandomizedSongs(
@@ -119,14 +131,11 @@ const Playlist = () => {
                         options.randomizationShouldNotRepeatSongs
                     );
                     dispatch(setCurrentPlayArray(initialSongs));
-                    await TrackPlayer.add(convertSongListToTracks(initialSongs));
                     break;
                 default:
                     return;
             }
-            TrackPlayer.play();
-            // @ts-ignore
-            navigation.navigate('HomeTabs', { screen: 'Playback' });
+            setStartPlayback(true);
         }
     }
 
