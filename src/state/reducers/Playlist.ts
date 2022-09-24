@@ -296,9 +296,9 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
             return oldState;
         }
         case SHUFFLE_CURRENT_PLAYLIST: {
-            switch (state.playbackOptions.shuffleOptions.orderedType) {
-                case ShuffleType.STANDARD:
-                    if (state.currentPlaylist) {
+            if (state.currentPlaylist) {
+                switch (state.playbackOptions.shuffleOptions.orderedType) {
+                    case ShuffleType.STANDARD:
                         return {
                             ...state,
                             currentPlaylist: {
@@ -306,13 +306,10 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                                 playArray: standardShuffle(state.currentPlaylist.albums, state.currentPlaylist.songs)
                             }
                         };
-                    }
-                    break;
-                case ShuffleType.STANDARD_ORDERED:
-                    // TODO implement random ordered shuffle
-                    break;
-                case ShuffleType.SPREAD_ORDERED:
-                    if (state.currentPlaylist) {
+                    case ShuffleType.STANDARD_ORDERED:
+                        // TODO implement random ordered shuffle
+                        break;
+                    case ShuffleType.SPREAD_ORDERED:
                         return {
                             ...state,
                             currentPlaylist: {
@@ -320,10 +317,9 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                                 playArray: spreadOrderedAlbumShuffle(state.currentPlaylist.albums, state.currentPlaylist.songs)
                             }
                         };
-                    }
-                    break;
-                default:
-                    break;
+                    default:
+                        break;
+                }
             }
             return state;
         }

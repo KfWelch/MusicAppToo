@@ -1,5 +1,5 @@
 import { NavigationProp } from "@react-navigation/native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, SafeAreaView, Switch, Text, useColorScheme, View } from "react-native";
 import NumericInput from "react-native-numeric-input";
 import TrackPlayer from "react-native-track-player";
@@ -22,13 +22,26 @@ interface PlaylistCardProps {
 }
 
 const PlaylistCard = (props: PlaylistCardProps) => {
-    const { playlist } = props;
+    const { playlist, navigation } = props;
     const dispatch = useDispatch();
     const options = useTypedSelector(state => state.Options);
     const { currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
     const systemColorScheme = useColorScheme();
     const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
     const scheme = isDarkMode ? 'dark' : 'light';
+    const [startPlayback, setStartPlayback] = useState(false);
+
+    useEffect(() => {
+        if (navigation.isFocused() && currentPlaylist && startPlayback) {
+            setStartPlayback(false);
+            TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray))
+                .then(() => {
+                    TrackPlayer.play();
+                    // @ts-ignore
+                    navigation.navigate('HomeTabs', { screen: 'Playback' });
+                });
+        }
+    }, [currentPlaylist, startPlayback]);
 
     const flatListItemSeparator = () => (<View style={styles.flatlistSeparator} />);
 
@@ -95,14 +108,12 @@ const PlaylistCard = (props: PlaylistCardProps) => {
         switch (playbackOptions.mode) {
             case PlaybackMode.NORMAL:
                 const playArray = getPlayArray(playlist);
-                setCurrentPlayArray(playArray);
-                await TrackPlayer.add(convertSongListToTracks(playArray));
+                dispatch(setCurrentPlayArray(playArray));
                 break;
             case PlaybackMode.SHUFFLE:
                 if (currentPlaylist) {
                     dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
                     dispatch(shuffleCurrentPlaylist());
-                    await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
                 }
                 break;
             case PlaybackMode.RANDOMIZE:
@@ -113,13 +124,11 @@ const PlaylistCard = (props: PlaylistCardProps) => {
                     options.randomizationShouldNotRepeatSongs
                 );
                 dispatch(setCurrentPlayArray(initialSongs));
-                await TrackPlayer.add(convertSongListToTracks(initialSongs));
                 break;
             default:
                 return;
         }
-        TrackPlayer.play();
-        props.navigation.navigate('Playback');
+        setStartPlayback(true);
     }
 
     const playlistView = () => (

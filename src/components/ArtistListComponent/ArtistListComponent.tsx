@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TrackPlayer from "react-native-track-player";
@@ -20,13 +20,26 @@ import styles from "./ArtistListComponent.style";
 const ArtistList = () => {
     const albumsState = useTypedSelector(state => state.Albums);
     const { currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
+    const { artists } = albumsState;
     const autoPlay = useTypedSelector(state => state.Options.autoPlayOnReload);
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const options = useTypedSelector(state => state.Options);
     const systemColorScheme = useColorScheme();
     const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
-    const { artists } = albumsState;
+    const [startPlayback, setStartPlayback] = useState(false);
+
+    useEffect(() => {
+        if (navigation.isFocused() && currentPlaylist && startPlayback) {
+            setStartPlayback(false);
+            TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray))
+                .then(() => {
+                    TrackPlayer.play();
+                    // @ts-ignore
+                    navigation.navigate('HomeTabs', { screen: 'Playback' });
+                });
+        }
+    }, [currentPlaylist, startPlayback]);
 
     const selectArtistFromList = (artistName: string, pressedTitle: string) => {
         dispatch(selectArtist(artistName));
@@ -87,13 +100,11 @@ const ArtistList = () => {
                                                 switch (playbackOptions.mode) {
                                                     case PlaybackMode.NORMAL:
                                                         const playArray = getPlayArray(currentPlaylist);
-                                                        setCurrentPlayArray(playArray);
-                                                        await TrackPlayer.add(convertSongListToTracks(playArray));
+                                                        dispatch(setCurrentPlayArray(playArray));
                                                         break;
                                                     case PlaybackMode.SHUFFLE:
                                                         dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
                                                         dispatch(shuffleCurrentPlaylist());
-                                                        await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
                                                         break;
                                                     case PlaybackMode.RANDOMIZE:
                                                         const initialSongs = getRandomizedSongs(
@@ -103,14 +114,11 @@ const ArtistList = () => {
                                                             options.randomizationShouldNotRepeatSongs
                                                         );
                                                         dispatch(setCurrentPlayArray(initialSongs));
-                                                        await TrackPlayer.add(convertSongListToTracks(initialSongs));
                                                         break;
                                                     default:
                                                         return;
                                                 }
-                                                TrackPlayer.play();
-                                                // @ts-ignore
-                                                navigation.navigate('Playback')
+                                                setStartPlayback(true);
                                             }
                                         }} />)}  
                                         subItemFlatlist={(
