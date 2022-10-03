@@ -6,7 +6,14 @@ const styles = StyleSheet.create({
         height: 70,
         padding: 15,
         justifyContent: 'space-between',
-        alignItems: "center"
+        alignItems: 'center'
+    },
+    sectionTitle: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    sectionTitleText: {
+        fontSize: 24
     },
     text: {
         fontSize: 16
