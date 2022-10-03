@@ -6,18 +6,18 @@ import {
 } from '../actions/Options';
 
 interface OptionsState {
-    overrideSystemAppearance: boolean;
-    isDarkmode: boolean;
-    autoPlayOnReload: boolean;
+    generalOverrideSystemAppearance: boolean;
+    generalDarkmode: boolean;
+    playbackAutoPlayOnReload: boolean;
     randomizationForwardBuffer: number;
     randomizationBackwardBuffer: number;
     randomizationShouldNotRepeatSongs: boolean;
 };
 
 const initialState: OptionsState = {
-    overrideSystemAppearance: false,
-    isDarkmode: false,
-    autoPlayOnReload: false,
+    generalOverrideSystemAppearance: false,
+    generalDarkmode: false,
+    playbackAutoPlayOnReload: false,
     randomizationForwardBuffer: 10,
     randomizationBackwardBuffer: 25,
     randomizationShouldNotRepeatSongs: true
@@ -28,12 +28,12 @@ export const Options = (state = initialState, action: Actions): OptionsState => 
         case OVERRIDE_APPEARANCE:
             return {
                 ...state,
-                overrideSystemAppearance: action.payload
+                generalOverrideSystemAppearance: action.payload
             };
         case SET_DARKMODE:
             return {
                 ...state,
-                isDarkmode: action.payload
+                generalDarkmode: action.payload
             };
         case SET_OPTION: {
             const newOptions = { ...state };

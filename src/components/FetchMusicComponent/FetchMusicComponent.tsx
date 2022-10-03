@@ -31,7 +31,7 @@ const FetchMusicComponent = () => {
     const artists = useTypedSelector(state => state.Albums.artists);
     const options = useTypedSelector(state => state.Options);
     const systemColorScheme = useColorScheme();
-    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
+    const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const [totalArtists, setTotalArtists] = useState(1);

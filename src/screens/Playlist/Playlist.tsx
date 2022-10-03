@@ -31,7 +31,7 @@ const Playlist = () => {
     const navigation = useNavigation();
     const options = useTypedSelector(state => state.Options);
     const systemColorScheme = useColorScheme();
-    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
+    const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
     const [isAlreadyShuffled, setIsAlreadyShuffled] = useState(false);
     const [startPlayback, setStartPlayback] = useState(false);
 

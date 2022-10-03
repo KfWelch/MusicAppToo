@@ -27,7 +27,7 @@ const PlaylistCard = (props: PlaylistCardProps) => {
     const options = useTypedSelector(state => state.Options);
     const { currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
     const systemColorScheme = useColorScheme();
-    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
+    const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
     const scheme = isDarkMode ? 'dark' : 'light';
     const [startPlayback, setStartPlayback] = useState(false);
 

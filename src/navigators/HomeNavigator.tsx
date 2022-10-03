@@ -43,7 +43,7 @@ const lightTheme = {
 const HomeNavigator = () => {
     const options = useTypedSelector(state => state.Options);
     const colorScheme = useColorScheme();
-    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : colorScheme === 'dark';
+    const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : colorScheme === 'dark';
 
     return (
         <NavigationContainer theme={isDarkMode ? darkTheme : lightTheme}>
