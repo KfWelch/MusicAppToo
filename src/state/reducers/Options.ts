@@ -23,6 +23,18 @@ const initialState: OptionsState = {
     randomizationShouldNotRepeatSongs: true
 };
 
+/**
+ * To add more options, all that needs to be done is add the new variable to the
+ * state type and initial state.  The options screen is fully automated
+ * 
+ * Options should be only number, boolean, or string types
+ * The first part of the camelCase variable name should be the name of what section
+ * you want the option to appear under
+ * 
+ * @param state 
+ * @param action 
+ * @returns 
+ */
 export const Options = (state = initialState, action: Actions): OptionsState => {
     switch (action.type) {
         case OVERRIDE_APPEARANCE:
