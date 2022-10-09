@@ -17,7 +17,7 @@ const DropDownCard = (props: DropDownCardProps) => {
     const { mainItem, mainItemHelperText, subItems, onItemClick } = props;
     const options = useTypedSelector(state => state.Options);
     const colorScheme = useColorScheme();
-    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : colorScheme === 'dark';
+    const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : colorScheme === 'dark';
     const [showSubItems, setShowSubItems] = useState(false);
 
     const subItemsItemView = ({ item }: { item: string }) => (

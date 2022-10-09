@@ -21,12 +21,12 @@ const ArtistList = () => {
     const albumsState = useTypedSelector(state => state.Albums);
     const { currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
     const { artists } = albumsState;
-    const autoPlay = useTypedSelector(state => state.Options.autoPlayOnReload);
+    const autoPlay = useTypedSelector(state => state.Options.playbackAutoPlayOnReload);
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const options = useTypedSelector(state => state.Options);
     const systemColorScheme = useColorScheme();
-    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
+    const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
     const [startPlayback, setStartPlayback] = useState(false);
 
     useEffect(() => {

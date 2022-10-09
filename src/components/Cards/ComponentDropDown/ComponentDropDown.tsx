@@ -14,7 +14,7 @@ const ComponentDropDown = (props: DropDownProps) => {
     const { mainItemCard, subItemFlatlist } = props;
     const options = useTypedSelector(state => state.Options);
     const colorScheme = useColorScheme();
-    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : colorScheme === 'dark';
+    const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : colorScheme === 'dark';
     const [showSubItems, setShowSubItems] = useState(false);
 
     return (

@@ -26,7 +26,7 @@ const Playback = () => {
     const [currentTrack, setCurrentTrack] = useState(0);
     const [currentSong, setCurrentSong] = useState<Song | undefined>(undefined);
     const systemColorScheme = useColorScheme();
-    const isDarkMode = options.overrideSystemAppearance ? options.isDarkmode : systemColorScheme === 'dark';
+    const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
 
     const translationY = useSharedValue(0);
     const scrollHandler = useAnimatedScrollHandler((event) => {
