@@ -12,6 +12,8 @@ interface OptionsState {
     randomizationForwardBuffer: number;
     randomizationBackwardBuffer: number;
     randomizationShouldNotRepeatSongs: boolean;
+    randomizationEnableRandomWaitTime: boolean;
+    randomizationMaxRandomWaitTimeSeconds: number;
 };
 
 const initialState: OptionsState = {
@@ -20,7 +22,9 @@ const initialState: OptionsState = {
     playbackAutoPlayOnReload: false,
     randomizationForwardBuffer: 10,
     randomizationBackwardBuffer: 25,
-    randomizationShouldNotRepeatSongs: true
+    randomizationShouldNotRepeatSongs: true,
+    randomizationEnableRandomWaitTime: false,
+    randomizationMaxRandomWaitTimeSeconds: 60
 };
 
 /**
