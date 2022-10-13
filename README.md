@@ -16,6 +16,29 @@ With this app I have had most success running it with two terminals, one running
 
 Currently running on a Galaxy Note 10, Android version 12
 
+For this project to work, the animated Flatlist component within `react-native-reanimated` needs to be modified.  In the node_modules, the file path will be `react-native-reanimated/src/reanimated2/component/Flatlist.tsx`.  In this file, you will want to change
+```typescript
+const ReanimatedFlatlist ... => {
+    // gibberish
+}
+```
+to
+```typescript
+const ReanimatedFlatlist: ReanimatedFlatListFC = React.forwardRef(({
+  itemLayoutAnimation,
+  ...restProps
+}, ref) => {
+  const cellRenderer = React.useMemo(
+    () => createCellRenderer(itemLayoutAnimation),
+    []
+  );
+  return (
+    <AnimatedFlatList {...restProps} CellRendererComponent={cellRenderer} ref={ref} />
+  );
+});
+```
+This is resolved in a more updated version of Reanimated, but unsure whether the version with the proper fix has been released as of yet, and will be updated when it has for sure been released.
+
 ## Redux Sagas
 Currently there is no expectations to be using any service calls with this app, but it is there for future reference
 

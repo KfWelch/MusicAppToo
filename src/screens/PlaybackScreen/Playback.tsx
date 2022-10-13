@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Pressable, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TrackPlayer, { Event, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player";
+import BackgroundTimer from 'react-native-background-timer';
 import SongCard from "../../components/Cards/SongCard/SongCard";
 import PlaybackControl from "../../components/PlaybackControl/PlaybackControl";
 import { Song } from "../../models/MusicModel";
@@ -25,6 +26,8 @@ const Playback = () => {
     const playbackState = usePlaybackState();
     const [currentTrack, setCurrentTrack] = useState(0);
     const [currentSong, setCurrentSong] = useState<Song | undefined>(undefined);
+    const [waitCounter, setWaitCounter] = useState(0);
+    const [countTo, setCountTo] = useState(options.randomizationMaxRandomWaitTimeSeconds);
     const systemColorScheme = useColorScheme();
     const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
 
@@ -33,8 +36,27 @@ const Playback = () => {
         translationY.value = event.contentOffset.y;
     });
 
+    useEffect(() => {
+        if (waitCounter >= countTo) {
+            BackgroundTimer.stopBackgroundTimer();
+            TrackPlayer.play();
+            setWaitCounter(0);
+        }
+    }, [waitCounter]);
+
+    const startRandomWaitTimer = () => {
+        TrackPlayer.pause();
+        setCountTo(Math.ceil(Math.random() * options.randomizationMaxRandomWaitTimeSeconds));
+        BackgroundTimer.runBackgroundTimer(() => {
+            setWaitCounter(counter => counter + 1);
+        }, 1000);
+    };
+
     useTrackPlayerEvents([Event.PlaybackTrackChanged], event => {
         if (event.type === Event.PlaybackTrackChanged) {
+            if (playbackOptions.mode === PlaybackMode.RANDOMIZE && options.randomizationEnableRandomWaitTime) {
+                startRandomWaitTimer();
+            }
             TrackPlayer.getCurrentTrack().then(currentIndex => {
                 if (playbackOptions.mode === PlaybackMode.RANDOMIZE && currentPlaylist) {
                     const { randomizationForwardBuffer, randomizationBackwardBuffer } = options;
