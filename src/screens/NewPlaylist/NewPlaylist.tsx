@@ -14,7 +14,8 @@ import ArtistCard from '../../components/Cards/ArtistCard/ArtistCard';
 import { getAlbumId, getSongId } from '../../utils/musicUtils';
 import { TextInput } from 'react-native-gesture-handler';
 import styles from './NewPlaylist.style';
-import color, { colorScheme } from '../../constant/Color';
+import { colorScheme } from '../../constant/Color';
+import _ from 'lodash';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -36,7 +37,21 @@ const NewPlaylist = () => {
         }
     });
 
-    const songsInPlaylist = () => !!(newPlaylist.individualSongs.length || newPlaylist.albums.length);
+    const areSongsInPlaylist = () => !!(newPlaylist.individualSongs.length || newPlaylist.albums.length);
+    const isPlaylistEdited = (): boolean => {
+        const playlist = savedPlaylists.find(playlist => playlist.name === newPlaylist.title);
+        if (playlist) {
+            const albumPDiff = _.differenceWith(playlist.albums, newPlaylist.albums);
+            const albumNDiff = _.differenceWith(newPlaylist.albums, playlist.albums);
+            const songPDiff = _.differenceWith(playlist.songs, newPlaylist.individualSongs);
+            const songNDiff = _.differenceWith(newPlaylist.individualSongs, playlist.songs);
+            return !!(
+                albumPDiff.length || albumNDiff.length
+                || songPDiff.length || songNDiff.length
+            );
+        }
+        return true;
+    };
 
     const albumInPlaylist = (album: Album) => newPlaylist.albums.includes(album);
     const songInPlaylist = (song: Song) => newPlaylist.individualSongs.includes(song);
@@ -111,7 +126,7 @@ const NewPlaylist = () => {
         <SongCard song={item} onRemove={() => dispatch(removeSong(getSongId(item)))} colorScheme={isDarkMode ? 'dark' : 'light'} />
     );
 
-    const makePlaylistButton = () => (songsInPlaylist() && playlistName) ? (
+    const makePlaylistButton = () => (areSongsInPlaylist() && playlistName) ? (
         <View style={styles.makeButtonView}>
             <Button
                 onPress={() => {
@@ -134,13 +149,23 @@ const NewPlaylist = () => {
         </View>
     ) : null;
 
-    const saveEditsButton = () => (songsInPlaylist() && playlistName) ? (
+    const saveEditsButton = () => (areSongsInPlaylist() && isPlaylistEdited() && playlistName) ? (
         <View style={styles.makeButtonView}>
             <Button
                 onPress={() => {
-                    dispatch(editPlaylist(newPlaylist.title || '', playlistName));
-                    // @ts-ignore
-                    navigation.navigate('PlaylistList')
+                    if (playlistName !== newPlaylist.title && savedPlaylists.some(playlist => playlist.name === playlistName)) {
+                        Toast.show({
+                            type: 'error',
+                            position: 'bottom',
+                            text1: 'Cannot create playlist',
+                            text2: 'Name already taken',
+                            visibilityTime: 4000
+                        });
+                    } else {
+                        dispatch(editPlaylist(newPlaylist.title || '', playlistName));
+                        // @ts-ignore
+                        navigation.navigate('PlaylistList')
+                    }
                 }}
                 title="Save changes"
             />
@@ -156,7 +181,7 @@ const NewPlaylist = () => {
                 }}
                 value={playlistName} onChangeText={setPlaylistName}
                 placeholder="Enter Playlist Name"
-                editable={songsInPlaylist()}
+                editable={areSongsInPlaylist()}
                 textAlign='center'
             />
             <View style={styles.selectedMusicView}>
