@@ -5,16 +5,12 @@ import { spreadOrderedAlbumShuffle, standardShuffle } from '../../utils/Playlist
 import {
     Actions,
     ADD_ALBUM,
-    ADD_ALBUM_TO_PLAYLIST,
     ADD_SONG,
-    ADD_SONG_TO_PLAYLIST,
     GENERATE_PLAYLIST,
     REMOVE_ALBUM,
-    REMOVE_ALBUM_FROM_PLAYLIST,
     REMOVE_OLDEST_RANDOM_SONG,
     REMOVE_PLAYLIST,
     REMOVE_SONG,
-    REMOVE_SONG_FROM_PLAYLIST,
     SET_ALBUM_AS_PLAYLIST,
     SET_ALBUM_ORDERED,
     SET_CURRENT_PLAYLIST,
@@ -165,62 +161,6 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                         ...initialState.newPlaylist
                     }
                 }
-            }
-            return oldState;
-        }
-        case ADD_SONG_TO_PLAYLIST: {
-            const playlistIndex = oldState.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
-            if (playlistIndex >= 0) {
-                const playlist = oldState.savedPlaylists[playlistIndex];
-                playlist.songs.push(action.payload.song);
-                playlist.playArray.push(action.payload.song);
-                oldState.savedPlaylists.splice(playlistIndex, 1, playlist);
-                return {
-                    ...oldState,
-                    savedPlaylists: oldState.savedPlaylists
-                };
-            }
-            return oldState;
-        }
-        case REMOVE_SONG_FROM_PLAYLIST: {
-            const playlistIndex = oldState.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
-            if (playlistIndex >= 0) {
-                const playlist = oldState.savedPlaylists[playlistIndex];
-                playlist.songs = playlist.songs.splice(playlist.songs.findIndex(song => getSongId(song) === action.payload.songId), 1);
-                playlist.playArray = getPlayArray(playlist);
-                oldState.savedPlaylists.splice(playlistIndex, 1, playlist);
-                return {
-                    ...oldState,
-                    savedPlaylists: oldState.savedPlaylists
-                };
-            }
-            return oldState;
-        }
-        case ADD_ALBUM_TO_PLAYLIST: {
-            const playlistIndex = oldState.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
-            if (playlistIndex >= 0) {
-                const playlist = oldState.savedPlaylists[playlistIndex];
-                playlist.albums.push(action.payload.album);
-                playlist.playArray = getPlayArray(playlist);
-                oldState.savedPlaylists.splice(playlistIndex, 1, playlist);
-                return {
-                    ...oldState,
-                    savedPlaylists: oldState.savedPlaylists
-                };
-            }
-            return oldState;
-        }
-        case REMOVE_ALBUM_FROM_PLAYLIST: {
-            const playlistIndex = oldState.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
-            if (playlistIndex >= 0) {
-                const playlist = oldState.savedPlaylists[playlistIndex];
-                playlist.albums = playlist.albums.splice(playlist.albums.findIndex(album => getAlbumId(album) === action.payload.albumId), 1);
-                playlist.playArray = getPlayArray(playlist);
-                oldState.savedPlaylists.splice(playlistIndex, 1, playlist);
-                return {
-                    ...oldState,
-                    savedPlaylists: oldState.savedPlaylists
-                };
             }
             return oldState;
         }

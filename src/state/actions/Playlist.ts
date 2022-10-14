@@ -8,11 +8,6 @@ export const REMOVE_ALBUM = 'PLAYLIST/REMOVE_ALBUM';
 export const GENERATE_PLAYLIST = 'PLAYLIST/GENERATE_PLAYLIST';
 export const EDIT_PLAYLIST = 'PLAYLIST/EDIT';
 
-export const ADD_SONG_TO_PLAYLIST = 'PLAYLIST/ADD_SONG_TO_PLAYLIST';
-export const REMOVE_SONG_FROM_PLAYLIST = 'PLAYLIST/REMOVE_SONG_FROM_PLAYLIST';
-export const ADD_ALBUM_TO_PLAYLIST = 'PLAYLIST/ADD_ALBUM_TO_PLAYLIST';
-export const REMOVE_ALBUM_FROM_PLAYLIST = 'PLAYLIST/REMOVE_ALBUM_FROM_PLAYLIST';
-
 export const SET_CURRENT_PLAYLIST = 'PLAYLIST/SET_CURRENT';
 export const SET_ALBUM_AS_PLAYLIST = 'PLAYLIST/SET_ALBUM_AS';
 
@@ -63,26 +58,6 @@ export const generatePlaylist = (playlistName: string) => ({
 export const editPlaylist = (playlistName: string, newName?: string) => ({
     type: EDIT_PLAYLIST,
     payload: { playlistName, newName }
-} as const);
-
-export const addSongToPlaylist = (song: Song, playlistName: string) => ({
-    type: ADD_SONG_TO_PLAYLIST,
-    payload: { song, playlistName }
-} as const);
-
-export const removeSongFromPlaylist = (songId: string, playlistName: string) => ({
-    type: REMOVE_SONG_FROM_PLAYLIST,
-    payload: { songId, playlistName }
-} as const);
-
-export const addAlbumToPlaylist = (album: Album, playlistName: string) => ({
-    type: ADD_ALBUM_TO_PLAYLIST,
-    payload: { album, playlistName }
-} as const);
-
-export const removeAlbumFromPlaylist = (albumId: string, playlistName: string) => ({
-    type: REMOVE_ALBUM_FROM_PLAYLIST,
-    payload: { albumId, playlistName }
 } as const);
 
 export const setCurrentPlaylist = (playlist: Playlist) => ({
@@ -175,10 +150,6 @@ export type Actions =
     | ReturnType<typeof removeAlbum>
     | ReturnType<typeof generatePlaylist>
     | ReturnType<typeof editPlaylist>
-    | ReturnType<typeof addSongToPlaylist>
-    | ReturnType<typeof removeSongFromPlaylist>
-    | ReturnType<typeof addAlbumToPlaylist>
-    | ReturnType<typeof removeAlbumFromPlaylist>
     | ReturnType<typeof setCurrentPlaylist>
     | ReturnType<typeof setAlbumAsCurrentPlaylist>
     | ReturnType<typeof setAlbumOrdered>
