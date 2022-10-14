@@ -3,6 +3,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import _ from 'lodash';
 import { useTypedSelector } from '../../state/reducers';
 import { Album, Artist, Song } from '../../models/MusicModel';
 import SongCard from '../../components/Cards/SongCard/SongCard';
@@ -15,7 +16,6 @@ import { getAlbumId, getSongId } from '../../utils/musicUtils';
 import { TextInput } from 'react-native-gesture-handler';
 import styles from './NewPlaylist.style';
 import { colorScheme } from '../../constant/Color';
-import _ from 'lodash';
 
 const Tab = createMaterialTopTabNavigator();
 
