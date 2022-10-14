@@ -6,6 +6,7 @@ export const REMOVE_SONG = 'PLAYLIST/REMOVE_SONG';
 export const ADD_ALBUM = 'PLAYLIST/ADD_ALBUM';
 export const REMOVE_ALBUM = 'PLAYLIST/REMOVE_ALBUM';
 export const GENERATE_PLAYLIST = 'PLAYLIST/GENERATE_PLAYLIST';
+export const EDIT_PLAYLIST = 'PLAYLIST/EDIT';
 
 export const ADD_SONG_TO_PLAYLIST = 'PLAYLIST/ADD_SONG_TO_PLAYLIST';
 export const REMOVE_SONG_FROM_PLAYLIST = 'PLAYLIST/REMOVE_SONG_FROM_PLAYLIST';
@@ -23,6 +24,7 @@ export const SET_RANDOM_NEXT_SONG = 'PLAYLIST/SET_RANDOM_NEXT_SONG';
 export const REMOVE_OLDEST_RANDOM_SONG = 'PLAYLIST/REMOVE_OLDEST_RANDOM';
 
 export const SET_SAVED_PLAYLISTS = 'PLAYLIST/SET_SAVED_LISTS';
+export const SET_PLAYLIST_TO_EDIT = 'PLAYLIST/SET_TO_EDIT';
 export const REMOVE_PLAYLIST = 'PLAYLIST/REMOVE';
 
 export const SET_PLAYBACK_MODE = 'PLAYLIST/SET_PLAYBACK_MODE';
@@ -56,6 +58,11 @@ export const removeAlbum = (albumName: string) => ({
 export const generatePlaylist = (playlistName: string) => ({
     type: GENERATE_PLAYLIST,
     payload: playlistName
+} as const);
+
+export const editPlaylist = (playlistName: string, newName?: string) => ({
+    type: EDIT_PLAYLIST,
+    payload: { playlistName, newName }
 } as const);
 
 export const addSongToPlaylist = (song: Song, playlistName: string) => ({
@@ -122,6 +129,10 @@ export const setSavedPlaylists = (playlists: Playlist[]) => ({
     payload: playlists
 } as const);
 
+export const setPlaylistToEdit = () => ({
+    type: SET_PLAYLIST_TO_EDIT
+} as const);
+
 export const removePlaylist = (playlistName: string) => ({
     type: REMOVE_PLAYLIST,
     payload: playlistName
@@ -163,6 +174,7 @@ export type Actions =
     | ReturnType<typeof addAlbum>
     | ReturnType<typeof removeAlbum>
     | ReturnType<typeof generatePlaylist>
+    | ReturnType<typeof editPlaylist>
     | ReturnType<typeof addSongToPlaylist>
     | ReturnType<typeof removeSongFromPlaylist>
     | ReturnType<typeof addAlbumToPlaylist>
@@ -176,6 +188,7 @@ export type Actions =
     | ReturnType<typeof setRandomNextSongs>
     | ReturnType<typeof removeOldestRandomSongs>
     | ReturnType<typeof setSavedPlaylists>
+    | ReturnType<typeof setPlaylistToEdit>
     | ReturnType<typeof removePlaylist>
     | ReturnType<typeof setPlaybackMode>
     | ReturnType<typeof setRepeat>

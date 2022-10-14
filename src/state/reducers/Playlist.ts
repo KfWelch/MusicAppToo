@@ -27,7 +27,9 @@ import {
     SET_REPEAT,
     SET_RESHUFFLE,
     SET_SONG_WEIGHT,
-    SHUFFLE_CURRENT_PLAYLIST
+    SHUFFLE_CURRENT_PLAYLIST,
+    SET_PLAYLIST_TO_EDIT,
+    EDIT_PLAYLIST
 } from '../actions/Playlist';
 
 export enum PlaybackMode {
@@ -55,6 +57,7 @@ interface PlaylistState {
     newPlaylist: {
         individualSongs: Song[];
         albums: Album[];
+        title?: string;
     };
     playbackOptions: {
         mode: PlaybackMode;
@@ -146,6 +149,24 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                     individualSongs: []
                 }
             };
+        }
+        case EDIT_PLAYLIST: {
+            const playlistIndex = oldState.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
+            if (playlistIndex >= 0) {
+                const playlist = oldState.savedPlaylists[playlistIndex];
+                playlist.songs = state.newPlaylist.individualSongs;
+                playlist.albums = state.newPlaylist.albums;
+                playlist.name = action.payload.newName || playlist.name;
+                playlist.playArray = getNewPlayArray(state.newPlaylist.albums, state.newPlaylist.individualSongs);
+                oldState.savedPlaylists.splice(playlistIndex, 1, playlist);
+                return {
+                    ...oldState,
+                    newPlaylist: {
+                        ...initialState.newPlaylist
+                    }
+                }
+            }
+            return oldState;
         }
         case ADD_SONG_TO_PLAYLIST: {
             const playlistIndex = oldState.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
@@ -361,6 +382,15 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
             } else {
                 return {...state};
             }
+        case SET_PLAYLIST_TO_EDIT:
+            return {
+                ...state,
+                newPlaylist: {
+                    albums: state.currentPlaylist?.albums || [],
+                    individualSongs: state.currentPlaylist?.songs || [],
+                    title: state.currentPlaylist?.name || ''
+                }
+            };
         case REMOVE_PLAYLIST: {
             const playlistIndex = oldState.savedPlaylists.findIndex(playlist => playlist.name === action.payload);
             oldState.savedPlaylists.splice(playlistIndex, 1);

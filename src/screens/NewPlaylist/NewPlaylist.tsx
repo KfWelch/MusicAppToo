@@ -6,7 +6,7 @@ import Toast from 'react-native-toast-message';
 import { useTypedSelector } from '../../state/reducers';
 import { Album, Artist, Song } from '../../models/MusicModel';
 import SongCard from '../../components/Cards/SongCard/SongCard';
-import { addAlbum, addSong, generatePlaylist, removeAlbum, removeSong } from '../../state/actions/Playlist';
+import { addAlbum, addSong, editPlaylist, generatePlaylist, removeAlbum, removeSong } from '../../state/actions/Playlist';
 import ComponentDropDown from '../../components/Cards/ComponentDropDown/ComponentDropDown';
 import AlbumCard from '../../components/Cards/AlbumCard/AlbumCard';
 import { Button, FlatList, SafeAreaView, Text, useColorScheme, View } from 'react-native';
@@ -29,6 +29,12 @@ const NewPlaylist = () => {
     const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
 
     const [playlistName, setPlaylistName] = useState('');
+
+    navigation.addListener('focus', () => {
+        if (newPlaylist.title) {
+            setPlaylistName(newPlaylist.title)
+        }
+    });
 
     const songsInPlaylist = () => !!(newPlaylist.individualSongs.length || newPlaylist.albums.length);
 
@@ -128,6 +134,19 @@ const NewPlaylist = () => {
         </View>
     ) : null;
 
+    const saveEditsButton = () => (songsInPlaylist() && playlistName) ? (
+        <View style={styles.makeButtonView}>
+            <Button
+                onPress={() => {
+                    dispatch(editPlaylist(newPlaylist.title || '', playlistName));
+                    // @ts-ignore
+                    navigation.navigate('PlaylistList')
+                }}
+                title="Save changes"
+            />
+        </View>
+    ) : null;
+
     const selectedMusicView = () => (
         <SafeAreaView style={styles.container}>
             <TextInput
@@ -164,7 +183,7 @@ const NewPlaylist = () => {
                     )}
                 />
             </View>
-            {makePlaylistButton()}
+            {newPlaylist.title ? saveEditsButton() : makePlaylistButton()}
         </SafeAreaView>
     );
 
