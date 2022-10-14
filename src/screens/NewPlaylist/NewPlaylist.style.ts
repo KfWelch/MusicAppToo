@@ -2,21 +2,24 @@ import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        height: '100%',
         padding: 7
     },
     flatListView: {
         flex: 1
     },
+    selectedMusicView: {
+        height: '85%'
+    },
     selectedAlbums: {
         flexBasis: 'auto',
         flexShrink: 1,
-        flexGrow: 2
+        flexGrow: 4
     },
     selectedSongs: {
         flexBasis: 'auto',
         flexShrink: 1,
-        flexGrow: 1
+        flexGrow: 2
     },
     titleText: {
         fontSize: 18,
@@ -26,7 +29,8 @@ const styles = StyleSheet.create({
         borderRadius: 10
     },
     makeButtonView: {
-        alignSelf: 'flex-end'
+        alignItems: 'center',
+        justifyContent: 'center'
     }
 });
 

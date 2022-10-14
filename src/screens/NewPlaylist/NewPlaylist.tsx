@@ -159,29 +159,31 @@ const NewPlaylist = () => {
                 editable={songsInPlaylist()}
                 textAlign='center'
             />
-            <View style={styles.selectedAlbums}>
-                <ComponentDropDown
-                    mainItemCard={(<Text style={styles.titleText}>Albums</Text>)}
-                    subItemFlatlist={(
-                        <FlatList
-                            data={newPlaylist.albums}
-                            renderItem={selectedAlbumView}
-                            keyExtractor={(item, index) => `${item.albumName}-${index}`}
-                        />
-                    )}
-                />
-            </View>
-            <View style={styles.selectedSongs}>
-                <ComponentDropDown
-                    mainItemCard={(<Text style={styles.titleText}>Individual songs</Text>)}
-                    subItemFlatlist={(
-                        <FlatList
-                            data={newPlaylist.individualSongs}
-                            renderItem={selectedSongView}
-                            keyExtractor={(item, index) => `${item.title}-${index}`}
-                        />
-                    )}
-                />
+            <View style={styles.selectedMusicView}>
+                <View style={styles.selectedAlbums}>
+                    <ComponentDropDown
+                        mainItemCard={(<Text style={styles.titleText}>Albums</Text>)}
+                        subItemFlatlist={(
+                            <FlatList
+                                data={newPlaylist.albums}
+                                renderItem={selectedAlbumView}
+                                keyExtractor={(item, index) => `${item.albumName}-${index}`}
+                            />
+                        )}
+                    />
+                </View>
+                <View style={styles.selectedSongs}>
+                    <ComponentDropDown
+                        mainItemCard={(<Text style={styles.titleText}>Individual songs</Text>)}
+                        subItemFlatlist={(
+                            <FlatList
+                                data={newPlaylist.individualSongs}
+                                renderItem={selectedSongView}
+                                keyExtractor={(item, index) => `${item.title}-${index}`}
+                            />
+                        )}
+                    />
+                </View>
             </View>
             {newPlaylist.title ? saveEditsButton() : makePlaylistButton()}
         </SafeAreaView>
