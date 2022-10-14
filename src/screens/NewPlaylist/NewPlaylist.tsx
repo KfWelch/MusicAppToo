@@ -219,7 +219,7 @@ const NewPlaylist = () => {
             <Tab.Screen name="Available Music">
                 {() => availableMusicView()}
             </Tab.Screen>
-            <Tab.Screen name="New Playlist">
+            <Tab.Screen name={newPlaylist.title ? 'Playlist' : 'New Playlist'}>
                 {() => selectedMusicView()}
             </Tab.Screen>
         </Tab.Navigator>
