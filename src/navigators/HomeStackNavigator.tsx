@@ -88,7 +88,7 @@ const HomeStack = () => {
                 name="NewPlaylist"
                 component={NewPlaylist}
                 options={{
-                    headerTitle: newPlaylist.title ? 'Edit or Make Duplicate Playlist' : 'New Playlist'
+                    headerTitle: newPlaylist.title ? 'Edit Playlist' : 'New Playlist'
                 }}
             />
             <Stack.Screen
