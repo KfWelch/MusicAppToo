@@ -3,10 +3,11 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import _ from 'lodash';
 import { useTypedSelector } from '../../state/reducers';
 import { Album, Artist, Song } from '../../models/MusicModel';
 import SongCard from '../../components/Cards/SongCard/SongCard';
-import { addAlbum, addSong, generatePlaylist, removeAlbum, removeSong } from '../../state/actions/Playlist';
+import { addAlbum, addSong, editPlaylist, generatePlaylist, removeAlbum, removeSong } from '../../state/actions/Playlist';
 import ComponentDropDown from '../../components/Cards/ComponentDropDown/ComponentDropDown';
 import AlbumCard from '../../components/Cards/AlbumCard/AlbumCard';
 import { Button, FlatList, SafeAreaView, Text, useColorScheme, View } from 'react-native';
@@ -14,7 +15,7 @@ import ArtistCard from '../../components/Cards/ArtistCard/ArtistCard';
 import { getAlbumId, getSongId } from '../../utils/musicUtils';
 import { TextInput } from 'react-native-gesture-handler';
 import styles from './NewPlaylist.style';
-import color, { colorScheme } from '../../constant/Color';
+import { colorScheme } from '../../constant/Color';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -30,7 +31,27 @@ const NewPlaylist = () => {
 
     const [playlistName, setPlaylistName] = useState('');
 
-    const songsInPlaylist = () => !!(newPlaylist.individualSongs.length || newPlaylist.albums.length);
+    navigation.addListener('focus', () => {
+        if (newPlaylist.title) {
+            setPlaylistName(newPlaylist.title)
+        }
+    });
+
+    const areSongsInPlaylist = () => !!(newPlaylist.individualSongs.length || newPlaylist.albums.length);
+    const isPlaylistEdited = (): boolean => {
+        const playlist = savedPlaylists.find(playlist => playlist.name === newPlaylist.title);
+        if (playlist) {
+            const albumPDiff = _.differenceWith(playlist.albums, newPlaylist.albums);
+            const albumNDiff = _.differenceWith(newPlaylist.albums, playlist.albums);
+            const songPDiff = _.differenceWith(playlist.songs, newPlaylist.individualSongs);
+            const songNDiff = _.differenceWith(newPlaylist.individualSongs, playlist.songs);
+            return !!(
+                albumPDiff.length || albumNDiff.length
+                || songPDiff.length || songNDiff.length
+            );
+        }
+        return true;
+    };
 
     const albumInPlaylist = (album: Album) => newPlaylist.albums.includes(album);
     const songInPlaylist = (song: Song) => newPlaylist.individualSongs.includes(song);
@@ -105,7 +126,7 @@ const NewPlaylist = () => {
         <SongCard song={item} onRemove={() => dispatch(removeSong(getSongId(item)))} colorScheme={isDarkMode ? 'dark' : 'light'} />
     );
 
-    const makePlaylistButton = () => (songsInPlaylist() && playlistName) ? (
+    const makePlaylistButton = () => (areSongsInPlaylist() && playlistName) ? (
         <View style={styles.makeButtonView}>
             <Button
                 onPress={() => {
@@ -128,6 +149,29 @@ const NewPlaylist = () => {
         </View>
     ) : null;
 
+    const saveEditsButton = () => (areSongsInPlaylist() && isPlaylistEdited() && playlistName) ? (
+        <View style={styles.makeButtonView}>
+            <Button
+                onPress={() => {
+                    if (playlistName !== newPlaylist.title && savedPlaylists.some(playlist => playlist.name === playlistName)) {
+                        Toast.show({
+                            type: 'error',
+                            position: 'bottom',
+                            text1: 'Cannot create playlist',
+                            text2: 'Name already taken',
+                            visibilityTime: 4000
+                        });
+                    } else {
+                        dispatch(editPlaylist(newPlaylist.title || '', playlistName));
+                        // @ts-ignore
+                        navigation.navigate('PlaylistList')
+                    }
+                }}
+                title="Save changes"
+            />
+        </View>
+    ) : null;
+
     const selectedMusicView = () => (
         <SafeAreaView style={styles.container}>
             <TextInput
@@ -137,34 +181,36 @@ const NewPlaylist = () => {
                 }}
                 value={playlistName} onChangeText={setPlaylistName}
                 placeholder="Enter Playlist Name"
-                editable={songsInPlaylist()}
+                editable={areSongsInPlaylist()}
                 textAlign='center'
             />
-            <View style={styles.selectedAlbums}>
-                <ComponentDropDown
-                    mainItemCard={(<Text style={styles.titleText}>Albums</Text>)}
-                    subItemFlatlist={(
-                        <FlatList
-                            data={newPlaylist.albums}
-                            renderItem={selectedAlbumView}
-                            keyExtractor={(item, index) => `${item.albumName}-${index}`}
-                        />
-                    )}
-                />
+            <View style={styles.selectedMusicView}>
+                <View style={styles.selectedAlbums}>
+                    <ComponentDropDown
+                        mainItemCard={(<Text style={styles.titleText}>Albums</Text>)}
+                        subItemFlatlist={(
+                            <FlatList
+                                data={newPlaylist.albums}
+                                renderItem={selectedAlbumView}
+                                keyExtractor={(item, index) => `${item.albumName}-${index}`}
+                            />
+                        )}
+                    />
+                </View>
+                <View style={styles.selectedSongs}>
+                    <ComponentDropDown
+                        mainItemCard={(<Text style={styles.titleText}>Individual songs</Text>)}
+                        subItemFlatlist={(
+                            <FlatList
+                                data={newPlaylist.individualSongs}
+                                renderItem={selectedSongView}
+                                keyExtractor={(item, index) => `${item.title}-${index}`}
+                            />
+                        )}
+                    />
+                </View>
             </View>
-            <View style={styles.selectedSongs}>
-                <ComponentDropDown
-                    mainItemCard={(<Text style={styles.titleText}>Individual songs</Text>)}
-                    subItemFlatlist={(
-                        <FlatList
-                            data={newPlaylist.individualSongs}
-                            renderItem={selectedSongView}
-                            keyExtractor={(item, index) => `${item.title}-${index}`}
-                        />
-                    )}
-                />
-            </View>
-            {makePlaylistButton()}
+            {newPlaylist.title ? saveEditsButton() : makePlaylistButton()}
         </SafeAreaView>
     );
 
@@ -173,7 +219,7 @@ const NewPlaylist = () => {
             <Tab.Screen name="Available Music">
                 {() => availableMusicView()}
             </Tab.Screen>
-            <Tab.Screen name="New Playlist">
+            <Tab.Screen name={newPlaylist.title ? 'Playlist' : 'New Playlist'}>
                 {() => selectedMusicView()}
             </Tab.Screen>
         </Tab.Navigator>

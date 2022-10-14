@@ -12,6 +12,8 @@ import Playlist from '../screens/Playlist/Playlist';
 import { useTypedSelector } from '../state/reducers';
 import HomeTabs from './HomeTabsNavigator';
 import { playable } from '../utils/trackPlayUtils';
+import { useDispatch } from 'react-redux';
+import { setPlaylistToEdit } from '../state/actions/Playlist';
 
 export type HomeStackNavigatorParams = {
     HomeTabs: undefined;
@@ -23,7 +25,9 @@ const Stack = createNativeStackNavigator<HomeStackNavigatorParams>();
 
 const HomeStack = () => {
     const currentArtist = useTypedSelector(state => state.Albums.selectedArtist);
-    const savedPlaylists = useTypedSelector(state => state.Playlist.savedPlaylists);
+    const { savedPlaylists } = useTypedSelector(state => state.Playlist);
+    const { newPlaylist } = useTypedSelector(state => state.Playlist);
+    const dispatch = useDispatch();
     const playbackState = usePlaybackState();
     const [currentTab, setCurrentTab] = useState('Home');
     const playing = playbackState === State.Playing;
@@ -50,7 +54,14 @@ const HomeStack = () => {
         </Pressable>
     );
 
-    
+    const editPlaylistButton = (navigation: NavigationProp<any>) => (
+        <Pressable style={styles.optionButton} onPress={() => {
+            dispatch(setPlaylistToEdit());
+            navigation.navigate('NewPlaylist')
+        }}>
+            <MaterialCommunityIcons name="playlist-edit" size={30} />
+        </Pressable>
+    );    
 
     return (
         <Stack.Navigator>
@@ -77,15 +88,18 @@ const HomeStack = () => {
                 name="NewPlaylist"
                 component={NewPlaylist}
                 options={{
-                    headerTitle: 'New Playlist'
+                    headerTitle: newPlaylist.title ? 'Edit Playlist' : 'New Playlist'
                 }}
             />
             <Stack.Screen
                 name="Playlist"
                 component={Playlist}
-                options={{
-                    headerTitle: 'Playlist'
-                }}
+                options={({ navigation }: { navigation: NavigationProp<any> }) => ({
+                    headerTitle: 'Playlist',
+                    headerRight: () => (
+                        editPlaylistButton(navigation)
+                    )
+                })}
             />
         </Stack.Navigator>
     );
