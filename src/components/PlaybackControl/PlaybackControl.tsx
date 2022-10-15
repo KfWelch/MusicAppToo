@@ -1,8 +1,20 @@
 import Slider from "@react-native-community/slider";
 import React, { useState } from "react";
-import { SafeAreaView, Pressable, View, Dimensions, Text } from "react-native";
-import { State, usePlaybackState, useProgress } from 'react-native-track-player';
+import {
+    SafeAreaView,
+    Pressable,
+    View,
+    Dimensions,
+    Text
+} from "react-native";
+import {
+    RepeatMode,
+    State,
+    usePlaybackState,
+    useProgress
+} from 'react-native-track-player';
 import Icon from "react-native-vector-icons/AntDesign";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { getMinSec } from "../../utils/timeUtils";
 import styles from "./PlaybackControl.style";
 
@@ -17,11 +29,23 @@ interface PlaybackControlProps {
     setVol: (volume: number) => void;
     skipForward: () => void;
     skipBack: () => void;
-    skipTo: () => void;
+    repeatMode: RepeatMode;
+    setRepeatMode: React.Dispatch<React.SetStateAction<RepeatMode>>
 }
 
 const PlaybackControl = (props: PlaybackControlProps) => {
-    const { play, pause, stop, restart, seek, setVol, skipForward, skipBack, skipTo } = props;
+    const {
+        play,
+        pause,
+        stop,
+        restart,
+        seek,
+        setVol,
+        skipForward,
+        skipBack,
+        repeatMode,
+        setRepeatMode
+    } = props;
     const progress = useProgress(100);
     const playing = usePlaybackState() === State.Playing;
     const [seeking, setSeeking] = useState(false);
@@ -34,7 +58,43 @@ const PlaybackControl = (props: PlaybackControlProps) => {
         }}>
             <Text>{getMinSec(sliderPos)}</Text>
         </View>
-    )
+    );
+
+    const repeatIcon = () => {
+        let icon = '';
+        switch (repeatMode) {
+            case RepeatMode.Off:
+                icon = 'repeat-off';
+                break;
+            case RepeatMode.Queue:
+                icon = 'repeat';
+                break;
+            case RepeatMode.Track:
+                icon = 'repeat-once';
+                break;
+            default:
+                icon = 'repeat-off';
+        }
+        return (
+            <MaterialCommunityIcons name={icon} size={20} />
+        );
+    };
+
+    const setRepeat = () => {
+        switch (repeatMode) {
+            case RepeatMode.Off:
+                setRepeatMode(RepeatMode.Queue);
+                break;
+            case RepeatMode.Queue:
+                setRepeatMode(RepeatMode.Track);
+                break;
+            case RepeatMode.Track:
+                setRepeatMode(RepeatMode.Off);
+                break;
+            default:
+                setRepeatMode(RepeatMode.Off);
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -57,6 +117,9 @@ const PlaybackControl = (props: PlaybackControlProps) => {
                 </View>
             </View>
             <View style={styles.controlsContainer}>
+                <Pressable onPress={restart} hitSlop={5}>
+                    <MaterialCommunityIcons name="replay" size={20} />
+                </Pressable>
                 <Pressable onPress={skipBack}>
                     <Icon name="stepbackward" size={30} />
                 </Pressable>
@@ -65,6 +128,9 @@ const PlaybackControl = (props: PlaybackControlProps) => {
                 </Pressable>
                 <Pressable onPress={skipForward}>
                     <Icon name="stepforward" size={30} />
+                </Pressable>
+                <Pressable onPress={setRepeat} hitSlop={5}>
+                    {repeatIcon()}
                 </Pressable>
             </View>
         </SafeAreaView>

@@ -20,7 +20,13 @@ module.exports = {
         'no-undef': 'off',
         'import/prefer-default-export': 0,
         'no-extra-semi': 0,
-        'semi': 1
+        'semi': 1,
+        'default-case': ['warn'],
+        'curly': 'error',
+        'dot-notation': 'error',
+        'sort-imports': 'warn',
+        'jsx-quotes': ['error', 'prefer-double'],
+        'quotes': ['error', 'single', { "allowTemplateLiterals": true }]
       },
     },
   ],

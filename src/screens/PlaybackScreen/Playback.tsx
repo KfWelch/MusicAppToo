@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Pressable, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TrackPlayer, { Event, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player";
+import TrackPlayer, { Event, RepeatMode, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player";
 import BackgroundTimer from 'react-native-background-timer';
 import SongCard from "../../components/Cards/SongCard/SongCard";
 import PlaybackControl from "../../components/PlaybackControl/PlaybackControl";
@@ -28,6 +28,7 @@ const Playback = () => {
     const [currentSong, setCurrentSong] = useState<Song | undefined>(undefined);
     const [waitCounter, setWaitCounter] = useState(0);
     const [countTo, setCountTo] = useState(options.randomizationMaxRandomWaitTimeSeconds);
+    const [repeatMode, setRepeatMode] = useState(RepeatMode.Off);
     const systemColorScheme = useColorScheme();
     const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
 
@@ -35,6 +36,16 @@ const Playback = () => {
     const scrollHandler = useAnimatedScrollHandler((event) => {
         translationY.value = event.contentOffset.y;
     });
+
+    useEffect(() => {
+        TrackPlayer.getRepeatMode().then(mode => {
+            setRepeatMode(mode);
+        });
+    }, []);
+
+    useEffect(() => {
+        TrackPlayer.setRepeatMode(repeatMode);
+    }, [repeatMode]);
 
     useEffect(() => {
         if (waitCounter >= countTo) {
@@ -183,13 +194,14 @@ const Playback = () => {
             <PlaybackControl
                 play={() => startPlayback()}
                 pause={() => TrackPlayer.pause()}
-                restart={() => {}}
+                restart={() => TrackPlayer.seekTo(0)}
                 seek={pos => TrackPlayer.seekTo(pos)}
                 setVol={() => {}}
                 skipBack={() => TrackPlayer.skipToPrevious()}
                 skipForward={() => TrackPlayer.skipToNext()}
-                skipTo={() => {}}
                 stop={() => TrackPlayer.stop()}
+                repeatMode={repeatMode}
+                setRepeatMode={setRepeatMode}
             />
         </SafeAreaView>
     )
