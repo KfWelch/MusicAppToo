@@ -1,4 +1,12 @@
 import React, { useState } from 'react';
+import {
+    Button,
+    FlatList,
+    SafeAreaView,
+    Text,
+    useColorScheme,
+    View
+} from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
@@ -7,10 +15,16 @@ import _ from 'lodash';
 import { useTypedSelector } from '../../state/reducers';
 import { Album, Artist, Song } from '../../models/MusicModel';
 import SongCard from '../../components/Cards/SongCard/SongCard';
-import { addAlbum, addSong, editPlaylist, generatePlaylist, removeAlbum, removeSong } from '../../state/actions/Playlist';
+import {
+    addAlbum,
+    addSong,
+    editPlaylist,
+    generatePlaylist,
+    removeAlbum,
+    removeSong
+} from '../../state/actions/Playlist';
 import ComponentDropDown from '../../components/Cards/ComponentDropDown/ComponentDropDown';
 import AlbumCard from '../../components/Cards/AlbumCard/AlbumCard';
-import { Button, FlatList, SafeAreaView, Text, useColorScheme, View } from 'react-native';
 import ArtistCard from '../../components/Cards/ArtistCard/ArtistCard';
 import { getAlbumId, getSongId } from '../../utils/musicUtils';
 import { TextInput } from 'react-native-gesture-handler';

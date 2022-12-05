@@ -1,22 +1,22 @@
-import Slider from "@react-native-community/slider";
-import React, { useState } from "react";
+import Slider from '@react-native-community/slider';
+import React, { useState } from 'react';
 import {
     SafeAreaView,
     Pressable,
     View,
     Dimensions,
     Text
-} from "react-native";
+} from 'react-native';
 import {
     RepeatMode,
     State,
     usePlaybackState,
     useProgress
 } from 'react-native-track-player';
-import Icon from "react-native-vector-icons/AntDesign";
+import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { getMinSec } from "../../utils/timeUtils";
-import styles from "./PlaybackControl.style";
+import { getMinSec } from '../../utils/timeUtils';
+import styles from './PlaybackControl.style';
 
 const width = Dimensions.get('window').width;
 

@@ -1,6 +1,12 @@
 import _ from 'lodash';
 import { Album, Playlist as PlaylistModel, Song } from '../../models/MusicModel.d';
-import { getAlbumIdFromSongId, getAlbumId, getPlayArray, getSongId, getSongTitleFromId, getNewPlayArray } from '../../utils/musicUtils';
+import {
+    getAlbumIdFromSongId,
+    getAlbumId,
+    getSongId,
+    getSongTitleFromId,
+    getNewPlayArray
+} from '../../utils/musicUtils';
 import { spreadOrderedAlbumShuffle, standardShuffle } from '../../utils/PlaylistShuffle';
 import {
     Actions,

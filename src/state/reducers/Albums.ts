@@ -1,6 +1,6 @@
-import _ from "lodash";
-import { Album, Artist, Song } from "../../models/MusicModel";
-import { disclessAlbumName } from "../../utils/musicUtils";
+import _ from 'lodash';
+import { Album, Artist, Song } from '../../models/MusicModel';
+import { disclessAlbumName } from '../../utils/musicUtils';
 import {
     Actions,
     ADD_ALBUM,

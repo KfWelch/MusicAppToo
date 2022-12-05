@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { Pressable, SafeAreaView, useColorScheme, View } from 'react-native';
+import {
+    Pressable,
+    SafeAreaView,
+    useColorScheme,
+    View
+} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign'
 import color from '../../../constant/Color';
 import { useTypedSelector } from '../../../state/reducers';

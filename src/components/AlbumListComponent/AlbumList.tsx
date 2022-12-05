@@ -1,11 +1,11 @@
-import React from "react";
-import { FlatList, View } from "react-native";
+import React from 'react';
+import { FlatList, View } from 'react-native';
 import TrackPlayer, { Track } from 'react-native-track-player';
-import { Album } from "../../models/MusicModel";
-import { useTypedSelector } from "../../state/reducers";
-import { convertSongToTrack } from "../../utils/musicUtils";
-import DropDownCard from "../Cards/DropDownCard/DropDownCard";
-import styles from "./AlbumList.style";
+import { Album } from '../../models/MusicModel';
+import { useTypedSelector } from '../../state/reducers';
+import { convertSongToTrack } from '../../utils/musicUtils';
+import DropDownCard from '../Cards/DropDownCard/DropDownCard';
+import styles from './AlbumList.style';
 
 const AlbumList = () => {
     const albums = useTypedSelector(state => state.Albums);

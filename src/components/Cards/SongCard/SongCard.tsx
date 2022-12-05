@@ -1,5 +1,10 @@
 import React from 'react';
-import { Dimensions, Pressable, Text, View } from 'react-native';
+import {
+    Dimensions,
+    Pressable,
+    Text,
+    View
+} from 'react-native';
 import NumericInput from 'react-native-numeric-input';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Animated, {

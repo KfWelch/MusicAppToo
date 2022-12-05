@@ -1,4 +1,4 @@
-import { Album, Artist, Song } from "../../models/MusicModel";
+import { Album, Artist, Song } from '../../models/MusicModel';
 
 export const ADD_ARTIST = 'ALBUMS/ADD_ARTIST';
 export const ADD_ALBUM = 'ALBUMS/ADD_ALBUM';

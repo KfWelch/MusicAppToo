@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationProp } from '@react-navigation/native';
 import TrackPlayer, { State, usePlaybackState } from 'react-native-track-player';
-import Icon from "react-native-vector-icons/AntDesign";
+import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './HomeNavigator.style';
 import ArtistScreen from '../screens/ArtistScreen/ArtistScreen';

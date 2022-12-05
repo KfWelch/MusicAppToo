@@ -1,5 +1,5 @@
-import _ from "lodash";
-import { Playlist, Song } from "../models/MusicModel.d";
+import _ from 'lodash';
+import { Playlist, Song } from '../models/MusicModel.d';
 
 export const getRandomizedSongs = (playlist: Playlist, numberToGet: number, weighted: boolean, noSkip: boolean): Song[] => {
     const songsToAdd: Song[] = [];
