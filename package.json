@@ -1,5 +1,5 @@
 {
-  "name": "musicapptoo",
+  "name": "MusicAppToo",
   "version": "1.2.2",
   "private": true,
   "scripts": {
@@ -28,7 +28,7 @@
     "lodash": "4.17.21",
     "luxon": "^3.0.4",
     "react": "17.0.2",
-    "react-native": "0.67.0",
+    "react-native": "0.67.5",
     "react-native-background-timer": "^2.4.1",
     "react-native-config": "1.4.11",
     "react-native-dropdown-picker": "^5.4.2",
