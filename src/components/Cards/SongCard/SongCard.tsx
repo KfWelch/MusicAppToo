@@ -77,8 +77,8 @@ const SongCard = (props: SongCardAnimatedProps) => {
     }
     
     const weightView = () => onWeightChange && (
-        <View style={styles.infoView}>
-            <Text style={styles.subtitle}>Randomization weight</Text>
+        <View style={{...styles.infoView, flex: 1}}>
+            <Text style={styles.subsubtitle}>Randomization weight</Text>
             <NumericInput
                 value={song.weight}
                 minValue={1}
@@ -109,7 +109,7 @@ const SongCard = (props: SongCardAnimatedProps) => {
             color={!isPlaying ? colorScheme[props.colorScheme].content : 'salmon'}
         />
         {/* <Text style={styles.indexNumber}>{`${song.position || song.numberInAlbum || ''})`}</Text> */}
-        <View style={styles.infoView}>
+        <View style={{...styles.infoView, flex: 1}}>
             <Text style={styles.title}>{song.title}</Text>
             <Text style={styles.subtitle}>{song.albumName}</Text>
         </View>

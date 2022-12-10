@@ -26,6 +26,7 @@ import styles from './PlaylistCard.style';
 import { useTypedSelector } from '../../../state/reducers';
 import { PlaybackMode } from '../../../state/reducers/Playlist';
 import { getRandomizedSongs } from '../../../utils/PlaylistRandomization';
+import { color } from '../../../constant/Color';
 
 interface PlaylistCardProps {
     playlist: Playlist,
@@ -53,58 +54,6 @@ const PlaylistCard = (props: PlaylistCardProps) => {
                 });
         }
     }, [currentPlaylist, startPlayback]);
-
-    const flatListItemSeparator = () => (<View style={styles.flatlistSeparator} />);
-
-    const renderAlbumSong = ({ item }: { item: Song }) => (<SongCard song={item} colorScheme={scheme} />);
-
-    const renderAlbumFlatlist = (album: Album) => (
-        <View>
-            <FlatList
-                data={album.songs}
-                renderItem={renderAlbumSong}
-                ItemSeparatorComponent={flatListItemSeparator}
-                keyExtractor={(item, index) => `${item.title}-${index}`}
-            />
-        </View>
-    );
-
-    const renderPlaylistAlbums = ({ item }: { item: Album }) => (
-        <ComponentDropDown
-            mainItemCard={(
-                <AlbumCard
-                    album={item}
-                />
-            )}
-            subItemFlatlist={renderAlbumFlatlist(item)}
-        />
-    );
-
-    const renderPlaylistSongs = ({ item }: { item: Song}) => (
-        <SongCard
-            song={item}
-            colorScheme={scheme}
-        />
-    );
-
-    const playlistSubItemsFlatlist = () => (
-        <View>
-            <FlatList
-                data={playlist.albums}
-                renderItem={renderPlaylistAlbums}
-                key="Albums"
-                ItemSeparatorComponent={flatListItemSeparator}
-                keyExtractor={(item, index) => `${item.albumName}-${index}`}
-            />
-            <FlatList
-                data={playlist.songs}
-                renderItem={renderPlaylistSongs}
-                key="Songs"
-                ItemSeparatorComponent={flatListItemSeparator}
-                keyExtractor={(item, index) => `${item.title}-${index}`}
-            />
-        </View>
-    );
 
     const goToPlaylist = () => {
         dispatch(setCurrentPlaylist(playlist));
@@ -140,8 +89,8 @@ const PlaylistCard = (props: PlaylistCardProps) => {
         setStartPlayback(true);
     }
 
-    const playlistView = () => (
-        <View style={styles.cardView}>
+    return (
+        <SafeAreaView style={{...styles.cardView, borderColor: isDarkMode ? color.DARK_RED : color.DARK_SLATE_BLUE}}>
             <Pressable style={styles.infoView} onPress={goToPlaylist} onLongPress={playPlaylist}>
                 <Text style={styles.title}>{playlist.name}</Text>
                 <Text style={styles.subtitle}>{`Total songs: ${playlist.playArray.length}`}</Text>
@@ -152,15 +101,6 @@ const PlaylistCard = (props: PlaylistCardProps) => {
             <Pressable onLongPress={() => dispatch(removePlaylist(playlist.name))}>
                 <MaterialCommunityIcons name="playlist-remove" size={30} />
             </Pressable>
-        </View>
-    );
-
-    return (
-        <SafeAreaView style={styles.container}>
-            <ComponentDropDown
-                mainItemCard={playlistView()}
-                subItemFlatlist={playlistSubItemsFlatlist()}
-            />
         </SafeAreaView>
     );
 };

@@ -8,8 +8,12 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 14
     },
+    subsubtitle: {
+        fontSize: 14,
+        textAlign: 'center'
+    },
     cardView: {
-        width: '80%',
+        width: '85%',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -20,7 +24,7 @@ const styles = StyleSheet.create({
     },
     infoView: {
         flexDirection: 'column',
-        width: '50%'
+        marginHorizontal: 10
     }
 });
 

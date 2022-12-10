@@ -21,8 +21,8 @@ const AlbumCard = (props: AlbumCardProps) => {
     const { album, setAlbumOrdered, onAdd, onRemove, onPlay } = props;
 
     const orderedAlbumSelectorView = (ordered = false) => setAlbumOrdered && (
-        <View style={styles.infoView}>
-            <Text style={styles.subtitle}>Order this album?</Text>
+        <View style={{...styles.infoView, flex: 1}}>
+            <Text style={styles.subsubtitle}>Order this album?</Text>
             <Switch value={ordered} onValueChange={setAlbumOrdered} />
         </View>
     );
@@ -48,7 +48,7 @@ const AlbumCard = (props: AlbumCardProps) => {
     return (
         <View style={styles.cardView}>
             <MaterialCommunityIcons name="music-box-multiple-outline" size={40} />
-            <View style={styles.infoView}>
+            <View style={{...styles.infoView, flex: 3}}>
                 <Text style={styles.title}>{album.albumName}</Text>
                 <Text style={styles.subtitle}>{album.artistName}</Text>
                 <Text style={styles.subtitle}>{`${album.songs.length} songs`}</Text>

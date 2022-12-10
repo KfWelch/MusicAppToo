@@ -1,10 +1,6 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-    container: {
-        flexDirection:'column',
-        alignSelf: 'center'
-    },
     indexNumber: {
         fontSize: 18
     },
@@ -15,13 +11,15 @@ const styles = StyleSheet.create({
         fontSize: 14
     },
     cardView: {
-        width: '85%',
+        width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 15,
-        height: 70,
-        alignSelf: 'stretch'
+        height: 80,
+        alignSelf: 'stretch',
+        borderRadius: 7,
+        borderWidth: 1
     },
     infoView: {
         flexDirection: 'column'
