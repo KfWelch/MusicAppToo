@@ -1,22 +1,36 @@
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
-import { Button, FlatList, Pressable, Switch, Text, useColorScheme, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useDispatch } from "react-redux";
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { Button, FlatList, Pressable, Switch, Text, useColorScheme, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useDispatch } from 'react-redux';
 import ModalDropdown from 'react-native-modal-dropdown';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import ComponentDropDown from "../../components/Cards/ComponentDropDown/ComponentDropDown";
-import AlbumCard from "../../components/Cards/AlbumCard/AlbumCard";
-import SongCard from "../../components/Cards/SongCard/SongCard";
-import { Album, Song } from "../../models/MusicModel";
-import { setAlbumOrdered, setCurrentPlayArray, setShuffleType, setPlaybackMode, setRandomizeType, setReshuffle, setSongWeight, shuffleCurrentPlaylist } from "../../state/actions/Playlist";
-import { useTypedSelector } from "../../state/reducers";
-import { ShuffleType, PlaybackMode, RandomizationType } from "../../state/reducers/Playlist";
-import { convertSongListToTracks, getAlbumId, getPlayArray, getSongId } from "../../utils/musicUtils";
-import styles from "./Playlist.style";
-import TrackPlayer from "react-native-track-player";
-import { getRandomizedSongs } from "../../utils/PlaylistRandomization";
+import ComponentDropDown from '../../components/Cards/ComponentDropDown/ComponentDropDown';
+import AlbumCard from '../../components/Cards/AlbumCard/AlbumCard';
+import SongCard from '../../components/Cards/SongCard/SongCard';
+import { Album, Song } from '../../models/MusicModel';
+import {
+    setAlbumOrdered,
+    setCurrentPlayArray,
+    setShuffleType,
+    setPlaybackMode,
+    setRandomizeType,
+    setReshuffle,
+    setSongWeight,
+    shuffleCurrentPlaylist
+} from '../../state/actions/Playlist';
+import { useTypedSelector } from '../../state/reducers';
+import { ShuffleType, PlaybackMode, RandomizationType } from '../../state/reducers/Playlist';
+import {
+    convertSongListToTracks,
+    getAlbumId,
+    getPlayArray,
+    getSongId
+} from '../../utils/musicUtils';
+import styles from './Playlist.style';
+import TrackPlayer from 'react-native-track-player';
+import { getRandomizedSongs } from '../../utils/PlaylistRandomization';
 
     const playbackModeOptions: PlaybackMode[] = [PlaybackMode.NORMAL, PlaybackMode.SHUFFLE, PlaybackMode.RANDOMIZE];
     const shuffleTypeOptions: ShuffleType[] = [ShuffleType.STANDARD, ShuffleType.SPREAD, ShuffleType.SPREAD_ORDERED, ShuffleType.STANDARD_ORDERED];

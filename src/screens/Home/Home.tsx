@@ -1,8 +1,7 @@
-import React from "react";
-import { SafeAreaView } from "react-native";
-import ArtistList from "../../components/ArtistListComponent/ArtistListComponent";
-import FetchMusicComponent from "../../components/FetchMusicComponent/FetchMusicComponent";
-import styles from "./Home.style";
+import React from 'react';
+import { SafeAreaView } from 'react-native';
+import ArtistList from '../../components/ArtistListComponent/ArtistListComponent';
+import styles from './Home.style';
 
 const Home = () => (
     <SafeAreaView style={styles.container}>

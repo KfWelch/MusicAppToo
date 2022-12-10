@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import TrackPlayer, { State, usePlaybackState } from 'react-native-track-player';
+import React from 'react';
+import TrackPlayer, { RepeatMode } from 'react-native-track-player';
 import AlbumList from '../../components/AlbumListComponent/AlbumList';
 import PlaybackControl from '../../components/PlaybackControl/PlaybackControl';
 import { useTypedSelector } from '../../state/reducers';
@@ -11,7 +11,7 @@ const ArtistScreen = (): JSX.Element => {
     return (
         <>
         <AlbumList />
-        <PlaybackControl
+        {/* <PlaybackControl
             play={() => TrackPlayer.play()}
             pause={() => TrackPlayer.pause()}
             restart={() => {}}
@@ -19,9 +19,9 @@ const ArtistScreen = (): JSX.Element => {
             setVol={() => {}}
             skipBack={() => TrackPlayer.skipToPrevious()}
             skipForward={() => TrackPlayer.skipToNext()}
-            skipTo={() => {}}
             stop={() => {}}
-        />
+            repeatMode={(mode: RepeatMode) => {}}
+        /> */}
         </>
     )
 }

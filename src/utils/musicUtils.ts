@@ -1,6 +1,6 @@
-import { Track } from "react-native-track-player";
-import { GetMusicAlbum, GetMusicTrack } from "../models/GetMusicFiles";
-import { Album, Playlist, Song } from "../models/MusicModel";
+import { Track } from 'react-native-track-player';
+import { GetMusicAlbum, GetMusicTrack } from '../models/GetMusicFiles';
+import { Album, Playlist, Song } from '../models/MusicModel';
 
 export const convertSongToTrack = (song: Song): Track => {
     return {

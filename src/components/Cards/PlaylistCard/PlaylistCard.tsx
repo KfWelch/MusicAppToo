@@ -1,20 +1,31 @@
-import { NavigationProp } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
-import { FlatList, Pressable, SafeAreaView, Switch, Text, useColorScheme, View } from "react-native";
-import NumericInput from "react-native-numeric-input";
-import TrackPlayer from "react-native-track-player";
+import { NavigationProp } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import {
+    FlatList,
+    Pressable,
+    SafeAreaView,
+    Text,
+    useColorScheme,
+    View
+} from 'react-native';
+import TrackPlayer from 'react-native-track-player';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useDispatch } from "react-redux";
-import { Album, Playlist, Song } from "../../../models/MusicModel";
-import { removeAlbumFromPlaylist, removePlaylist, removeSongFromPlaylist, setAlbumOrdered, setCurrentPlayArray, setCurrentPlaylist, setSongWeight, shuffleCurrentPlaylist } from "../../../state/actions/Playlist";
-import { convertSongListToTracks, getAlbumId, getPlayArray, getSongId } from "../../../utils/musicUtils";
-import AlbumCard from "../AlbumCard/AlbumCard";
-import SongCard from "../SongCard/SongCard";
-import ComponentDropDown from "../ComponentDropDown/ComponentDropDown";
-import styles from "./PlaylistCard.style";
-import { useTypedSelector } from "../../../state/reducers";
-import { PlaybackMode } from "../../../state/reducers/Playlist";
-import { getRandomizedSongs } from "../../../utils/PlaylistRandomization";
+import { useDispatch } from 'react-redux';
+import { Album, Playlist, Song } from '../../../models/MusicModel';
+import {
+    removePlaylist,
+    setCurrentPlayArray,
+    setCurrentPlaylist,
+    shuffleCurrentPlaylist
+} from '../../../state/actions/Playlist';
+import { convertSongListToTracks, getPlayArray } from '../../../utils/musicUtils';
+import AlbumCard from '../AlbumCard/AlbumCard';
+import SongCard from '../SongCard/SongCard';
+import ComponentDropDown from '../ComponentDropDown/ComponentDropDown';
+import styles from './PlaylistCard.style';
+import { useTypedSelector } from '../../../state/reducers';
+import { PlaybackMode } from '../../../state/reducers/Playlist';
+import { getRandomizedSongs } from '../../../utils/PlaylistRandomization';
 
 interface PlaylistCardProps {
     playlist: Playlist,
@@ -63,7 +74,6 @@ const PlaylistCard = (props: PlaylistCardProps) => {
             mainItemCard={(
                 <AlbumCard
                     album={item}
-                    onRemove={() => dispatch(removeAlbumFromPlaylist(getAlbumId(item), playlist.name))}
                 />
             )}
             subItemFlatlist={renderAlbumFlatlist(item)}
@@ -73,7 +83,6 @@ const PlaylistCard = (props: PlaylistCardProps) => {
     const renderPlaylistSongs = ({ item }: { item: Song}) => (
         <SongCard
             song={item}
-            onRemove={() => dispatch(removeSongFromPlaylist(getSongId(item), playlist.name))}
             colorScheme={scheme}
         />
     );

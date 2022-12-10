@@ -1,21 +1,31 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Pressable, useColorScheme, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import TrackPlayer, { Event, RepeatMode, usePlaybackState, useTrackPlayerEvents } from "react-native-track-player";
+import React, { useEffect, useRef, useState } from 'react';
+import { Pressable, useColorScheme, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import TrackPlayer, {
+    Event,
+    RepeatMode,
+    usePlaybackState,
+    useTrackPlayerEvents
+} from 'react-native-track-player';
 import BackgroundTimer from 'react-native-background-timer';
-import SongCard from "../../components/Cards/SongCard/SongCard";
-import PlaybackControl from "../../components/PlaybackControl/PlaybackControl";
-import { Song } from "../../models/MusicModel";
-import { useTypedSelector } from "../../state/reducers";
-import { convertSongListToTracks, getSongId } from "../../utils/musicUtils";
-import styles from "./Playback.style";
-import { useDispatch } from "react-redux";
-import { removeOldestRandomSongs, setCurrentPlayArray, setLastSongPlayed, setRandomNextSongs } from "../../state/actions/Playlist";
-import { playable } from "../../utils/trackPlayUtils";
-import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
-import { MARGIN, SongCardHeight } from "../../components/Cards/SongCard/SongCard.style";
-import { PlaybackMode } from "../../state/reducers/Playlist";
-import { getRandomizedNextSong, getRandomizedSongs } from "../../utils/PlaylistRandomization";
+import SongCard from '../../components/Cards/SongCard/SongCard';
+import PlaybackControl from '../../components/PlaybackControl/PlaybackControl';
+import { Song } from '../../models/MusicModel';
+import { useTypedSelector } from '../../state/reducers';
+import { convertSongListToTracks, getSongId } from '../../utils/musicUtils';
+import styles from './Playback.style';
+import { useDispatch } from 'react-redux';
+import {
+    removeOldestRandomSongs,
+    setCurrentPlayArray,
+    setLastSongPlayed,
+    setRandomNextSongs
+} from '../../state/actions/Playlist';
+import { playable } from '../../utils/trackPlayUtils';
+import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import { MARGIN, SongCardHeight } from '../../components/Cards/SongCard/SongCard.style';
+import { PlaybackMode } from '../../state/reducers/Playlist';
+import { getRandomizedNextSong, getRandomizedSongs } from '../../utils/PlaylistRandomization';
 
 const CARD_HEIGHT = SongCardHeight + MARGIN * 2;
 
@@ -69,56 +79,58 @@ const Playback = () => {
                 startRandomWaitTimer();
             }
             TrackPlayer.getCurrentTrack().then(currentIndex => {
-                if (playbackOptions.mode === PlaybackMode.RANDOMIZE && currentPlaylist) {
-                    const { randomizationForwardBuffer, randomizationBackwardBuffer } = options;
-                    const totalBuffer = randomizationBackwardBuffer + randomizationForwardBuffer;
-                    const totalCurrentSongs = currentPlaylist && currentPlaylist.playArray.length;
-                    const currentForwardBuffer = totalCurrentSongs - currentIndex;
-
-                    // We need to add when the forward buffer is smaller than we need
-                    if (currentForwardBuffer < randomizationForwardBuffer) {
-                        const bufferNeeded = randomizationForwardBuffer - currentForwardBuffer;
-                        const songsToAdd: Song[] = [];
-                        if (options.randomizationShouldNotRepeatSongs) {
-                            songsToAdd.push(getRandomizedNextSong(
-                                currentPlaylist,
-                                playbackOptions.randomizeOptions.weighted,
-                                currentPlaylist.playArray[currentPlaylist.playArray.length - 1]
-                            ));
-                        } else {
-                            songsToAdd.push(getRandomizedNextSong(currentPlaylist, playbackOptions.randomizeOptions.weighted));
-                        }
-                        for (let i = 1; i < bufferNeeded; i++) {
-                            let nextSong: Song;
+                if (currentIndex) {
+                    if (playbackOptions.mode === PlaybackMode.RANDOMIZE && currentPlaylist) {
+                        const { randomizationForwardBuffer, randomizationBackwardBuffer } = options;
+                        const totalBuffer = randomizationBackwardBuffer + randomizationForwardBuffer;
+                        const totalCurrentSongs = currentPlaylist && currentPlaylist.playArray.length;
+                        const currentForwardBuffer = totalCurrentSongs - currentIndex;
+    
+                        // We need to add when the forward buffer is smaller than we need
+                        if (currentForwardBuffer < randomizationForwardBuffer) {
+                            const bufferNeeded = randomizationForwardBuffer - currentForwardBuffer;
+                            const songsToAdd: Song[] = [];
                             if (options.randomizationShouldNotRepeatSongs) {
-                                nextSong = getRandomizedNextSong(
+                                songsToAdd.push(getRandomizedNextSong(
                                     currentPlaylist,
                                     playbackOptions.randomizeOptions.weighted,
-                                    songsToAdd[i - 1]
-                                );
+                                    currentPlaylist.playArray[currentPlaylist.playArray.length - 1]
+                                ));
                             } else {
-                                nextSong = getRandomizedNextSong(
-                                    currentPlaylist,
-                                    playbackOptions.randomizeOptions.weighted
-                                );
+                                songsToAdd.push(getRandomizedNextSong(currentPlaylist, playbackOptions.randomizeOptions.weighted));
                             }
-                            songsToAdd.push(nextSong);
-                        }
-                        dispatch(setRandomNextSongs(songsToAdd));
-                        TrackPlayer.add(convertSongListToTracks(songsToAdd));
-
-                        // We need to remove when we have more than the total buffer
-                        if (totalCurrentSongs > totalBuffer) {
-                            const songsToRemove = totalCurrentSongs - totalBuffer;
-                            TrackPlayer.remove([...Array(songsToRemove).keys()]);
-                            dispatch(removeOldestRandomSongs(songsToRemove));
-                            // We need to subtract here however many songs we removed
-                            currentIndex = currentIndex - songsToRemove;
+                            for (let i = 1; i < bufferNeeded; i++) {
+                                let nextSong: Song;
+                                if (options.randomizationShouldNotRepeatSongs) {
+                                    nextSong = getRandomizedNextSong(
+                                        currentPlaylist,
+                                        playbackOptions.randomizeOptions.weighted,
+                                        songsToAdd[i - 1]
+                                    );
+                                } else {
+                                    nextSong = getRandomizedNextSong(
+                                        currentPlaylist,
+                                        playbackOptions.randomizeOptions.weighted
+                                    );
+                                }
+                                songsToAdd.push(nextSong);
+                            }
+                            dispatch(setRandomNextSongs(songsToAdd));
+                            TrackPlayer.add(convertSongListToTracks(songsToAdd));
+    
+                            // We need to remove when we have more than the total buffer
+                            if (totalCurrentSongs > totalBuffer) {
+                                const songsToRemove = totalCurrentSongs - totalBuffer;
+                                TrackPlayer.remove([...Array(songsToRemove).keys()]);
+                                dispatch(removeOldestRandomSongs(songsToRemove));
+                                // We need to subtract here however many songs we removed
+                                currentIndex = currentIndex - songsToRemove;
+                            }
                         }
                     }
+                    setCurrentTrack(currentIndex);
+                    dispatch(setLastSongPlayed(currentIndex));
                 }
-                setCurrentTrack(currentIndex);
-                dispatch(setLastSongPlayed(currentIndex));
             });
         }
     });
@@ -199,7 +211,6 @@ const Playback = () => {
                 setVol={() => {}}
                 skipBack={() => TrackPlayer.skipToPrevious()}
                 skipForward={() => TrackPlayer.skipToNext()}
-                stop={() => TrackPlayer.stop()}
                 repeatMode={repeatMode}
                 setRepeatMode={setRepeatMode}
             />

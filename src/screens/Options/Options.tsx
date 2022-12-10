@@ -1,12 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, SafeAreaView, SectionList, SectionListData, SectionListRenderItem, Switch, Text, TextInput, useColorScheme, View } from "react-native";
-import NumericInput from "react-native-numeric-input";
-import { useDispatch } from "react-redux";
-import { colorScheme } from "../../constant/Color";
-import { setOptionByName } from "../../state/actions/Options";
-import { useTypedSelector } from "../../state/reducers";
-import { splitCamelCaseToWords } from "../../utils/stringUtils";
-import styles from "./Options.style";
+import React from 'react';
+import {
+    SafeAreaView,
+    SectionList,
+    SectionListRenderItem,
+    Switch,
+    Text,
+    TextInput,
+    useColorScheme,
+    View
+} from 'react-native';
+import NumericInput from 'react-native-numeric-input';
+import { useDispatch } from 'react-redux';
+import colorScheme from '../../constant/Color';
+import { setOptionByName } from '../../state/actions/Options';
+import { useTypedSelector } from '../../state/reducers';
+import { splitCamelCaseToWords } from '../../utils/stringUtils';
+import styles from './Options.style';
 
 enum TypeofTypes {
     NUMBER = 'number',

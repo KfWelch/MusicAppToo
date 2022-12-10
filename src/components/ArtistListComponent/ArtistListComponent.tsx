@@ -1,21 +1,26 @@
-import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
-import { FlatList, useColorScheme, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import TrackPlayer from "react-native-track-player";
-import { useDispatch } from "react-redux";
-import { Album, Artist, Song } from "../../models/MusicModel";
-import { selectArtist } from "../../state/actions/Albums";
-import { setAlbumAsCurrentPlaylist, setCurrentPlayArray, shuffleCurrentPlaylist } from "../../state/actions/Playlist";
-import { useTypedSelector } from "../../state/reducers";
-import { PlaybackMode } from "../../state/reducers/Playlist";
-import { convertSongListToTracks, getAlbumId, getPlayArray, getSongId } from "../../utils/musicUtils";
-import { getRandomizedSongs } from "../../utils/PlaylistRandomization";
-import AlbumCard from "../Cards/AlbumCard/AlbumCard";
-import ArtistCard from "../Cards/ArtistCard/ArtistCard";
-import ComponentDropDown from "../Cards/ComponentDropDown/ComponentDropDown";
-import SongCard from "../Cards/SongCard/SongCard";
-import styles from "./ArtistListComponent.style";
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, useColorScheme, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import TrackPlayer from 'react-native-track-player';
+import { useDispatch } from 'react-redux';
+import { Album, Artist, Song } from '../../models/MusicModel';
+import { selectArtist } from '../../state/actions/Albums';
+import { setAlbumAsCurrentPlaylist, setCurrentPlayArray, shuffleCurrentPlaylist } from '../../state/actions/Playlist';
+import { useTypedSelector } from '../../state/reducers';
+import { PlaybackMode } from '../../state/reducers/Playlist';
+import {
+    convertSongListToTracks,
+    getAlbumId,
+    getPlayArray,
+    getSongId
+} from '../../utils/musicUtils';
+import { getRandomizedSongs } from '../../utils/PlaylistRandomization';
+import AlbumCard from '../Cards/AlbumCard/AlbumCard';
+import ArtistCard from '../Cards/ArtistCard/ArtistCard';
+import ComponentDropDown from '../Cards/ComponentDropDown/ComponentDropDown';
+import SongCard from '../Cards/SongCard/SongCard';
+import styles from './ArtistListComponent.style';
 
 const ArtistList = () => {
     const albumsState = useTypedSelector(state => state.Albums);

@@ -1,5 +1,5 @@
-import { PartialState, RootState } from ".";
-import { AsyncState } from "./generic/makeAsyncReducer";
+import { PartialState, RootState } from '.';
+import { AsyncState } from './generic/makeAsyncReducer';
 
 export type AsyncSelector<Q, R, E> = (state: RootState) => AsyncState<Q, R, E> | PartialState;
 

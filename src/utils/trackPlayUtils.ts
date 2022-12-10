@@ -1,4 +1,4 @@
-import { State } from "react-native-track-player";
+import { State } from 'react-native-track-player';
 
 /**
  * Used to find out whether we are currently playing music

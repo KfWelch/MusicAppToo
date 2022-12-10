@@ -1,29 +1,30 @@
-import Slider from "@react-native-community/slider";
-import React, { useState } from "react";
+// @ts-ignore
+import Slider from 'react-native-sliders';
+import React, { useState } from 'react';
 import {
     SafeAreaView,
     Pressable,
     View,
     Dimensions,
     Text
-} from "react-native";
+} from 'react-native';
 import {
     RepeatMode,
     State,
     usePlaybackState,
     useProgress
 } from 'react-native-track-player';
-import Icon from "react-native-vector-icons/AntDesign";
+import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { getMinSec } from "../../utils/timeUtils";
-import styles from "./PlaybackControl.style";
+import { getMinSec } from '../../utils/timeUtils';
+import styles from './PlaybackControl.style';
 
 const width = Dimensions.get('window').width;
 
 interface PlaybackControlProps {
     play: () => void;
     pause: () => void;
-    stop: () => void;
+    stop?: () => void;
     restart: () => void;
     seek: (pos: number) => void;
     setVol: (volume: number) => void;
@@ -101,7 +102,7 @@ const PlaybackControl = (props: PlaybackControlProps) => {
             <View style={styles.progressContainer}>
                 {sliderNumberView()}
                 <Slider
-                    value={progress.position}
+                    value={progress.position || 0}
                     minimumValue={0}
                     maximumValue={progress.duration}
                     onSlidingStart={() => setSeeking(true)}

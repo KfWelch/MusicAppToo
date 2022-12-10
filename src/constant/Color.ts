@@ -1,4 +1,4 @@
-const color = {
+export const color = {
     BLACK_TRANSPARENT_200: '#00000033',
     BLACK_TRANSPARENT_500: '#00000080',
     BLACK_TRANSPARENT_600: '#00000099',
@@ -18,7 +18,7 @@ interface ColorScheme {
     }
 }
 
-export const colorScheme: ColorScheme = {
+const colorScheme: ColorScheme = {
     dark: {
         background: '#190a10',
         outline: 'darkred',
@@ -33,4 +33,4 @@ export const colorScheme: ColorScheme = {
     }
 }
 
-export default color;
+export default colorScheme;

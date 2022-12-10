@@ -1,8 +1,18 @@
 
 import _ from 'lodash';
 import React, { useState } from 'react';
-import { Button, SafeAreaView, useColorScheme, View } from 'react-native';
-import { check, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
+import {
+    Button,
+    SafeAreaView,
+    useColorScheme,
+    View
+} from 'react-native';
+import {
+    check,
+    PERMISSIONS,
+    request,
+    RESULTS
+} from 'react-native-permissions';
 import Toast from 'react-native-toast-message';
 import * as RNFS from 'react-native-fs';
 import { TagType } from 'jsmediatags/types';
@@ -16,11 +26,22 @@ import styles from './FetchMusicComponent.style';
 import { Album, Artist, Song } from '../../models/MusicModel';
 import { useTypedSelector } from '../../state/reducers';
 import { useDispatch } from 'react-redux';
-import { addAlbum, addArtist, combineMultiDiscAlbums, resetSavedAlbums } from '../../state/actions/Albums';
-import { colorScheme } from '../../constant/Color';
-import { disclessAlbumName, getAlbumId, getArtistFromPath, getMusicAlbumId, getMusicTrackId } from '../../utils/musicUtils';
+import {
+    addAlbum,
+    addArtist,
+    combineMultiDiscAlbums,
+    resetSavedAlbums
+} from '../../state/actions/Albums';
+import {
+    disclessAlbumName,
+    getAlbumId,
+    getArtistFromPath,
+    getMusicAlbumId,
+    getMusicTrackId
+} from '../../utils/musicUtils';
 import { useNavigation } from '@react-navigation/native';
 import { GetMusicAlbum, GetMusicTrack } from '../../models/GetMusicFiles';
+import colorScheme from '../../constant/Color';
 
 interface Progress {
     total: number;

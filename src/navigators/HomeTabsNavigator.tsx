@@ -6,7 +6,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Home from '../screens/Home/Home';
 import Playback from '../screens/PlaybackScreen/Playback';
 import PlaylistList from '../screens/PlaylistList/PlaylistList';
-import { playable } from '../utils/trackPlayUtils';
 
 export type HomeTabNavParams = {
     Home: undefined;

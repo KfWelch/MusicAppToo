@@ -1,5 +1,10 @@
 import React from 'react';
-import { Pressable, Switch, Text, View } from 'react-native';
+import {
+    Pressable,
+    Switch,
+    Text,
+    View
+} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Album } from '../../../models/MusicModel';
 import styles from './AlbumCard.style';
