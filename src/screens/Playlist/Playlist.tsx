@@ -72,7 +72,9 @@ const Playlist = () => {
     const songView = ({ item }: { item: Song }) => (
         <SongCard
             song={item}
-            onWeightChange={value => dispatch(setSongWeight(getSongId(item), value))}
+            onWeightChange={playerOptions.mode === PlaybackMode.RANDOMIZE
+                ? value => dispatch(setSongWeight(getSongId(item), value))
+                : undefined}
             colorScheme={isDarkMode ? 'dark' : 'light'}
         />
     );
@@ -82,7 +84,9 @@ const Playlist = () => {
             mainItemCard={(
                 <AlbumCard
                     album={item}
-                    setAlbumOrdered={ordered => dispatch(setAlbumOrdered(getAlbumId(item), ordered))}
+                    setAlbumOrdered={playerOptions.mode === PlaybackMode.SHUFFLE
+                        ? ordered => dispatch(setAlbumOrdered(getAlbumId(item), ordered))
+                        : undefined}
                 />
             )}
             subItemFlatlist={(
@@ -202,14 +206,6 @@ const Playlist = () => {
         </SafeAreaView>
     );
 
-    const individualSongView = ({ item }: { item: Song }) => (
-        <SongCard
-            song={item}
-            onWeightChange={newWeight => dispatch(setSongWeight(getSongId(item), newWeight))}
-            colorScheme={isDarkMode ? 'dark' : 'light'}
-        />
-    );
-
     const songsView = () => (
         <SafeAreaView style={styles.container}>
             {playbackOptions.mode === PlaybackMode.SHUFFLE && <Button
@@ -221,7 +217,7 @@ const Playlist = () => {
             />}
             <FlatList
                 data={currentPlaylist?.playArray}
-                renderItem={individualSongView}
+                renderItem={songView}
                 keyExtractor={(item, index) => `${item.title}-${index}`}
                 style={styles.songsFlatlist}
             />

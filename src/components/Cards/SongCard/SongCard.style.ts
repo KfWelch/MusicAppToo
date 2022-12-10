@@ -14,6 +14,10 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 14
     },
+    subsubtitle: {
+        fontSize: 14,
+        textAlign: 'center'
+    },
     cardView: {
         width: '90%',
         flexDirection: 'row',
@@ -28,7 +32,7 @@ const styles = StyleSheet.create({
     },
     infoView: {
         flexDirection: 'column',
-        width: '60%'
+        marginHorizontal: 10
     },
     border: {
         borderWidth: 1
