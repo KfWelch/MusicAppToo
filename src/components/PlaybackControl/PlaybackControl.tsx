@@ -1,4 +1,5 @@
-import Slider from '@react-native-community/slider';
+// @ts-ignore
+import Slider from 'react-native-sliders';
 import React, { useState } from 'react';
 import {
     SafeAreaView,
@@ -23,7 +24,7 @@ const width = Dimensions.get('window').width;
 interface PlaybackControlProps {
     play: () => void;
     pause: () => void;
-    stop: () => void;
+    stop?: () => void;
     restart: () => void;
     seek: (pos: number) => void;
     setVol: (volume: number) => void;
@@ -101,7 +102,7 @@ const PlaybackControl = (props: PlaybackControlProps) => {
             <View style={styles.progressContainer}>
                 {sliderNumberView()}
                 <Slider
-                    value={progress.position}
+                    value={progress.position || 0}
                     minimumValue={0}
                     maximumValue={progress.duration}
                     onSlidingStart={() => setSeeking(true)}

@@ -33,7 +33,7 @@ const HomeStack = () => {
     const playing = playbackState === State.Playing;
 
     const playbackButton = () => playable(playbackState) && (playing ? (
-        <Pressable style={styles.optionButton} onPress={TrackPlayer.pause} onLongPress={TrackPlayer.stop}>
+        <Pressable style={styles.optionButton} onPress={TrackPlayer.pause}>
             <Icon name="caretright" size={20} />
         </Pressable>
     ) : (
