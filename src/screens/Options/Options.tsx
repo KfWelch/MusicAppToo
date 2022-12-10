@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import NumericInput from 'react-native-numeric-input';
 import { useDispatch } from 'react-redux';
-import { colorScheme } from '../../constant/Color';
+import colorScheme from '../../constant/Color';
 import { setOptionByName } from '../../state/actions/Options';
 import { useTypedSelector } from '../../state/reducers';
 import { splitCamelCaseToWords } from '../../utils/stringUtils';

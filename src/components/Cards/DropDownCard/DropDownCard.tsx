@@ -8,7 +8,7 @@ import {
     View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import color from '../../../constant/Color';
+import { color } from '../../../constant/Color';
 import { useTypedSelector } from '../../../state/reducers';
 import styles from './DropDownCard.style';
 

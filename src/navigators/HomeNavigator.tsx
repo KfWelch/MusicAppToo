@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
 import { useColorScheme } from 'react-native';
 import FetchMusicComponent from '../components/FetchMusicComponent/FetchMusicComponent';
-import { colorScheme } from '../constant/Color';
+import colorScheme from '../constant/Color';
 import Options from '../screens/Options/Options';
 import { useTypedSelector } from '../state/reducers';
 import HomeStack from './HomeStackNavigator';

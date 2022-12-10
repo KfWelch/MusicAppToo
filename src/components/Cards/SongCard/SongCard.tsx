@@ -14,7 +14,7 @@ import Animated, {
     useAnimatedStyle,
     useDerivedValue
 } from 'react-native-reanimated';
-import { colorScheme } from '../../../constant/Color';
+import colorScheme from '../../../constant/Color';
 import { Song } from '../../../models/MusicModel';
 import styles, { MARGIN, SongCardHeight } from './SongCard.style';
 

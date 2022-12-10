@@ -32,7 +32,6 @@ import {
     combineMultiDiscAlbums,
     resetSavedAlbums
 } from '../../state/actions/Albums';
-import { colorScheme } from '../../constant/Color';
 import {
     disclessAlbumName,
     getAlbumId,
@@ -42,6 +41,7 @@ import {
 } from '../../utils/musicUtils';
 import { useNavigation } from '@react-navigation/native';
 import { GetMusicAlbum, GetMusicTrack } from '../../models/GetMusicFiles';
+import colorScheme from '../../constant/Color';
 
 interface Progress {
     total: number;

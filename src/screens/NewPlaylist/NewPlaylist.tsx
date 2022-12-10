@@ -29,7 +29,7 @@ import ArtistCard from '../../components/Cards/ArtistCard/ArtistCard';
 import { getAlbumId, getSongId } from '../../utils/musicUtils';
 import { TextInput } from 'react-native-gesture-handler';
 import styles from './NewPlaylist.style';
-import { colorScheme } from '../../constant/Color';
+import colorScheme from '../../constant/Color';
 
 const Tab = createMaterialTopTabNavigator();
 
