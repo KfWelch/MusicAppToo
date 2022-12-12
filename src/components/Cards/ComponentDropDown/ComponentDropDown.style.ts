@@ -6,7 +6,8 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'column',
         borderRadius: 7,
-        borderWidth: 1
+        borderWidth: 1,
+        alignSelf: 'center'
     },
     lineContainer: {
         padding: 15,
