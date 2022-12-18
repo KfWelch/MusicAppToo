@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+    FlexStyle,
     Pressable,
     SafeAreaView,
     useColorScheme,
@@ -13,17 +14,24 @@ import styles from './ComponentDropDown.style';
 interface DropDownProps {
     mainItemCard: JSX.Element;
     subItemFlatlist: JSX.Element;
+    style?: FlexStyle;
 }
 
 const ComponentDropDown = (props: DropDownProps) => {
-    const { mainItemCard, subItemFlatlist } = props;
+    const { mainItemCard, subItemFlatlist, style } = props;
     const options = useTypedSelector(state => state.Options);
     const colorScheme = useColorScheme();
     const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : colorScheme === 'dark';
     const [showSubItems, setShowSubItems] = useState(false);
 
+    const styleOverrides = style;
+
     return (
-        <SafeAreaView style={{ ...styles.container, borderColor: isDarkMode ? color.DARK_RED : color.DARK_SLATE_BLUE }}>
+        <SafeAreaView style={{
+            ...styles.container,
+            borderColor: isDarkMode ? color.DARK_RED : color.DARK_SLATE_BLUE,
+            ...styleOverrides
+        }}>
             <View style={styles.lineContainer}>
                 {mainItemCard}
                 <Pressable onPress={() => setShowSubItems(!showSubItems)}>

@@ -31,6 +31,7 @@ import {
 import styles from './Playlist.style';
 import TrackPlayer from 'react-native-track-player';
 import { getRandomizedSongs } from '../../utils/PlaylistRandomization';
+import colorScheme from '../../constant/Color';
 
     const playbackModeOptions: PlaybackMode[] = [PlaybackMode.NORMAL, PlaybackMode.SHUFFLE, PlaybackMode.RANDOMIZE];
     const shuffleTypeOptions: ShuffleType[] = [ShuffleType.STANDARD, ShuffleType.SPREAD, ShuffleType.SPREAD_ORDERED, ShuffleType.STANDARD_ORDERED];
@@ -96,6 +97,7 @@ const Playlist = () => {
                     keyExtractor={(item, index) => `${item.title}-${index}`}
                 />
             )}
+            style={{ width: '95%' }}
         />
     );
 
@@ -184,6 +186,7 @@ const Playlist = () => {
                 data={currentPlaylist?.albums}
                 renderItem={albumView}
                 keyExtractor={(item, index) => `${item.albumName}-${index}`}
+                ItemSeparatorComponent={() => (<View style={styles.separator} />)}
             />
         </View>
     );
@@ -198,16 +201,20 @@ const Playlist = () => {
         </View>
     );
 
+    const separator = () => (
+        <View style={{...styles.sectionSeparator, borderColor: colorScheme[isDarkMode ? 'dark' : 'light'].outline}} />
+    );
+
     const detailsView = () => (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.flatListView}>
             {detailsAlbums()}
+            {currentPlaylist?.songs.length && currentPlaylist.albums.length ? separator() : null}
             {detailsSongs()}
-            {controlBar()}
-        </SafeAreaView>
+        </View>
     );
 
     const songsView = () => (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.flatListView}>
             {playbackOptions.mode === PlaybackMode.SHUFFLE && <Button
                 onPress={() => {
                     dispatch(shuffleCurrentPlaylist());
@@ -221,24 +228,27 @@ const Playlist = () => {
                 keyExtractor={(item, index) => `${item.title}-${index}`}
                 style={styles.songsFlatlist}
             />
-            {controlBar()}
-        </SafeAreaView>
+        </View>
     )
 
     return (
-        <Tab.Navigator>
-            <Tab.Screen name="Details">
-                {() => detailsView()}
-            </Tab.Screen>
-            <Tab.Screen
-                name="Songs"
-                listeners={{
-                    focus: () => currentPlaylist && dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)))
-                }}
-            >
-                {() => songsView()}
-            </Tab.Screen>
-        </Tab.Navigator>
+        <SafeAreaView style={styles.container}>
+            <Tab.Navigator style={styles.content}>
+                <Tab.Screen name="Details">
+                    {() => detailsView()}
+                </Tab.Screen>
+                <Tab.Screen
+                    name="Songs"
+                    listeners={{
+                        focus: () => currentPlaylist && dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)))
+                    }}
+                >
+                    {() => songsView()}
+                </Tab.Screen>
+            </Tab.Navigator>
+            {separator()}
+            {controlBar()}
+        </SafeAreaView>
     );
 };
 

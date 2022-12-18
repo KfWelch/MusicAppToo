@@ -9,7 +9,6 @@ const styles = StyleSheet.create({
     controlBar: {
         flexDirection: 'row',
         height: 75,
-        padding: 15,
         justifyContent: 'space-evenly',
         alignItems: 'center',
         flex: 1
@@ -20,17 +19,30 @@ const styles = StyleSheet.create({
     controlBarColumnTitle: {
         fontSize: 16
     },
+    content: {
+        flex: 7
+    },
     flatListView: {
         flex: 1
     },
     albumsView: {
-        flex: 2
+        flex: 3,
+        marginTop: 10
     },
     songsView: {
-        flex: 1
+        flex: 2
     },
     songsFlatlist: {
         height: '60%'
+    },
+    sectionSeparator: {
+        borderBottomWidth: 1,
+        width: '95%',
+        alignSelf: 'center',
+        marginVertical: 5
+    },
+    separator: {
+        height: 5
     }
 });
 
