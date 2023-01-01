@@ -30,7 +30,7 @@ const ArtistCard = (props: ArtistCardProps) => {
             <MaterialCommunityIcons name="head" size={40} />
             <View style={styles.infoView}>
                 <Text style={styles.title}>{artist.artist}</Text>
-                <Text style={styles.subtitle}>{`${artist.albums.length} albums`}</Text>
+                <Text style={styles.subtitle}>{`${artist.albums.length} album${artist.albums.length === 1 ? '' : 's'}`}</Text>
             </View>
             {addView()}
             {removeView()}

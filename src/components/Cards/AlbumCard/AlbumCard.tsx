@@ -51,7 +51,7 @@ const AlbumCard = (props: AlbumCardProps) => {
             <View style={{...styles.infoView, flex: 3}}>
                 <Text style={styles.title}>{album.albumName}</Text>
                 <Text style={styles.subtitle}>{album.artistName}</Text>
-                <Text style={styles.subtitle}>{`${album.songs.length} songs`}</Text>
+                <Text style={styles.subtitle}>{`${album.songs.length} song${album.songs.length === 1 ? '' : 's'}`}</Text>
             </View>
             {orderedAlbumSelectorView(album.ordered)}
             {playView()}
