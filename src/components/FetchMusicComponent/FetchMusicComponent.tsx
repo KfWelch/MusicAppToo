@@ -1,6 +1,6 @@
 
 import _ from 'lodash';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Button,
     SafeAreaView,
@@ -63,6 +63,8 @@ const FetchMusicComponent = () => {
     const [totalSongs, setTotalSongs] = useState(1);
     const [songProgress, setSongProgress] = useState(0);
     const [loadingMusic, setLoadingMusic] = useState(0);
+    const [failedAlbums, setFailedAlbums] = useState(0);
+    const [failedSongs, setFailedSongs] = useState(0);
 
     const getMusicProgress = () => {
         const singleAlbumProgress = 1 / totalAlbums;
@@ -106,6 +108,37 @@ const FetchMusicComponent = () => {
             albumArraysToCombine.forEach(albumArray => dispatch(combineMultiDiscAlbums(albumArray)));
         });
     };
+
+    useEffect(() => {
+        if (loadingMusic === 2 && artists.length) {
+            condenseAlbums();
+
+            if (failedAlbums) {
+                Toast.show({
+                    position: 'bottom',
+                    type: 'info',
+                    text1: `Failed to get ${failedSongs} songs`,
+                    text2: `This has affected ${failedAlbums} albums`,
+                    visibilityTime: 5000
+                });
+            } else {
+                Toast.show({
+                    type: 'success',
+                    position: 'bottom',
+                    text1: `Finished loading music`
+                });
+            }
+
+            setLoadingMusic(0);
+            // @ts-ignore
+            navigation.navigate('HomeStack');
+        }
+    }, [
+        failedAlbums,
+        failedSongs,
+        loadingMusic,
+        artists
+    ]);
 
     const getPermission = async (showToast = true) => {
         const checkResult = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
@@ -162,7 +195,7 @@ const FetchMusicComponent = () => {
         setTotalSongs(1);
         setSongProgress(0);
         setAlbumProgress(0);
-        setLoadingMusic(2);
+        setLoadingMusic(1);
         let failedAlbumsGetMusic = 0;
         let failedSongsGetMusic = 0;
 
@@ -289,27 +322,9 @@ const FetchMusicComponent = () => {
             }
         }
 
-        setLoadingMusic(0);
-        if (failedAlbumsGetMusic) {
-            Toast.show({
-                position: 'bottom',
-                type: 'info',
-                text1: `Failed to get ${failedSongsGetMusic} songs`,
-                text2: `This has affected ${failedAlbumsGetMusic} albums`,
-                visibilityTime: 5000
-            });
-        } else {
-            Toast.show({
-                type: 'success',
-                position: 'bottom',
-                text1: `Finished loading music`
-            });
-        }
-
-        condenseAlbums();
-
-        // @ts-ignore
-        navigation.navigate('HomeStack');
+        setFailedAlbums(failedAlbumsGetMusic);
+        setFailedSongs(failedSongsGetMusic);
+        setLoadingMusic(2);
     };
 
     const reloadMusic = () => {
