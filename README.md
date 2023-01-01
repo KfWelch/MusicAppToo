@@ -39,6 +39,8 @@ const ReanimatedFlatlist: ReanimatedFlatListFC = React.forwardRef(({
 ```
 This is resolved in a more updated version of Reanimated, but unsure whether the version with the proper fix has been released as of yet, and will be updated when it has for sure been released.
 
+Additionally, in the node_modules, in package jsmediatags, the file `jsmediatags.min.js` under the dist folder needs to be renamed to `jsmediatags.js` for metro to recognize it
+
 ## Redux Sagas
 Currently there is no expectations to be using any service calls with this app, but it is there for future reference
 
