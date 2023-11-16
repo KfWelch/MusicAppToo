@@ -7,7 +7,7 @@ import {
     getSongTitleFromId,
     getNewPlayArray
 } from '../../utils/musicUtils';
-import { spreadOrderedAlbumShuffle, standardShuffle } from '../../utils/PlaylistShuffle';
+import { getShuffledByType, spreadOrderedAlbumShuffle, standardShuffle } from '../../utils/PlaylistShuffle';
 import {
     Actions,
     ADD_ALBUM,
@@ -17,10 +17,10 @@ import {
     REMOVE_OLDEST_RANDOM_SONG,
     REMOVE_PLAYLIST,
     REMOVE_SONG,
-    SET_ALBUM_AS_PLAYLIST,
+    SET_ALBUM_TO_PLAYLIST,
     SET_ALBUM_ORDERED,
     SET_CURRENT_PLAYLIST,
-    SET_CURRENT_PLAY_ARRAY,
+    SET_VIEWING_PLAY_ARRAY,
     SET_LAST_SONG_PLAYED,
     SET_SHUFFLE_TYPE,
     SET_PLAYBACK_MODE,
@@ -29,9 +29,11 @@ import {
     SET_REPEAT,
     SET_RESHUFFLE,
     SET_SONG_WEIGHT,
-    SHUFFLE_CURRENT_PLAYLIST,
     SET_PLAYLIST_TO_EDIT,
-    EDIT_PLAYLIST
+    EDIT_PLAYLIST,
+    SET_CURRENT_AS_PLAYING,
+    SHUFFLE_VIEWING_PLAYLIST,
+    SHUFFLE_PLAYING_PLAYLIST
 } from '../actions/Playlist';
 
 export enum PlaybackMode {
@@ -53,7 +55,8 @@ export enum RandomizationType {
 }
 
 interface PlaylistState {
-    currentPlaylist: PlaylistModel | null;
+    viewingPlaylist: PlaylistModel | null;
+    playingPlaylist: PlaylistModel | null;
     currentPlaylistTrack: number;
     savedPlaylists: PlaylistModel[];
     newPlaylist: {
@@ -75,7 +78,8 @@ interface PlaylistState {
 };
 
 const initialState: PlaylistState = {
-    currentPlaylist: null,
+    viewingPlaylist: null,
+    playingPlaylist: null,
     currentPlaylistTrack: -1,
     savedPlaylists: [],
     newPlaylist: {
@@ -173,18 +177,25 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
         case SET_CURRENT_PLAYLIST:
             return {
                 ...state,
-                currentPlaylist: action.payload
+                viewingPlaylist: action.payload
             };
-        case SET_ALBUM_AS_PLAYLIST:
+        case SET_ALBUM_TO_PLAYLIST:
             return {
                 ...state,
-                currentPlaylist: {
+                playingPlaylist: {
                     albums: [action.payload],
                     name: getAlbumId(action.payload),
                     playArray: action.payload.songs,
                     songs: []
                 }
             };
+        case SET_CURRENT_AS_PLAYING: {
+            const toPlay = _.cloneDeep(state.viewingPlaylist);
+            return {
+                ...state,
+                playingPlaylist: toPlay
+            }
+        }
         case SET_ALBUM_ORDERED: {
             if (action.payload.playlistName) {
                 const playlistIndex = oldState.savedPlaylists.findIndex(playlist => playlist.name === action.payload.playlistName);
@@ -198,13 +209,13 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                         savedPlaylists: oldState.savedPlaylists
                     };
                 }
-            } else if (oldState.currentPlaylist) {
-                const currentPlaylist = { ...oldState.currentPlaylist };
+            } else if (oldState.viewingPlaylist) {
+                const currentPlaylist = { ...oldState.viewingPlaylist };
                 const albumIndex = currentPlaylist.albums.findIndex(album => getAlbumId(album) === action.payload.albumId);
                 currentPlaylist.albums[albumIndex].ordered = action.payload.ordered;
                 return {
                     ...oldState,
-                    currentPlaylist
+                    viewingPlaylist: currentPlaylist
                 };
             }
             return oldState;
@@ -237,8 +248,8 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                         };
                     }
                 }
-            } else if (oldState.currentPlaylist) {
-                const currentPlaylist = { ...oldState.currentPlaylist };
+            } else if (oldState.viewingPlaylist) {
+                const currentPlaylist = { ...oldState.viewingPlaylist };
                 const albumId = getAlbumIdFromSongId(action.payload.songId);
                 const title = getSongTitleFromId(action.payload.songId);
                 const albumIndex = currentPlaylist.albums.findIndex(album => getAlbumId(album) === albumId);
@@ -249,67 +260,61 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                     currentPlaylist.albums.splice(albumIndex, 1, album);
                     return {
                         ...oldState,
-                        currentPlaylist
+                        viewingPlaylist: currentPlaylist
                     };
                 } else {
                     const songIndex = currentPlaylist.songs.findIndex(song => song.title === title);
                     currentPlaylist.songs[songIndex].weight = action.payload.weight;
                     return {
                         ...oldState,
-                        currentPlaylist
+                        viewingPlaylist: currentPlaylist
                     };
                 }
             }
             return oldState;
         }
-        case SHUFFLE_CURRENT_PLAYLIST: {
-            if (state.currentPlaylist) {
-                switch (state.playbackOptions.shuffleOptions.orderedType) {
-                    case ShuffleType.STANDARD:
-                        return {
-                            ...state,
-                            currentPlaylist: {
-                                ...state.currentPlaylist,
-                                playArray: standardShuffle(state.currentPlaylist.albums, state.currentPlaylist.songs)
-                            }
-                        };
-                    case ShuffleType.STANDARD_ORDERED:
-                        // TODO implement random ordered shuffle
-                        break;
-                    case ShuffleType.SPREAD_ORDERED:
-                        return {
-                            ...state,
-                            currentPlaylist: {
-                                ...state.currentPlaylist,
-                                playArray: spreadOrderedAlbumShuffle(state.currentPlaylist.albums, state.currentPlaylist.songs)
-                            }
-                        };
-                    default:
-                        break;
-                }
-            }
-            return state;
-        }
-        case SET_CURRENT_PLAY_ARRAY: {
-            if (state.currentPlaylist) {
+        case SHUFFLE_VIEWING_PLAYLIST:
+            if (state.viewingPlaylist) {
                 return {
                     ...state,
-                    currentPlaylist: {
-                        ...state.currentPlaylist,
+                    viewingPlaylist: {
+                        ...state.viewingPlaylist,
+                        playArray: getShuffledByType(state.viewingPlaylist, state.playbackOptions.shuffleOptions.orderedType)
+                    }
+                };
+            }
+            return state;
+        case SHUFFLE_PLAYING_PLAYLIST:
+            if (state.playingPlaylist) {
+                return {
+                    ...state,
+                    playingPlaylist: {
+                        ...state.playingPlaylist,
+                        playArray: getShuffledByType(state.playingPlaylist, state.playbackOptions.shuffleOptions.orderedType)
+                    }
+                };
+            }
+            return state; 
+        case SET_VIEWING_PLAY_ARRAY: {
+            if (state.viewingPlaylist) {
+                return {
+                    ...state,
+                    viewingPlaylist: {
+                        ...state.viewingPlaylist,
                         playArray: action.payload
                     }
                 };
             } else {
-                return {...state};
+                return { ...state };
             }
         }
         case SET_RANDOM_NEXT_SONG: {
-            if (state.currentPlaylist) {
+            if (state.viewingPlaylist) {
                 return {
                     ...state,
-                    currentPlaylist: {
-                        ...state.currentPlaylist,
-                        playArray: [...state.currentPlaylist.playArray, ...action.payload]
+                    viewingPlaylist: {
+                        ...state.viewingPlaylist,
+                        playArray: [...state.viewingPlaylist.playArray, ...action.payload]
                     }
                 }
             } else {
@@ -317,12 +322,12 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
             }
         }
         case REMOVE_OLDEST_RANDOM_SONG:
-            if (state.currentPlaylist) {
+            if (state.playingPlaylist) {
                 return {
                     ...state,
-                    currentPlaylist: {
-                        ...state.currentPlaylist,
-                        playArray: state.currentPlaylist.playArray.slice(action.payload)
+                    playingPlaylist: {
+                        ...state.playingPlaylist,
+                        playArray: state.playingPlaylist.playArray.slice(action.payload)
                     }
                 };
             } else {
@@ -332,9 +337,9 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
             return {
                 ...state,
                 newPlaylist: {
-                    albums: state.currentPlaylist?.albums || [],
-                    individualSongs: state.currentPlaylist?.songs || [],
-                    title: state.currentPlaylist?.name || ''
+                    albums: state.viewingPlaylist?.albums || [],
+                    individualSongs: state.viewingPlaylist?.songs || [],
+                    title: state.viewingPlaylist?.name || ''
                 }
             };
         case REMOVE_PLAYLIST: {
@@ -394,11 +399,11 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
                 }
             };
         case SET_LAST_SONG_PLAYED:
-            if (state.currentPlaylist) {
+            if (state.viewingPlaylist) {
                 return {
                     ...state,
-                    currentPlaylist: {
-                        ...state.currentPlaylist,
+                    viewingPlaylist: {
+                        ...state.viewingPlaylist,
                         lastSongPlayed: action.payload
                     }
                 };

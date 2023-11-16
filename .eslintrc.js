@@ -25,6 +25,10 @@ module.exports = {
         'curly': 'error',
         'dot-notation': 'error',
         'sort-imports': 'warn',
+        'no-duplicate-imports': 'error',
+        'no-unused-vars': 'warn',
+        'no-unused-expressions': 'warn',
+        'no-unused-imports': 'warn',
         'jsx-quotes': ['error', 'prefer-double'],
         'quotes': ['error', 'single', { "allowTemplateLiterals": true }]
       },

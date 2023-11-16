@@ -9,12 +9,14 @@ export const GENERATE_PLAYLIST = 'PLAYLIST/GENERATE_PLAYLIST';
 export const EDIT_PLAYLIST = 'PLAYLIST/EDIT';
 
 export const SET_CURRENT_PLAYLIST = 'PLAYLIST/SET_CURRENT';
-export const SET_ALBUM_AS_PLAYLIST = 'PLAYLIST/SET_ALBUM_AS';
+export const SET_ALBUM_TO_PLAYLIST = 'PLAYLIST/SET_ALBUM_AS';
+export const SET_CURRENT_AS_PLAYING = 'PLAYLIST/SET_CURRENT_AS_PLAYING';
 
 export const SET_ALBUM_ORDERED = 'PLAYLIST/SET_ALBUM_ORDERED';
 export const SET_SONG_WEIGHT = 'PLAYLIST/SET_SONG_WEIGHT';
-export const SHUFFLE_CURRENT_PLAYLIST = 'PLAYLIST/SHUFFLE_CURRENT';
-export const SET_CURRENT_PLAY_ARRAY = 'PLAYLIST/SET_PLAY_ARRAY';
+export const SHUFFLE_VIEWING_PLAYLIST = 'PLAYLIST/SHUFFLE_VIEWING';
+export const SHUFFLE_PLAYING_PLAYLIST = 'PLAYLIST/SHUFFLE_PLAYING';
+export const SET_VIEWING_PLAY_ARRAY = 'PLAYLIST/SET_VIEWING_PLAY_ARRAY';
 export const SET_RANDOM_NEXT_SONG = 'PLAYLIST/SET_RANDOM_NEXT_SONG';
 export const REMOVE_OLDEST_RANDOM_SONG = 'PLAYLIST/REMOVE_OLDEST_RANDOM';
 
@@ -65,9 +67,13 @@ export const setCurrentPlaylist = (playlist: Playlist) => ({
     payload: playlist
 } as const);
 
-export const setAlbumAsCurrentPlaylist = (album: Album) => ({
-    type: SET_ALBUM_AS_PLAYLIST,
+export const setAlbumAsPlayingPlaylist = (album: Album) => ({
+    type: SET_ALBUM_TO_PLAYLIST,
     payload: album
+} as const);
+
+export const setCurrentPlaylistAsPlaying = () => ({
+    type: SET_CURRENT_AS_PLAYING
 } as const);
 
 export const setAlbumOrdered = (albumId: string, ordered: boolean, playlistName?: string) => ({
@@ -80,12 +86,16 @@ export const setSongWeight = (songId: string, weight: number, playlistName?: str
     payload: { playlistName, songId, weight }
 } as const);
 
-export const shuffleCurrentPlaylist = () => ({
-    type: SHUFFLE_CURRENT_PLAYLIST
+export const shuffleViewingPlaylist = () => ({
+    type: SHUFFLE_VIEWING_PLAYLIST
 } as const);
 
-export const setCurrentPlayArray = (songs: Song[]) => ({
-    type: SET_CURRENT_PLAY_ARRAY,
+export const shufflePlayingPlaylist = () => ({
+    type: SHUFFLE_PLAYING_PLAYLIST
+} as const);
+
+export const setViewingPlayArray = (songs: Song[]) => ({
+    type: SET_VIEWING_PLAY_ARRAY,
     payload: songs
 } as const);
 
@@ -151,11 +161,13 @@ export type Actions =
     | ReturnType<typeof generatePlaylist>
     | ReturnType<typeof editPlaylist>
     | ReturnType<typeof setCurrentPlaylist>
-    | ReturnType<typeof setAlbumAsCurrentPlaylist>
+    | ReturnType<typeof setAlbumAsPlayingPlaylist>
+    | ReturnType<typeof setCurrentPlaylistAsPlaying>
     | ReturnType<typeof setAlbumOrdered>
     | ReturnType<typeof setSongWeight>
-    | ReturnType<typeof shuffleCurrentPlaylist>
-    | ReturnType<typeof setCurrentPlayArray>
+    | ReturnType<typeof shuffleViewingPlaylist>
+    | ReturnType<typeof shufflePlayingPlaylist>
+    | ReturnType<typeof setViewingPlayArray>
     | ReturnType<typeof setRandomNextSongs>
     | ReturnType<typeof removeOldestRandomSongs>
     | ReturnType<typeof setSavedPlaylists>

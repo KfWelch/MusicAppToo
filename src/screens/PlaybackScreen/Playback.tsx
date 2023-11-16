@@ -17,7 +17,7 @@ import styles from './Playback.style';
 import { useDispatch } from 'react-redux';
 import {
     removeOldestRandomSongs,
-    setCurrentPlayArray,
+    setViewingPlayArray,
     setLastSongPlayed,
     setRandomNextSongs
 } from '../../state/actions/Playlist';
@@ -30,7 +30,7 @@ import { getRandomizedNextSong, getRandomizedSongs } from '../../utils/PlaylistR
 const CARD_HEIGHT = SongCardHeight + MARGIN * 2;
 
 const Playback = () => {
-    const { currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
+    const { playingPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
     const options = useTypedSelector(state => state.Options);
     const dispatch = useDispatch();
     const playbackState = usePlaybackState();
@@ -80,10 +80,10 @@ const Playback = () => {
             }
             TrackPlayer.getCurrentTrack().then(currentIndex => {
                 if (currentIndex) {
-                    if (playbackOptions.mode === PlaybackMode.RANDOMIZE && currentPlaylist) {
+                    if (playbackOptions.mode === PlaybackMode.RANDOMIZE && playingPlaylist) {
                         const { randomizationForwardBuffer, randomizationBackwardBuffer } = options;
                         const totalBuffer = randomizationBackwardBuffer + randomizationForwardBuffer;
-                        const totalCurrentSongs = currentPlaylist && currentPlaylist.playArray.length;
+                        const totalCurrentSongs = playingPlaylist && playingPlaylist.playArray.length;
                         const currentForwardBuffer = totalCurrentSongs - currentIndex;
     
                         // We need to add when the forward buffer is smaller than we need
@@ -92,24 +92,24 @@ const Playback = () => {
                             const songsToAdd: Song[] = [];
                             if (options.randomizationShouldNotRepeatSongs) {
                                 songsToAdd.push(getRandomizedNextSong(
-                                    currentPlaylist,
+                                    playingPlaylist,
                                     playbackOptions.randomizeOptions.weighted,
-                                    currentPlaylist.playArray[currentPlaylist.playArray.length - 1]
+                                    playingPlaylist.playArray[playingPlaylist.playArray.length - 1]
                                 ));
                             } else {
-                                songsToAdd.push(getRandomizedNextSong(currentPlaylist, playbackOptions.randomizeOptions.weighted));
+                                songsToAdd.push(getRandomizedNextSong(playingPlaylist, playbackOptions.randomizeOptions.weighted));
                             }
                             for (let i = 1; i < bufferNeeded; i++) {
                                 let nextSong: Song;
                                 if (options.randomizationShouldNotRepeatSongs) {
                                     nextSong = getRandomizedNextSong(
-                                        currentPlaylist,
+                                        playingPlaylist,
                                         playbackOptions.randomizeOptions.weighted,
                                         songsToAdd[i - 1]
                                     );
                                 } else {
                                     nextSong = getRandomizedNextSong(
-                                        currentPlaylist,
+                                        playingPlaylist,
                                         playbackOptions.randomizeOptions.weighted
                                     );
                                 }
@@ -139,23 +139,23 @@ const Playback = () => {
 
     const startPlayback = async () => {
         const tracks = await TrackPlayer.getQueue();
-        if (currentPlaylist) {
+        if (playingPlaylist) {
             if (!tracks.length) {
                 if (playbackOptions.mode === PlaybackMode.RANDOMIZE) {
                     const initialSongs = getRandomizedSongs(
-                        currentPlaylist,
+                        playingPlaylist,
                         options.randomizationForwardBuffer,
                         playbackOptions.randomizeOptions.weighted,
                         options.randomizationShouldNotRepeatSongs
                     );
-                    dispatch(setCurrentPlayArray(initialSongs));
+                    dispatch(setViewingPlayArray(initialSongs));
                     await TrackPlayer.add(convertSongListToTracks(initialSongs));
                 } else {
                     // Here we need to take back from the play array because we are resuming,
                     // not playing a new playlist
-                    await TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray));
-                    if (currentPlaylist.lastSongPlayed && !playable(playbackState)) {
-                        await TrackPlayer.skip(currentPlaylist.lastSongPlayed);
+                    await TrackPlayer.add(convertSongListToTracks(playingPlaylist.playArray));
+                    if (playingPlaylist.lastSongPlayed && !playable(playbackState)) {
+                        await TrackPlayer.skip(playingPlaylist.lastSongPlayed);
                     }
                 }
             }
@@ -164,7 +164,7 @@ const Playback = () => {
     }
 
     useEffect(() => {
-        setCurrentSong(currentPlaylist?.playArray[currentTrack]);
+        setCurrentSong(playingPlaylist?.playArray[currentTrack]);
         // @ts-ignore
         pickerRef.current?.scrollToIndex({
             animated: true,
@@ -184,10 +184,10 @@ const Playback = () => {
         </Pressable>
     );
 
-    const songView = () => !!(currentPlaylist && currentSong) && (
+    const songView = () => !!(playingPlaylist && currentSong) && (
         <View style={styles.scrollView}>
             <Animated.FlatList
-                data={currentPlaylist.playArray}
+                data={playingPlaylist.playArray}
                 renderItem={renderSongCard}
                 keyExtractor={(item, index) => getSongId(item) + index}
                 onScroll={scrollHandler}

@@ -1,27 +1,23 @@
 import { NavigationProp } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import {
-    FlatList,
     Pressable,
     SafeAreaView,
     Text,
-    useColorScheme,
-    View
+    useColorScheme
 } from 'react-native';
 import TrackPlayer from 'react-native-track-player';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch } from 'react-redux';
-import { Album, Playlist, Song } from '../../../models/MusicModel';
+import { Playlist } from '../../../models/MusicModel';
 import {
     removePlaylist,
-    setCurrentPlayArray,
+    setViewingPlayArray,
     setCurrentPlaylist,
-    shuffleCurrentPlaylist
+    setCurrentPlaylistAsPlaying,
+    shuffleViewingPlaylist
 } from '../../../state/actions/Playlist';
 import { convertSongListToTracks, getPlayArray } from '../../../utils/musicUtils';
-import AlbumCard from '../AlbumCard/AlbumCard';
-import SongCard from '../SongCard/SongCard';
-import ComponentDropDown from '../ComponentDropDown/ComponentDropDown';
 import styles from './PlaylistCard.style';
 import { useTypedSelector } from '../../../state/reducers';
 import { PlaybackMode } from '../../../state/reducers/Playlist';
@@ -37,23 +33,22 @@ const PlaylistCard = (props: PlaylistCardProps) => {
     const { playlist, navigation } = props;
     const dispatch = useDispatch();
     const options = useTypedSelector(state => state.Options);
-    const { currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
+    const { viewingPlaylist, playingPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
     const systemColorScheme = useColorScheme();
     const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
     const scheme = isDarkMode ? 'dark' : 'light';
     const [startPlayback, setStartPlayback] = useState(false);
 
     useEffect(() => {
-        if (navigation.isFocused() && currentPlaylist && startPlayback) {
+        if (navigation.isFocused() && playingPlaylist && startPlayback) {
             setStartPlayback(false);
-            TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray))
+            TrackPlayer.add(convertSongListToTracks(playingPlaylist.playArray))
                 .then(() => {
                     TrackPlayer.play();
-                    // @ts-ignore
                     navigation.navigate('HomeTabs', { screen: 'Playback' });
                 });
         }
-    }, [currentPlaylist, startPlayback]);
+    }, [playingPlaylist, startPlayback]);
 
     const goToPlaylist = () => {
         dispatch(setCurrentPlaylist(playlist));
@@ -66,12 +61,12 @@ const PlaylistCard = (props: PlaylistCardProps) => {
         switch (playbackOptions.mode) {
             case PlaybackMode.NORMAL:
                 const playArray = getPlayArray(playlist);
-                dispatch(setCurrentPlayArray(playArray));
+                dispatch(setViewingPlayArray(playArray));
                 break;
             case PlaybackMode.SHUFFLE:
-                if (currentPlaylist) {
-                    dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
-                    dispatch(shuffleCurrentPlaylist());
+                if (viewingPlaylist) {
+                    dispatch(setViewingPlayArray(getPlayArray(viewingPlaylist)));
+                    dispatch(shuffleViewingPlaylist());
                 }
                 break;
             case PlaybackMode.RANDOMIZE:
@@ -81,11 +76,12 @@ const PlaylistCard = (props: PlaylistCardProps) => {
                     playbackOptions.randomizeOptions.weighted,
                     options.randomizationShouldNotRepeatSongs
                 );
-                dispatch(setCurrentPlayArray(initialSongs));
+                dispatch(setViewingPlayArray(initialSongs));
                 break;
             default:
                 return;
         }
+        dispatch(setCurrentPlaylistAsPlaying());
         setStartPlayback(true);
     }
 
