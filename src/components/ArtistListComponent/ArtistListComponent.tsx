@@ -6,7 +6,7 @@ import TrackPlayer from 'react-native-track-player';
 import { useDispatch } from 'react-redux';
 import { Album, Artist, Song } from '../../models/MusicModel';
 import { selectArtist } from '../../state/actions/Albums';
-import { setAlbumAsCurrentPlaylist, setCurrentPlayArray, shuffleCurrentPlaylist } from '../../state/actions/Playlist';
+import { setAlbumAsPlayingPlaylist, setViewingPlayArray, shuffleViewingPlaylist } from '../../state/actions/Playlist';
 import { useTypedSelector } from '../../state/reducers';
 import { PlaybackMode } from '../../state/reducers/Playlist';
 import {
@@ -24,7 +24,7 @@ import styles from './ArtistListComponent.style';
 
 const ArtistList = () => {
     const albumsState = useTypedSelector(state => state.Albums);
-    const { currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
+    const { viewingPlaylist: currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
     const { artists } = albumsState;
     const autoPlay = useTypedSelector(state => state.Options.playbackAutoPlayOnReload);
     const navigation = useNavigation();
@@ -63,7 +63,7 @@ const ArtistList = () => {
                             playbackOptions.randomizeOptions.weighted,
                             options.randomizationShouldNotRepeatSongs
                         );
-                        dispatch(setCurrentPlayArray(initialSongs));
+                        dispatch(setViewingPlayArray(initialSongs));
                         TrackPlayer.add(convertSongListToTracks(initialSongs))
                             .then(() => {
                                 TrackPlayer.play();
@@ -98,18 +98,18 @@ const ArtistList = () => {
                                 renderItem={({ item }: { item: Album }) => (
                                     <ComponentDropDown
                                         mainItemCard={(<AlbumCard album={item} onPlay={async () => {
-                                            dispatch(setAlbumAsCurrentPlaylist(item));
+                                            dispatch(setAlbumAsPlayingPlaylist(item));
                                             await TrackPlayer.reset();
                                             await TrackPlayer.removeUpcomingTracks();
                                             if (currentPlaylist) {
                                                 switch (playbackOptions.mode) {
                                                     case PlaybackMode.NORMAL:
                                                         const playArray = getPlayArray(currentPlaylist);
-                                                        dispatch(setCurrentPlayArray(playArray));
+                                                        dispatch(setViewingPlayArray(playArray));
                                                         break;
                                                     case PlaybackMode.SHUFFLE:
-                                                        dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
-                                                        dispatch(shuffleCurrentPlaylist());
+                                                        dispatch(setViewingPlayArray(getPlayArray(currentPlaylist)));
+                                                        dispatch(shuffleViewingPlaylist());
                                                         break;
                                                     case PlaybackMode.RANDOMIZE:
                                                         const initialSongs = getRandomizedSongs(
@@ -118,7 +118,7 @@ const ArtistList = () => {
                                                             playbackOptions.randomizeOptions.weighted,
                                                             options.randomizationShouldNotRepeatSongs
                                                         );
-                                                        dispatch(setCurrentPlayArray(initialSongs));
+                                                        dispatch(setViewingPlayArray(initialSongs));
                                                         break;
                                                     default:
                                                         return;

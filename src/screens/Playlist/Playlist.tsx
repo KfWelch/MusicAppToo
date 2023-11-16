@@ -12,13 +12,14 @@ import SongCard from '../../components/Cards/SongCard/SongCard';
 import { Album, Song } from '../../models/MusicModel';
 import {
     setAlbumOrdered,
-    setCurrentPlayArray,
+    setViewingPlayArray,
     setShuffleType,
     setPlaybackMode,
     setRandomizeType,
     setReshuffle,
     setSongWeight,
-    shuffleCurrentPlaylist
+    setCurrentPlaylistAsPlaying,
+    shuffleViewingPlaylist
 } from '../../state/actions/Playlist';
 import { useTypedSelector } from '../../state/reducers';
 import { ShuffleType, PlaybackMode, RandomizationType } from '../../state/reducers/Playlist';
@@ -40,7 +41,7 @@ import colorScheme from '../../constant/Color';
 const Tab = createMaterialTopTabNavigator();
 
 const Playlist = () => {
-    const { currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
+    const { viewingPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
     const playerOptions = useTypedSelector(state => state.Playlist.playbackOptions);
     const dispatch = useDispatch();
     const navigation = useNavigation();
@@ -51,24 +52,25 @@ const Playlist = () => {
     const [startPlayback, setStartPlayback] = useState(false);
 
     navigation.addListener('focus', () => {
-        if (currentPlaylist) {
+        if (viewingPlaylist) {
             setIsAlreadyShuffled(false);
             setStartPlayback(false);
-            dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
+            dispatch(setViewingPlayArray(getPlayArray(viewingPlaylist)));
         }
     });
 
     useEffect(() => {
-        if (navigation.isFocused() && currentPlaylist && startPlayback) {
+        if (navigation.isFocused() && viewingPlaylist && startPlayback) {
             setStartPlayback(false);
-            TrackPlayer.add(convertSongListToTracks(currentPlaylist.playArray))
+            TrackPlayer.add(convertSongListToTracks(viewingPlaylist.playArray))
                 .then(() => {
+                    dispatch(setCurrentPlaylistAsPlaying());
                     TrackPlayer.play();
                     // @ts-ignore
                     navigation.navigate('HomeTabs', { screen: 'Playback' });
                 });
         }
-    }, [currentPlaylist, startPlayback]);
+    }, [viewingPlaylist, startPlayback]);
 
     const songView = ({ item }: { item: Song }) => (
         <SongCard
@@ -131,30 +133,31 @@ const Playlist = () => {
 
     const handlePlay = async () => {
         await TrackPlayer.reset();
-        if (currentPlaylist) {
+        if (viewingPlaylist) {
             switch (playbackOptions.mode) {
                 case PlaybackMode.NORMAL:
-                    const playArray = getPlayArray(currentPlaylist);
-                    dispatch(setCurrentPlayArray(playArray));
+                    const playArray = getPlayArray(viewingPlaylist);
+                    dispatch(setViewingPlayArray(playArray));
                     break;
                 case PlaybackMode.SHUFFLE:
                     if (!isAlreadyShuffled) {
-                        dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)));
-                        dispatch(shuffleCurrentPlaylist());
+                        dispatch(setViewingPlayArray(getPlayArray(viewingPlaylist)));
+                        dispatch(shuffleViewingPlaylist());
                     }
                     break;
                 case PlaybackMode.RANDOMIZE:
                     const initialSongs = getRandomizedSongs(
-                        currentPlaylist,
+                        viewingPlaylist,
                         options.randomizationForwardBuffer,
                         playbackOptions.randomizeOptions.weighted,
                         options.randomizationShouldNotRepeatSongs
                     );
-                    dispatch(setCurrentPlayArray(initialSongs));
+                    dispatch(setViewingPlayArray(initialSongs));
                     break;
                 default:
                     return;
             }
+            dispatch(setCurrentPlaylistAsPlaying());
             setStartPlayback(true);
         }
     }
@@ -180,10 +183,10 @@ const Playlist = () => {
         </View>
     );
 
-    const detailsAlbums = () => !!currentPlaylist?.albums.length && (
+    const detailsAlbums = () => !!viewingPlaylist?.albums.length && (
         <View style={styles.albumsView}>
             <FlatList
-                data={currentPlaylist?.albums}
+                data={viewingPlaylist?.albums}
                 renderItem={albumView}
                 keyExtractor={(item, index) => `${item.albumName}-${index}`}
                 ItemSeparatorComponent={() => (<View style={styles.separator} />)}
@@ -191,10 +194,10 @@ const Playlist = () => {
         </View>
     );
 
-    const detailsSongs = () => !!currentPlaylist?.songs.length && (
+    const detailsSongs = () => !!viewingPlaylist?.songs.length && (
         <View style={styles.songsView}>
             <FlatList
-                data={currentPlaylist?.songs}
+                data={viewingPlaylist?.songs}
                 renderItem={songView}
                 keyExtractor={(item, index) => `${item.title}-${index}`}
             />
@@ -208,7 +211,7 @@ const Playlist = () => {
     const detailsView = () => (
         <View style={styles.flatListView}>
             {detailsAlbums()}
-            {currentPlaylist?.songs.length && currentPlaylist.albums.length ? separator() : null}
+            {viewingPlaylist?.songs.length && viewingPlaylist.albums.length ? separator() : null}
             {detailsSongs()}
         </View>
     );
@@ -217,13 +220,13 @@ const Playlist = () => {
         <View style={styles.flatListView}>
             {playbackOptions.mode === PlaybackMode.SHUFFLE && <Button
                 onPress={() => {
-                    dispatch(shuffleCurrentPlaylist());
+                    dispatch(shuffleViewingPlaylist());
                     setIsAlreadyShuffled(true);
                 }}
                 title="Shuffle Playlist"
             />}
             <FlatList
-                data={currentPlaylist?.playArray}
+                data={viewingPlaylist?.playArray}
                 renderItem={songView}
                 keyExtractor={(item, index) => `${item.title}-${index}`}
                 style={styles.songsFlatlist}
@@ -240,7 +243,7 @@ const Playlist = () => {
                 <Tab.Screen
                     name="Songs"
                     listeners={{
-                        focus: () => currentPlaylist && dispatch(setCurrentPlayArray(getPlayArray(currentPlaylist)))
+                        focus: () => viewingPlaylist && dispatch(setViewingPlayArray(getPlayArray(viewingPlaylist)))
                     }}
                 >
                     {() => songsView()}

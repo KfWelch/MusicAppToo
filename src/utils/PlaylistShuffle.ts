@@ -1,4 +1,5 @@
-import { Album, Song } from '../models/MusicModel';
+import { Album, Playlist, Song } from '../models/MusicModel';
+import { ShuffleType } from '../state/reducers/Playlist';
 import { getSongId } from './musicUtils';
 
 interface songIdPos {
@@ -106,4 +107,18 @@ export const standardShuffle = (albums: Album[], individualSongs: Song[]): Song[
     });
 
     return songListToPlaylist(songList, unorderedPlaylist); 
+};
+
+export const getShuffledByType = (playlist: Playlist, type: ShuffleType): Song[] => {
+    switch (type) {
+        case ShuffleType.STANDARD:
+            return standardShuffle(playlist.albums, playlist.songs);
+        case ShuffleType.STANDARD_ORDERED:
+            // TODO implement random ordered shuffle
+            return [];
+        case ShuffleType.SPREAD_ORDERED:
+            return spreadOrderedAlbumShuffle(playlist.albums, playlist.songs);
+        default:
+            return playlist.playArray;
+    }
 };
