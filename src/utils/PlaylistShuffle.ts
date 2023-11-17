@@ -76,6 +76,50 @@ export const spreadOrderedAlbumShuffle = (albums: Album[], individualSongs: Song
     return songListToPlaylist(songList, unorderedPlaylist);    
 };
 
+export const spreadAlbumShuffle = (albums: Album[], individualSongs: Song[]): Song[] => {
+    const songList: songIdPos[] = [];
+    let unorderedPlaylist: Song[] = [...individualSongs];
+
+    individualSongs.forEach(song => {
+        let pos = Math.random();
+        while (isRandomNumberUsed(songList, pos)) {
+            pos = Math.random();
+        }
+        songList.push({
+            position: pos,
+            id: getSongId(song)
+        });
+    });
+
+    albums.forEach(album => {
+        unorderedPlaylist = unorderedPlaylist.concat(album.songs);
+        const slots: number[] = [];
+
+        const { songs } = album;
+        const { length } = songs;
+        songs.forEach(song => {
+            // make sure we've got an empty slot
+            let slot = Math.floor(Math.random() * length);
+            while (slots.includes(slot)) {
+                slot = Math.floor(Math.random() * length);
+            }
+            slots.push(slot);
+
+            // make sure we've got an empty position in that slot
+            let pos = (Math.random() + slot) / length;
+            while (isRandomNumberUsed(songList, pos)) {
+                pos = (Math.random() + slot) / length;
+            }
+            songList.push({
+                position: pos,
+                id: getSongId(song)
+            });
+        });
+    });
+
+    return songListToPlaylist(songList, unorderedPlaylist);
+}
+
 export const standardShuffle = (albums: Album[], individualSongs: Song[]): Song[] => {
     const songList: songIdPos[] = [];
     let unorderedPlaylist: Song[] = [...individualSongs];
@@ -118,6 +162,8 @@ export const getShuffledByType = (playlist: Playlist, type: ShuffleType): Song[]
             return [];
         case ShuffleType.SPREAD_ORDERED:
             return spreadOrderedAlbumShuffle(playlist.albums, playlist.songs);
+        case ShuffleType.SPREAD:
+            return spreadAlbumShuffle(playlist.albums, playlist.songs);
         default:
             return playlist.playArray;
     }
