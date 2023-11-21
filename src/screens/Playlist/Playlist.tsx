@@ -35,7 +35,13 @@ import { getRandomizedSongs } from '../../utils/PlaylistRandomization';
 import colorScheme from '../../constant/Color';
 
     const playbackModeOptions: PlaybackMode[] = [PlaybackMode.NORMAL, PlaybackMode.SHUFFLE, PlaybackMode.RANDOMIZE];
-    const shuffleTypeOptions: ShuffleType[] = [ShuffleType.STANDARD, ShuffleType.SPREAD, ShuffleType.SPREAD_ORDERED, ShuffleType.STANDARD_ORDERED];
+    const shuffleTypeOptions: ShuffleType[] = [
+        ShuffleType.STANDARD,
+        ShuffleType.SPREAD,
+        ShuffleType.SPREAD_ORDERED,
+        ShuffleType.ORDERED,
+        ShuffleType.POWER_ORDERED
+    ];
     const randomizationType: RandomizationType[] = [RandomizationType.WEIGHTED, RandomizationType.WEIGHTLESS];
 
 const Tab = createMaterialTopTabNavigator();
