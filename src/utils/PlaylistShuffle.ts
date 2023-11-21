@@ -60,7 +60,7 @@ class Shuffle {
      * @param individualSongs 
      * @returns 
      */
-    static spreadOrderedAlbumShuffle(albums: Album[], individualSongs: Song[]): Song[] {
+    static spreadOrderedAlbum(albums: Album[], individualSongs: Song[]): Song[] {
         const songList: songIdPos[] = [];
         let unorderedPlaylist: Song[] = [...individualSongs];
 
@@ -119,7 +119,7 @@ class Shuffle {
      * @param individualSongs 
      * @returns a shuffled playlist
      */
-    static orderedAlbumShuffle(albums: Album[], individualSongs: Song[]): Song[] {
+    static orderedAlbum(albums: Album[], individualSongs: Song[]): Song[] {
         const songList: songIdPos[] = [];
         let unorderedPlaylist: Song[] = [...individualSongs];
 
@@ -187,7 +187,7 @@ class Shuffle {
      * @param individualSongs 
      * @returns 
      */
-    static powerOrderedAlbumShuffle(albums: Album[], individualSongs: Song[]): Song[] {
+    static powerOrderedAlbum(albums: Album[], individualSongs: Song[]): Song[] {
         const songList: songIdPos[] = [];
         let unorderedPlaylist: Song[] = [...individualSongs];
 
@@ -283,7 +283,7 @@ class Shuffle {
      * @param individualSongs 
      * @returns 
      */
-    static spreadAlbumShuffle(albums: Album[], individualSongs: Song[]): Song[] {
+    static spreadAlbum(albums: Album[], individualSongs: Song[]): Song[] {
         const songList: songIdPos[] = [];
         let unorderedPlaylist: Song[] = [...individualSongs];
 
@@ -334,7 +334,7 @@ class Shuffle {
      * @param individualSongs 
      * @returns 
      */
-    static standardShuffle(albums: Album[], individualSongs: Song[]): Song[] {
+    static standard(albums: Album[], individualSongs: Song[]): Song[] {
         const songList: songIdPos[] = [];
         let unorderedPlaylist: Song[] = [...individualSongs];
 
@@ -380,15 +380,15 @@ export default Shuffle;
 export const getShuffledByType = (playlist: Playlist, type: ShuffleType): Song[] => {
     switch (type) {
         case ShuffleType.STANDARD:
-            return Shuffle.standardShuffle(playlist.albums, playlist.songs);
-        case ShuffleType.STANDARD_ORDERED:
-            return Shuffle.orderedAlbumShuffle(playlist.albums, playlist.songs);
+            return Shuffle.standard(playlist.albums, playlist.songs);
+        case ShuffleType.ORDERED:
+            return Shuffle.orderedAlbum(playlist.albums, playlist.songs);
         case ShuffleType.POWER_ORDERED:
-            return Shuffle.powerOrderedAlbumShuffle(playlist.albums, playlist.songs);
+            return Shuffle.powerOrderedAlbum(playlist.albums, playlist.songs);
         case ShuffleType.SPREAD_ORDERED:
-            return Shuffle.spreadOrderedAlbumShuffle(playlist.albums, playlist.songs);
+            return Shuffle.spreadOrderedAlbum(playlist.albums, playlist.songs);
         case ShuffleType.SPREAD:
-            return Shuffle.spreadAlbumShuffle(playlist.albums, playlist.songs);
+            return Shuffle.spreadAlbum(playlist.albums, playlist.songs);
         default:
             return playlist.playArray;
     }

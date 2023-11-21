@@ -44,7 +44,7 @@ export enum PlaybackMode {
 
 export enum ShuffleType {
     SPREAD_ORDERED = 'SpreadOrdered',
-    STANDARD_ORDERED = 'RandomOrdered',
+    ORDERED = 'RandomOrdered',
     POWER_ORDERED = 'PowerOrdered',
     SPREAD = 'Spread',
     STANDARD = 'Standard'

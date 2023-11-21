@@ -39,7 +39,7 @@ import colorScheme from '../../constant/Color';
         ShuffleType.STANDARD,
         ShuffleType.SPREAD,
         ShuffleType.SPREAD_ORDERED,
-        ShuffleType.STANDARD_ORDERED,
+        ShuffleType.ORDERED,
         ShuffleType.POWER_ORDERED
     ];
     const randomizationType: RandomizationType[] = [RandomizationType.WEIGHTED, RandomizationType.WEIGHTLESS];
