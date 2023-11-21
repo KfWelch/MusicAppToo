@@ -7,7 +7,7 @@ import {
     getSongTitleFromId,
     getNewPlayArray
 } from '../../utils/musicUtils';
-import { getShuffledByType, spreadOrderedAlbumShuffle, standardShuffle } from '../../utils/PlaylistShuffle';
+import { getShuffledByType } from '../../utils/PlaylistShuffle';
 import {
     Actions,
     ADD_ALBUM,
@@ -45,6 +45,7 @@ export enum PlaybackMode {
 export enum ShuffleType {
     SPREAD_ORDERED = 'SpreadOrdered',
     STANDARD_ORDERED = 'RandomOrdered',
+    POWER_ORDERED = 'PowerOrdered',
     SPREAD = 'Spread',
     STANDARD = 'Standard'
 };
