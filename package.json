@@ -33,6 +33,7 @@
     "react-native-dropdown-picker": "^5.4.2",
     "react-native-fs": "^2.18.0",
     "react-native-gesture-handler": "^2.8.0",
+    "react-native-modal": "^13.0.1",
     "react-native-modal-dropdown": "^1.0.2",
     "react-native-numeric-input": "^1.9.1",
     "react-native-pager-view": "^6.0.1",

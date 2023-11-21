@@ -33,16 +33,16 @@ import styles from './Playlist.style';
 import TrackPlayer from 'react-native-track-player';
 import { getRandomizedSongs } from '../../utils/PlaylistRandomization';
 import colorScheme from '../../constant/Color';
+import MultipleChoiceModal from '../../components/Modal/MultipleChoiceModal/MultipleChoiceModal';
 
-    const playbackModeOptions: PlaybackMode[] = [PlaybackMode.NORMAL, PlaybackMode.SHUFFLE, PlaybackMode.RANDOMIZE];
-    const shuffleTypeOptions: ShuffleType[] = [
-        ShuffleType.STANDARD,
-        ShuffleType.SPREAD,
-        ShuffleType.SPREAD_ORDERED,
-        ShuffleType.ORDERED,
-        ShuffleType.POWER_ORDERED
-    ];
-    const randomizationType: RandomizationType[] = [RandomizationType.WEIGHTED, RandomizationType.WEIGHTLESS];
+const playbackModeOptions: PlaybackMode[] = [PlaybackMode.NORMAL, PlaybackMode.SHUFFLE, PlaybackMode.RANDOMIZE];
+const shuffleTypeOptions: ShuffleType[] = [
+    ShuffleType.STANDARD,
+    ShuffleType.SPREAD,
+    ShuffleType.SPREAD_ORDERED,
+    ShuffleType.ORDERED,
+    ShuffleType.POWER_ORDERED
+];
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -54,8 +54,13 @@ const Playlist = () => {
     const options = useTypedSelector(state => state.Options);
     const systemColorScheme = useColorScheme();
     const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
+    const currentScheme = colorScheme[isDarkMode ? 'dark' : 'light'];
+
     const [isAlreadyShuffled, setIsAlreadyShuffled] = useState(false);
     const [startPlayback, setStartPlayback] = useState(false);
+
+    const [showShuffleOptions, setShowShuffleOptions] = useState(false);
+    const [showPlaybackOptions, setShowPlaybackOptions] = useState(false);
 
     navigation.addListener('focus', () => {
         if (viewingPlaylist) {
@@ -109,32 +114,69 @@ const Playlist = () => {
         />
     );
 
+    const playbackOptionsView = () => (
+        <View style={styles.controlBarColumn}>
+            <Pressable
+                onPress={() => setShowPlaybackOptions(true)}
+                style={{ ...styles.optionButton, borderColor: currentScheme.outline }}
+            >
+                <Text style={styles.controlBarColumnTitle}>Playback Mode</Text>
+                <ModalDropdown
+                    options={playbackModeOptions}
+                    defaultValue={playbackOptions.mode}
+                    onSelect={(index, option) => {
+                        dispatch(setPlaybackMode(option));
+                    }}
+
+                />
+            </Pressable>
+        </View>
+    );
+
+    const shuffleOptionsViewButton = () => (
+        <Pressable
+            onPress={() => setShowShuffleOptions(true)}
+            style={{ ...styles.optionButton, borderColor: currentScheme.outline }}
+        >
+            <Text style={styles.controlBarColumnTitle}>Shuffle Algorithm</Text>
+            <Text>{playbackOptions.shuffleOptions.orderedType}</Text>
+        </Pressable>
+    )
+
     const shuffleOptionsView = () => playerOptions.mode === PlaybackMode.SHUFFLE && (
         <View style={styles.controlBarColumn}>
-            <Text style={styles.controlBarColumnTitle}>Shuffle options</Text>
-            <ModalDropdown
-                options={shuffleTypeOptions}
-                defaultValue={playbackOptions.shuffleOptions.orderedType}
-                onSelect={(index, option) => {
-                    dispatch(setShuffleType(option));
+            {shuffleOptionsViewButton()}
+            <Pressable
+                onPress={() => dispatch(setReshuffle(!playbackOptions.shuffleOptions.reshuffleOnRepeat))}
+                style={{
+                    ...styles.optionButton,
+                    borderColor: currentScheme.outline,
+                    backgroundColor: playbackOptions.shuffleOptions.reshuffleOnRepeat
+                        ? currentScheme.contentBackground
+                        : currentScheme.background
                 }}
-            />
-            <Text>Shuffle on repeat?</Text>
-            <Switch
-                onValueChange={value => { dispatch(setReshuffle(value)); }}
-                value={playbackOptions.shuffleOptions.reshuffleOnRepeat}
-            />
+            >
+                <Text>Shuffle on repeat?</Text>
+            </Pressable>
         </View>
     );
 
     const randomizationOptionsView = () => playerOptions.mode === PlaybackMode.RANDOMIZE && (
-        <ModalDropdown
-            options={randomizationType}
-            defaultValue={playbackOptions.randomizeOptions.weighted ? RandomizationType.WEIGHTED : RandomizationType.WEIGHTLESS}
-            onSelect={(index, option) => {
-                dispatch(setRandomizeType(option));
-            }}
-        />
+        <View style={styles.controlBarColumn}>
+            <Pressable
+                onPress={() => dispatch(setRandomizeType(playbackOptions.randomizeOptions.weighted
+                    ? RandomizationType.WEIGHTLESS : RandomizationType.WEIGHTED))}
+                style={{
+                    ...styles.optionButton,
+                    borderColor: currentScheme.outline,
+                    backgroundColor: playbackOptions.randomizeOptions.weighted
+                        ? currentScheme.contentBackground
+                        : currentScheme.background
+                }}
+            >
+                <Text>{playbackOptions.randomizeOptions.weighted ? RandomizationType.WEIGHTED : RandomizationType.WEIGHTLESS}</Text>
+            </Pressable>
+        </View>
     );
 
     const handlePlay = async () => {
@@ -170,22 +212,12 @@ const Playlist = () => {
 
     const controlBar = () => (
         <View style={styles.controlBar}>
-            <View style={styles.controlBarColumn}>
-                <Text style={styles.controlBarColumnTitle}>Playback Mode</Text>
-                <ModalDropdown
-                    options={playbackModeOptions}
-                    defaultValue={playbackOptions.mode}
-                    onSelect={(index, option) => {
-                        dispatch(setPlaybackMode(option));
-                    }}
-
-                />
-            </View>
-            {shuffleOptionsView()}
-            {randomizationOptionsView()}
+            {playbackOptionsView()}
             <Pressable onPress={handlePlay}>
                 <MaterialCommunityIcons name="play-circle-outline" size={40} />
             </Pressable>
+            {shuffleOptionsView()}
+            {randomizationOptionsView()}
         </View>
     );
 
@@ -211,7 +243,7 @@ const Playlist = () => {
     );
 
     const separator = () => (
-        <View style={{...styles.sectionSeparator, borderColor: colorScheme[isDarkMode ? 'dark' : 'light'].outline}} />
+        <View style={{...styles.sectionSeparator, borderColor: currentScheme.outline}} />
     );
 
     const detailsView = () => (
@@ -242,6 +274,30 @@ const Playlist = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <MultipleChoiceModal
+                title="Shuffle Options"
+                description="Please choose which shuffle algorithm to use"
+                choices={shuffleTypeOptions}
+                onCancel={() => setShowShuffleOptions(false)}
+                isVisible={showShuffleOptions}
+                onConfirm={option => {
+                    dispatch(setShuffleType(option));
+                    setShowShuffleOptions(false);
+                }}
+                isDarkMode={isDarkMode}
+            />
+            <MultipleChoiceModal
+                title="Playback Mode"
+                description="Please choose which playback mode to use"
+                choices={playbackModeOptions}
+                onCancel={() => setShowPlaybackOptions(false)}
+                isVisible={showPlaybackOptions}
+                onConfirm={option => {
+                    dispatch(setPlaybackMode(option));
+                    setShowPlaybackOptions(false);
+                }}
+                isDarkMode={isDarkMode}
+            />
             <Tab.Navigator style={styles.content}>
                 <Tab.Screen name="Details">
                     {() => detailsView()}
