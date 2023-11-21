@@ -11,13 +11,31 @@ const DECPRECISION = 10e-17;
 const RANDMAX = 1 - DECPRECISION;
 
 /**
- * Takes the unordered playlist and orders it according to
- * the positions that have been given via the songList array
- * @param songList 
- * @param unorderedPlaylist 
- * @returns 
+ * This class includes all of the shuffle algorithms, as well as helper functions for shuffling
+ * 
+ * Shuffle types are as follows
+ * - Ordered Shuffles
+ * 
+ * -- standard - songs in ordered albums have randomly chosen positions, allows for bunching up
+ * 
+ * -- power - song positions for ordered albums are procedurally chosen, allows for bunching up, but could tend to put songs at the end
+ * 
+ * -- spread - song positions for ordered albums are spread evenly between 0 and 1 according to the randomization positioning
+ * 
+ * - Basic Shuffles
+ * 
+ * -- standard - all songs have randomly chosen positions
+ * 
+ * -- spread - all songs positions are spread evenly between 0 and 1 per album without order being enforced
  */
 class Shuffle {
+    /**
+     * Takes the unordered playlist and orders it according to
+     * the positions that have been given via the songList array
+     * @param songList 
+     * @param unorderedPlaylist 
+     * @returns 
+     */
     static songListToPlaylist(songList: songIdPos[], unorderedPlaylist: Song[]): Song[] {
         unorderedPlaylist.forEach(song => {
             song.position = (songList.find(item => item.id === getSongId(song)))?.position;
