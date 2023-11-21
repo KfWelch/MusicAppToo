@@ -14,7 +14,8 @@ const styles = StyleSheet.create({
         flex: 1
     },
     controlBarColumn: {
-        flexDirection: 'column'
+        flexDirection: 'column',
+        width: '35%'
     },
     controlBarColumnTitle: {
         fontSize: 16
@@ -43,6 +44,13 @@ const styles = StyleSheet.create({
     },
     separator: {
         height: 5
+    },
+    optionButton: {
+        borderWidth: 1,
+        borderRadius: 15,
+        padding: 5,
+        alignItems: 'center',
+        margin: 2
     }
 });
 
