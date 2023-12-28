@@ -1,6 +1,6 @@
 import { Track } from 'react-native-track-player';
-import { GetMusicAlbum, GetMusicTrack } from '../models/GetMusicFiles';
-import { Album, Playlist, Song } from '../models/MusicModel';
+import { GetMusicAlbum, GetMusicTrack } from '../models/GetMusicFiles.d';
+import { Album, Artist, Playlist, Song } from '../models/MusicModel.d';
 
 export const convertSongToTrack = (song: Song): Track => {
     return {
@@ -57,4 +57,12 @@ export const disclessAlbumName = (albumName: string): string => albumName.toLowe
 export const getArtistFromPath = (filePath: string): string => {
     const folders = filePath.split(/\\.|(\/)/g);
     return folders[folders.length - 5];
+};
+
+export const getTotalNumberOfAlbums = (artists: Artist[]): number => {
+    let count = 0;
+    artists.forEach(artist => {
+        count += artist.albums.length;
+    });
+    return count;
 };

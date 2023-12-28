@@ -38,7 +38,8 @@ import {
     getAlbumId,
     getArtistFromPath,
     getMusicAlbumId,
-    getMusicTrackId
+    getMusicTrackId,
+    getTotalNumberOfAlbums
 } from '../../utils/musicUtils';
 import { useNavigation } from '@react-navigation/native';
 import { GetMusicAlbum, GetMusicTrack } from '../../models/GetMusicFiles';
@@ -65,6 +66,7 @@ const FetchMusicComponent = () => {
     const [loadingMusic, setLoadingMusic] = useState(0);
     const [failedAlbums, setFailedAlbums] = useState(0);
     const [failedSongs, setFailedSongs] = useState(0);
+    const [previousNumOfAlbums, setPreviousNumOfAlbums] = useState(0);
 
     const getMusicProgress = () => {
         const singleAlbumProgress = 1 / totalAlbums;
@@ -110,7 +112,7 @@ const FetchMusicComponent = () => {
     };
 
     useEffect(() => {
-        if (loadingMusic === 2 && artists.length) {
+        if (loadingMusic === 2 && getTotalNumberOfAlbums(artists) > previousNumOfAlbums) {
             condenseAlbums();
 
             if (failedAlbums) {
@@ -129,6 +131,7 @@ const FetchMusicComponent = () => {
                 });
             }
 
+            setPreviousNumOfAlbums(0);
             setLoadingMusic(0);
             // @ts-ignore
             navigation.navigate('HomeStack');
@@ -137,7 +140,8 @@ const FetchMusicComponent = () => {
         failedAlbums,
         failedSongs,
         loadingMusic,
-        artists
+        artists,
+        previousNumOfAlbums
     ]);
 
     const getPermission = async (showToast = true) => {
@@ -196,6 +200,7 @@ const FetchMusicComponent = () => {
         setSongProgress(0);
         setAlbumProgress(0);
         setLoadingMusic(1);
+        setPreviousNumOfAlbums(getTotalNumberOfAlbums(artists));
         let failedAlbumsGetMusic = 0;
         let failedSongsGetMusic = 0;
 
