@@ -52,11 +52,16 @@ const HomeNavigator = () => {
                     name="HomeStack"
                     component={HomeStack}
                     options={{
-                        headerTitle: 'Music App Too'
+                        headerTitle: 'Music App Too',
+                        title: 'Home'
                     }}
                 />
                 <Drawer.Screen name="Options" component={Options} />
-                <Drawer.Screen name="GetMusic" component={FetchMusicComponent} />
+                <Drawer.Screen
+                    name="GetMusic"
+                    component={FetchMusicComponent}
+                    options={{ title: 'Get Music' }}
+                />
             </Drawer.Navigator>
         </NavigationContainer>
     );
