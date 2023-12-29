@@ -236,6 +236,8 @@ class Shuffle {
                 });
             } else {
                 const { length } = album.songs;
+                let power = Math.floor(length * 3 / 5) / 2;
+                power = power < 1.5 ? 1.5 : power;
                 let previousPos = 0;
                 // need to also get all previously used positions which are that close to the maximum
                 // we need to make sure there's enough room for all the songs in the album,
@@ -252,7 +254,7 @@ class Shuffle {
                     // choose a random that is higher than the previous position
                     // raising the rand to a >1 power to weight it lower and allow more room
                     // because it can easily squeeze to the end
-                    let pos = (Math.random() ** 1.5) * (1 - previousPos) + previousPos;
+                    let pos = (Math.random() ** power) * (1 - previousPos) + previousPos;
                     // get amount of end songs that are after the new position attempt
                     let songsAfter = endSongs.reduce((total, currentPos) => currentPos > pos ? total + 1 : total, 0);
                     // reroll if it is too high
@@ -260,7 +262,7 @@ class Shuffle {
                         length - index // how many songs left to go in the album
                         + songsAfter // number of other songs taking up space in the end slots
                     ) * DECPRECISION) {
-                        pos = (Math.random() ** 1.5) * (1 - previousPos) + previousPos;
+                        pos = (Math.random() ** power) * (1 - previousPos) + previousPos;
                         songsAfter = endSongs.reduce((total, currentPos) => currentPos > pos ? total + 1 : total, 0);
                     }
 

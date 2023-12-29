@@ -27,6 +27,8 @@ const HomeStack = () => {
     const currentArtist = useTypedSelector(state => state.Albums.selectedArtist);
     const { savedPlaylists } = useTypedSelector(state => state.Playlist);
     const { newPlaylist } = useTypedSelector(state => state.Playlist);
+    const { viewingPlaylist }  = useTypedSelector(state => state.Playlist);
+    const viewingPlaylistName = viewingPlaylist?.name;
     const dispatch = useDispatch();
     const playbackState = usePlaybackState();
     const [currentTab, setCurrentTab] = useState('Home');
@@ -95,7 +97,7 @@ const HomeStack = () => {
                 name="Playlist"
                 component={Playlist}
                 options={({ navigation }: { navigation: NavigationProp<any> }) => ({
-                    headerTitle: 'Playlist',
+                    headerTitle: `Playlist${viewingPlaylist ? ' - ' + viewingPlaylistName : ''}`,
                     headerRight: () => (
                         editPlaylistButton(navigation)
                     )
