@@ -3,6 +3,7 @@ import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import {
     Button,
+    Platform,
     SafeAreaView,
     useColorScheme,
     View
@@ -141,7 +142,23 @@ const FetchMusicComponent = () => {
     ]);
 
     const getPermission = async (showToast = true) => {
-        const checkResult = await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+        let permission;
+        if (Platform.OS === 'android') {
+            console.log(Platform.Version)
+            if (Platform.Version >= 33) {
+                permission = PERMISSIONS.ANDROID.READ_MEDIA_AUDIO;
+            } else {
+                permission = PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE;
+            }
+        } else if (Platform.OS === 'ios') {
+            permission = PERMISSIONS.IOS.MEDIA_LIBRARY;
+        } else {
+            return;
+        }
+        console.log(permission)
+        
+        const checkResult = await check(permission);
+        console.log(checkResult)
         switch (checkResult) {
             case RESULTS.GRANTED: 
                 showToast && Toast.show({
@@ -153,7 +170,8 @@ const FetchMusicComponent = () => {
                 Toast.show({ type: 'error', text1: 'Unable to access external storage' });
                 break;
             default:
-                const getResult = await request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)
+                const getResult = await request(permission);
+                console.log(getResult)
                 switch (getResult) {
                     case 'granted':
                         Toast.show({
@@ -269,7 +287,7 @@ const FetchMusicComponent = () => {
                         length: song.duration
                     };
                     albumSongs.push(albumSong);
-                } else {
+                } else {    
                     albumFailedSongs++;
                 }
             }

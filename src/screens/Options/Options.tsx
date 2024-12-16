@@ -71,7 +71,6 @@ const Options = () => {
         }
     });
 
-
     const boolSettingCard = (name: string, variableName: string, value: boolean) => (
         <View style={styles.cardView}>
             <Text style={styles.text}>{name}</Text>

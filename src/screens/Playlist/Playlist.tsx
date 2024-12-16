@@ -1,6 +1,6 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Button, FlatList, Pressable, Switch, Text, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch } from 'react-redux';
@@ -34,6 +34,7 @@ import TrackPlayer from 'react-native-track-player';
 import { getRandomizedSongs } from '../../utils/PlaylistRandomization';
 import colorScheme from '../../constant/Color';
 import MultipleChoiceModal from '../../components/Modal/MultipleChoiceModal/MultipleChoiceModal';
+import { titleSort } from '../../utils/stringUtils';
 
 const playbackModeOptions: PlaybackMode[] = [PlaybackMode.NORMAL, PlaybackMode.SHUFFLE, PlaybackMode.RANDOMIZE];
 const shuffleTypeOptions: ShuffleType[] = [
@@ -62,13 +63,30 @@ const Playlist = () => {
     const [showShuffleOptions, setShowShuffleOptions] = useState(false);
     const [showPlaybackOptions, setShowPlaybackOptions] = useState(false);
 
+    const [sortedAlbums, setSortedAlbums] = useState<Array<Album>>([]);
+    const [sortedSongs, setSortedSongs] = useState<Array<Song>>([]);
+
+    const updateSorts = () => {
+        if (viewingPlaylist) {
+            setSortedAlbums([...viewingPlaylist.albums]
+                .sort((a, b) => titleSort(a.albumName, b.albumName)));
+            setSortedSongs([...viewingPlaylist.songs]
+                .sort((a, b) => titleSort(a.title, b.title)));
+        }
+    };
+
     navigation.addListener('focus', () => {
         if (viewingPlaylist) {
             setIsAlreadyShuffled(false);
             setStartPlayback(false);
             dispatch(setViewingPlayArray(getPlayArray(viewingPlaylist)));
+            updateSorts();
         }
     });
+
+    useEffect(() => {
+        updateSorts();
+    }, [viewingPlaylist?.albums, viewingPlaylist?.songs]);
 
     useEffect(() => {
         if (navigation.isFocused() && viewingPlaylist && startPlayback) {
@@ -221,26 +239,26 @@ const Playlist = () => {
         </View>
     );
 
-    const detailsAlbums = () => !!viewingPlaylist?.albums.length && (
+    const detailsAlbums = () => sortedAlbums.length ? (
         <View style={styles.albumsView}>
             <FlatList
-                data={viewingPlaylist?.albums}
+                data={sortedAlbums}
                 renderItem={albumView}
                 keyExtractor={(item, index) => `${item.albumName}-${index}`}
                 ItemSeparatorComponent={() => (<View style={styles.separator} />)}
             />
         </View>
-    );
+    ) : <Fragment />;
 
-    const detailsSongs = () => !!viewingPlaylist?.songs.length && (
+    const detailsSongs = () => sortedSongs.length ? (
         <View style={styles.songsView}>
             <FlatList
-                data={viewingPlaylist?.songs}
+                data={sortedSongs}
                 renderItem={songView}
                 keyExtractor={(item, index) => `${item.title}-${index}`}
             />
         </View>
-    );
+    ) : <Fragment />;
 
     const separator = () => (
         <View style={{...styles.sectionSeparator, borderColor: currentScheme.outline}} />
@@ -249,7 +267,7 @@ const Playlist = () => {
     const detailsView = () => (
         <View style={styles.flatListView}>
             {detailsAlbums()}
-            {viewingPlaylist?.songs.length && viewingPlaylist.albums.length ? separator() : null}
+            {sortedSongs.length && sortedAlbums.length ? separator() : null}
             {detailsSongs()}
         </View>
     );

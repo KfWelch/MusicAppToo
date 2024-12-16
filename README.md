@@ -7,7 +7,7 @@ This app is to be a music player that allows for, well, playing music.  Some spe
 For development, you will need your IDE, and if you wish to use Android Studio, you will need to make sure you have downloaded and installed the correct SDK.  In general, you will also need to have Java JDK 11 installed on your system.  Because this is a React Native project, you will also need yarn or npm, the latter of which was used to build this project.
 
 Versions here used:
-    - Node 16 LTS with prepackaged NPM
+    - Node 20 LTS with prepackaged NPM
     - Android Studio 2020.3.1 Patch 4 (optional?)
     - JDK 11
 
