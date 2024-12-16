@@ -38,7 +38,7 @@ const SongCard = (props: SongCardAnimatedProps) => {
     if (animated) {
         const { index, yOffset } = animated;
         const position = useDerivedValue(() => {
-            return index * CARD_HEIGHT - yOffset.value
+            return index * CARD_HEIGHT - yOffset.value;
         });
         const disappearHeight = -CARD_HEIGHT;
         const topHeight = 0;

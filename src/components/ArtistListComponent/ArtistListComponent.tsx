@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FlatList, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import TrackPlayer from 'react-native-track-player';
@@ -21,6 +21,7 @@ import ArtistCard from '../Cards/ArtistCard/ArtistCard';
 import ComponentDropDown from '../Cards/ComponentDropDown/ComponentDropDown';
 import SongCard from '../Cards/SongCard/SongCard';
 import styles from './ArtistListComponent.style';
+import { titleSort } from '../../utils/stringUtils';
 
 const ArtistList = () => {
     const albumsState = useTypedSelector(state => state.Albums);
@@ -33,6 +34,10 @@ const ArtistList = () => {
     const systemColorScheme = useColorScheme();
     const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
     const [startPlayback, setStartPlayback] = useState(false);
+
+    const sortedArtists = useMemo(() => (
+        [...artists].sort((a, b) => titleSort(a.artist, b.artist))
+    ), [artists]);
 
     useEffect(() => {
         if (navigation.isFocused() && currentPlaylist && startPlayback) {
@@ -83,65 +88,70 @@ const ArtistList = () => {
         }
     }, []);
 
+    const renderArtist = ({ item }: { item: Artist }) => {
+        const sortedAlbums = [...item.albums].sort((a, b) => titleSort(a.albumName, b.albumName));
+        return (
+            <ComponentDropDown
+                mainItemCard={(<ArtistCard artist={item} />)}
+                subItemFlatlist={(
+                    <FlatList
+                        data={sortedAlbums}
+                        renderItem={({ item }: { item: Album }) => (
+                            <ComponentDropDown
+                                mainItemCard={(<AlbumCard album={item} onPlay={async () => {
+                                    dispatch(setAlbumAsPlayingPlaylist(item));
+                                    await TrackPlayer.reset();
+                                    await TrackPlayer.removeUpcomingTracks();
+                                    if (currentPlaylist) {
+                                        switch (playbackOptions.mode) {
+                                            case PlaybackMode.NORMAL:
+                                                const playArray = getPlayArray(currentPlaylist);
+                                                dispatch(setViewingPlayArray(playArray));
+                                                break;
+                                            case PlaybackMode.SHUFFLE:
+                                                dispatch(setViewingPlayArray(getPlayArray(currentPlaylist)));
+                                                dispatch(shuffleViewingPlaylist());
+                                                break;
+                                            case PlaybackMode.RANDOMIZE:
+                                                const initialSongs = getRandomizedSongs(
+                                                    currentPlaylist,
+                                                    options.randomizationForwardBuffer,
+                                                    playbackOptions.randomizeOptions.weighted,
+                                                    options.randomizationShouldNotRepeatSongs
+                                                );
+                                                dispatch(setViewingPlayArray(initialSongs));
+                                                break;
+                                            default:
+                                                return;
+                                        }
+                                        setStartPlayback(true);
+                                    }
+                                }} />)}  
+                                subItemFlatlist={(
+                                    <FlatList
+                                        data={item.songs}
+                                        renderItem={({ item }: { item: Song }) => (<SongCard song={item} colorScheme={isDarkMode ? 'dark' : 'light'} />)}
+                                        keyExtractor={(item, index) => `${getSongId(item)}-${index}`}
+                                        extraData={item}
+                                    />
+                                )}
+                            />
+                        )}
+                        keyExtractor={(item, index) => `${getAlbumId(item)}-${index}`}
+                        extraData={item}
+                    />
+                )}
+            />
+        )
+    };
+
     const itemSeparator = () => (<View style={styles.itemSeparator} />);
 
     return (
         <SafeAreaView style={styles.container}>
             <FlatList
-                data={artists}
-                renderItem={({ item }: { item: Artist }) => (
-                    <ComponentDropDown
-                        mainItemCard={(<ArtistCard artist={item} />)}
-                        subItemFlatlist={(
-                            <FlatList
-                                data={item.albums}
-                                renderItem={({ item }: { item: Album }) => (
-                                    <ComponentDropDown
-                                        mainItemCard={(<AlbumCard album={item} onPlay={async () => {
-                                            dispatch(setAlbumAsPlayingPlaylist(item));
-                                            await TrackPlayer.reset();
-                                            await TrackPlayer.removeUpcomingTracks();
-                                            if (currentPlaylist) {
-                                                switch (playbackOptions.mode) {
-                                                    case PlaybackMode.NORMAL:
-                                                        const playArray = getPlayArray(currentPlaylist);
-                                                        dispatch(setViewingPlayArray(playArray));
-                                                        break;
-                                                    case PlaybackMode.SHUFFLE:
-                                                        dispatch(setViewingPlayArray(getPlayArray(currentPlaylist)));
-                                                        dispatch(shuffleViewingPlaylist());
-                                                        break;
-                                                    case PlaybackMode.RANDOMIZE:
-                                                        const initialSongs = getRandomizedSongs(
-                                                            currentPlaylist,
-                                                            options.randomizationForwardBuffer,
-                                                            playbackOptions.randomizeOptions.weighted,
-                                                            options.randomizationShouldNotRepeatSongs
-                                                        );
-                                                        dispatch(setViewingPlayArray(initialSongs));
-                                                        break;
-                                                    default:
-                                                        return;
-                                                }
-                                                setStartPlayback(true);
-                                            }
-                                        }} />)}  
-                                        subItemFlatlist={(
-                                            <FlatList
-                                                data={item.songs}
-                                                renderItem={({ item }: { item: Song }) => (<SongCard song={item} colorScheme={isDarkMode ? 'dark' : 'light'} />)}
-                                                keyExtractor={(item, index) => `${getSongId(item)}-${index}`}
-                                                extraData={item}
-                                            />
-                                        )}
-                                    />
-                                )}
-                                keyExtractor={(item, index) => `${getAlbumId(item)}-${index}`}
-                                extraData={item}
-                            />
-                        )}
-                    />
-                )}
+                data={sortedArtists}
+                renderItem={renderArtist}
                 keyExtractor={(item, index) => `${item.artist}-${index}`}
                 ItemSeparatorComponent={itemSeparator}
                 extraData={albumsState}

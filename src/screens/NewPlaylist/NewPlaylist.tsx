@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     Button,
     FlatList,
@@ -30,6 +30,7 @@ import { getAlbumId, getSongId } from '../../utils/musicUtils';
 import { TextInput } from 'react-native-gesture-handler';
 import styles from './NewPlaylist.style';
 import colorScheme from '../../constant/Color';
+import { titleSort } from '../../utils/stringUtils';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -44,6 +45,10 @@ const NewPlaylist = () => {
     const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
 
     const [playlistName, setPlaylistName] = useState('');
+
+    const sortedArtists = useMemo(() => (
+        [...artists].sort((a, b) => titleSort(a.artist, b.artist))
+    ), [artists]);
 
     navigation.addListener('focus', () => {
         if (newPlaylist.title) {
@@ -98,23 +103,26 @@ const NewPlaylist = () => {
         />
     );
 
-    const availableArtistView = ({ item }: { item: Artist }) => (
-        <ComponentDropDown
-            mainItemCard={(<ArtistCard artist={item} onAdd={() => item.albums.forEach(album => dispatch(addAlbum(album)))} />)}
-            subItemFlatlist={(
-                <FlatList
-                    data={item.albums}
-                    renderItem={availableAlbumView}
-                    keyExtractor={(item, index) => `${item.albumName}-${index}`}
-                />
-            )}
-        />
-    );
+    const availableArtistView = ({ item }: { item: Artist }) => {
+        const sortedAlbums = [...item.albums].sort((a, b) => titleSort(a.albumName, b.albumName));
+        return (
+            <ComponentDropDown
+                mainItemCard={(<ArtistCard artist={item} onAdd={() => item.albums.forEach(album => dispatch(addAlbum(album)))} />)}
+                subItemFlatlist={(
+                    <FlatList
+                        data={sortedAlbums}
+                        renderItem={availableAlbumView}
+                        keyExtractor={(item, index) => `${item.albumName}-${index}`}
+                    />
+                )}
+            />
+        )
+    };
 
     const availableMusicView = () => (
         <SafeAreaView style={styles.container}>
             <FlatList
-                data={artists}
+                data={sortedArtists}
                 renderItem={availableArtistView}
                 keyExtractor={(item, index) => `${item.artist}-${index}`}
             />

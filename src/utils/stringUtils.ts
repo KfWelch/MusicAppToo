@@ -20,3 +20,19 @@ export const splitCamelCaseToWords = {
         return result;
     }
 };
+
+const indefiniteArticleStartRegex = /^(the|a|an)\s/i;
+
+export const titleSort = (a: string, b: string): number => {
+    const loweredA = a.toLowerCase();
+    const unindefiniteArticledA = loweredA.replace(indefiniteArticleStartRegex, '');
+    const loweredB = b.toLowerCase();
+    const unindefiniteArticledB = loweredB.replace(indefiniteArticleStartRegex, '');
+
+    if (unindefiniteArticledA < unindefiniteArticledB) {
+        return -1;
+    } else if (unindefiniteArticledB < unindefiniteArticledA) {
+        return 1;
+    }
+    return 0;
+};
