@@ -72,8 +72,8 @@ const NewPlaylist = () => {
         return true;
     };
 
-    const albumInPlaylist = (album: Album) => newPlaylist.albums.includes(album);
-    const songInPlaylist = (song: Song) => newPlaylist.individualSongs.includes(song);
+    const albumInPlaylist = (album: Album) => newPlaylist.albums.some(albm => getAlbumId(album) === getAlbumId(albm));
+    const songInPlaylist = (song: Song) => newPlaylist.individualSongs.some(sng => getSongId(song) === getSongId(sng));
     
     const availableSongView = ({ item }: { item: Song }) => (
         <SongCard
