@@ -24,6 +24,9 @@ import store, { persistor } from './src/state/store';
 import TrackPlayer, { Capability } from 'react-native-track-player';
 import { PersistGate } from 'redux-persist/integration/react';
 import HomeNavigator from './src/navigators/HomeNavigator';
+if (__DEV__) {
+    import('./ReactotronConfig').then(() => console.log('Reactotron Configured'));
+}
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
