@@ -25,7 +25,7 @@ import { titleSort } from '../../utils/stringUtils';
 
 const ArtistList = () => {
     const albumsState = useTypedSelector(state => state.Albums);
-    const { viewingPlaylist: currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
+    const { playingPlaylist: currentPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
     const { artists } = albumsState;
     const autoPlay = useTypedSelector(state => state.Options.playbackAutoPlayOnReload);
     const navigation = useNavigation();
@@ -101,7 +101,6 @@ const ArtistList = () => {
                                 mainItemCard={(<AlbumCard album={item} onPlay={async () => {
                                     dispatch(setAlbumAsPlayingPlaylist(item));
                                     await TrackPlayer.reset();
-                                    await TrackPlayer.removeUpcomingTracks();
                                     if (currentPlaylist) {
                                         switch (playbackOptions.mode) {
                                             case PlaybackMode.NORMAL:
