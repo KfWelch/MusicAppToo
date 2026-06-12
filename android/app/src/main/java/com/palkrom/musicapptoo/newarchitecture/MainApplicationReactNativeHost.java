@@ -1,4 +1,4 @@
-package com.musicapptoo.newarchitecture;
+package com.palkrom.musicapptoo.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.musicapptoo.BuildConfig;
-import com.musicapptoo.newarchitecture.components.MainComponentsRegistry;
-import com.musicapptoo.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.palkrom.musicapptoo.BuildConfig;
+import com.palkrom.musicapptoo.newarchitecture.components.MainComponentsRegistry;
+import com.palkrom.musicapptoo.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.musicapptoo.newarchitecture.components;
+package com.palkrom.musicapptoo.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

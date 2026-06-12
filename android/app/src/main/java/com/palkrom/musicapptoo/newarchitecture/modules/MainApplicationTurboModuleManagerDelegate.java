@@ -1,4 +1,4 @@
-package com.musicapptoo.newarchitecture.modules;
+package com.palkrom.musicapptoo.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

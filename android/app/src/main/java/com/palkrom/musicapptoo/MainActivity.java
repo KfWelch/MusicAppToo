@@ -1,4 +1,4 @@
-package com.musicapptoo;
+package com.palkrom.musicapptoo;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
