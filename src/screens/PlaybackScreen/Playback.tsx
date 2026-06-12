@@ -8,24 +8,25 @@ import TrackPlayer, {
     useTrackPlayerEvents
 } from 'react-native-track-player';
 import BackgroundTimer from 'react-native-background-timer';
+import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import { useFocusEffect } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 import SongCard from '../../components/Cards/SongCard/SongCard';
 import PlaybackControl from '../../components/PlaybackControl/PlaybackControl';
 import { Song } from '../../models/MusicModel';
-import { useTypedSelector } from '../../state/reducers';
 import { convertSongListToTracks, getSongId } from '../../utils/musicUtils';
-import styles from './Playback.style';
-import { useDispatch } from 'react-redux';
+import { getRandomizedNextSong, getRandomizedSongs } from '../../utils/PlaylistRandomization';
+import { playable } from '../../utils/trackPlayUtils';
+import { useTypedSelector } from '../../state/reducers';
 import {
     removeOldestRandomSongs,
     setViewingPlayArray,
     setLastSongPlayed,
     setRandomNextSongs
 } from '../../state/actions/Playlist';
-import { playable } from '../../utils/trackPlayUtils';
-import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
-import { MARGIN, SongCardHeight } from '../../components/Cards/SongCard/SongCard.style';
 import { PlaybackMode } from '../../state/reducers/Playlist';
-import { getRandomizedNextSong, getRandomizedSongs } from '../../utils/PlaylistRandomization';
+import { MARGIN, SongCardHeight } from '../../components/Cards/SongCard/SongCard.style';
+import styles from './Playback.style';
 
 const CARD_HEIGHT = SongCardHeight + MARGIN * 2;
 
@@ -162,8 +163,8 @@ const Playback = () => {
             TrackPlayer.play();
         }
     }
-
-    useEffect(() => {
+    
+    const scrollToCurrent = () => {
         setCurrentSong(playingPlaylist?.playArray[currentTrack]);
         // @ts-ignore
         pickerRef.current?.scrollToIndex({
@@ -171,7 +172,14 @@ const Playback = () => {
             index: currentTrack,
             viewPosition: 0.5
         });
+    };
+
+    useEffect(() => {
+        scrollToCurrent();
     }, [currentTrack]);
+    useFocusEffect(() => {
+        scrollToCurrent();
+    });
 
     const renderSongCard = ({ item, index }: { item: Song, index: number }) => (
         <Pressable onPress={async () => await TrackPlayer.skip(index)}>
@@ -193,8 +201,11 @@ const Playback = () => {
                 onScroll={scrollHandler}
                 scrollEventThrottle={16}
                 ref={pickerRef}
-                getItemLayout={(data, index) => (
+                getItemLayout={(_data, index) => (
                     {length: CARD_HEIGHT, offset: CARD_HEIGHT * index, index}
+                )}
+                ListFooterComponent={(
+                    <View style={{ height: 1.5 * CARD_HEIGHT }} />
                 )}
             />
         </View>
