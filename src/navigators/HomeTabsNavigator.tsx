@@ -1,11 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { usePlaybackState } from 'react-native-track-player';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Home from '../screens/Home/Home';
 import Playback from '../screens/PlaybackScreen/Playback';
 import PlaylistList from '../screens/PlaylistList/PlaylistList';
+import { SearchType } from './HomeStackNavigator';
+import { TextInput } from 'react-native';
 
 export type HomeTabNavParams = {
     Home: undefined;
@@ -17,9 +19,13 @@ const Tab = createBottomTabNavigator<HomeTabNavParams>();
 interface TabNavProps {
     currentTab: string;
     setCurrentTab: React.Dispatch<React.SetStateAction<string>>;
+    searchType: SearchType;
+    resetSearch: () => void;
 }
 
 const HomeTabs = (props: TabNavProps) => {
+    const { searchType, resetSearch, currentTab, setCurrentTab } = props;
+    const [searched, setSearched] = useState('');
     const playbackState = usePlaybackState();
     const navigation = useNavigation();
 
@@ -35,28 +41,36 @@ const HomeTabs = (props: TabNavProps) => {
         <MaterialCommunityIcons name="playlist-play" size={size} color={color} />
     );
 
+    const searchBarView = () => (
+        <TextInput value={searched} onChangeText={setSearched} onEndEditing={() => {
+            if (!searched) {
+                resetSearch();
+            }
+        }}/>
+    );
+
     return (
         <Tab.Navigator
             initialRouteName="Home"
             screenOptions={{
-                headerShown: false
+                headerShown: currentTab === 'Home' && searchType !== 'none',
+                header: searchBarView
             }}
         >
             <Tab.Screen
                 name="Home"
-                component={Home}
                 listeners={{
-                    focus: () => props.setCurrentTab('Home')
+                    focus: () => setCurrentTab('Home')
                 }}
                 options={{
                     tabBarIcon: props => homeIcon(props.size, props.color)
                 }}
-            />
+            >{props => <Home searched={searched} />}</Tab.Screen>
             <Tab.Screen
                 name="PlaylistList"
                 component={PlaylistList}
                 listeners={{
-                    focus: () => props.setCurrentTab('PlaylistList')
+                    focus: () => setCurrentTab('PlaylistList')
                 }}
                 options={{
                     tabBarIcon: props => playlistListIcon(props.size, props.color)
@@ -66,7 +80,7 @@ const HomeTabs = (props: TabNavProps) => {
                 name="Playback"
                 component={Playback}
                 listeners={{
-                    focus: () => props.setCurrentTab('Playback')
+                    focus: () => setCurrentTab('Playback')
                 }}
                 options={{
                     tabBarIcon: props => playbackIcon(props.size, props.color)

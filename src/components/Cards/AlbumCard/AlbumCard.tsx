@@ -1,13 +1,9 @@
 import React from 'react';
-import {
-    Pressable,
-    Switch,
-    Text,
-    View
-} from 'react-native';
+import {Pressable, Switch, Text, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Album } from '../../../models/MusicModel';
+import {Album} from '../../../models/MusicModel';
 import styles from './AlbumCard.style';
+import colorScheme from '../../../constant/Color';
 
 interface AlbumCardProps {
     album: Album;
@@ -15,43 +11,66 @@ interface AlbumCardProps {
     onRemove?: () => void;
     onAdd?: () => void;
     onPlay?: () => void;
+    searched?: string;
 }
 
 const AlbumCard = (props: AlbumCardProps) => {
-    const { album, setAlbumOrdered, onAdd, onRemove, onPlay } = props;
+    const {album, setAlbumOrdered, onAdd, onRemove, onPlay, searched} = props;
 
-    const orderedAlbumSelectorView = (ordered = false) => setAlbumOrdered && (
-        <View style={{...styles.infoView, flex: 1}}>
-            <Text style={styles.subsubtitle}>Order this album?</Text>
-            <Switch value={ordered} onValueChange={setAlbumOrdered} />
-        </View>
-    );
+    const orderedAlbumSelectorView = (ordered = false) =>
+        setAlbumOrdered && (
+            <View style={{...styles.infoView, flex: 1}}>
+                <Text style={styles.subsubtitle}>Order this album?</Text>
+                <Switch value={ordered} onValueChange={setAlbumOrdered} />
+            </View>
+        );
 
-    const removeView = () => onRemove && (
-        <Pressable onPress={onRemove}>
-            <MaterialCommunityIcons name="music-off" size={30} />
-        </Pressable>
-    );
+    const removeView = () =>
+        onRemove && (
+            <Pressable onPress={onRemove}>
+                <MaterialCommunityIcons name="music-off" size={30} />
+            </Pressable>
+        );
 
-    const playView = () => onPlay && (
-        <Pressable onPress={onPlay}>
-            <MaterialCommunityIcons name="play-outline" size={30} />
-        </Pressable>
-    );
+    const playView = () =>
+        onPlay && (
+            <Pressable onPress={onPlay}>
+                <MaterialCommunityIcons name="play-outline" size={30} />
+            </Pressable>
+        );
 
-    const addView = () => onAdd && (
-        <Pressable onPress={onAdd}>
-            <MaterialCommunityIcons name="plus-box-multiple-outline" size={30} />
-        </Pressable>
-    );
+    const addView = () =>
+        onAdd && (
+            <Pressable onPress={onAdd}>
+                <MaterialCommunityIcons name="plus-box-multiple-outline" size={30} />
+            </Pressable>
+        );
+
+    const getFoundColor = () => {
+        if (searched) {
+            if (album.albumName.includes(searched)) {
+                return 'yellow';
+            } else if (album.songs.some(song => song.title.includes(searched))) {
+                return 'orange';
+            }
+        }
+    };
 
     return (
         <View style={styles.cardView}>
             <MaterialCommunityIcons name="music-box-multiple-outline" size={40} />
             <View style={{...styles.infoView, flex: 3}}>
-                <Text style={styles.title}>{album.albumName}</Text>
+                <Text
+                    style={{
+                        ...styles.title,
+                        color: getFoundColor(),
+                    }}>
+                    {album.albumName}
+                </Text>
                 <Text style={styles.subtitle}>{album.artistName}</Text>
-                <Text style={styles.subtitle}>{`${album.songs.length} song${album.songs.length === 1 ? '' : 's'}`}</Text>
+                <Text style={styles.subtitle}>{`${album.songs.length} song${
+                    album.songs.length === 1 ? '' : 's'
+                }`}</Text>
             </View>
             {orderedAlbumSelectorView(album.ordered)}
             {playView()}
