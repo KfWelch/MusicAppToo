@@ -11,6 +11,22 @@ interface ArtistCardProps {
     searched?: string;
 }
 
+export const getFoundColor = (artist: Artist, searched?: string) => {
+    if (searched) {
+        if (artist.artist.toLowerCase().includes(searched.toLowerCase())) {
+            return 'yellow';
+        } else if (
+            artist.albums.some(
+                album =>
+                    album.albumName.toLowerCase().includes(searched.toLowerCase()) ||
+                    album.songs.some(song => song.title.toLowerCase().includes(searched.toLowerCase()))
+            )
+        ) {
+            return 'orange';
+        }
+    }
+};
+
 const ArtistCard = (props: ArtistCardProps) => {
     const {artist, onAdd, onRemove, searched} = props;
 
@@ -28,26 +44,11 @@ const ArtistCard = (props: ArtistCardProps) => {
             </Pressable>
         );
 
-    const getFoundColor = () => {
-        if (searched) {
-            if (artist.artist.includes(searched)) {
-                return 'yellow';
-            } else if (
-                artist.albums.some(album =>
-                    album.albumName.includes(searched)
-                    || album.songs.some(song => song.title.includes(searched))
-                )
-            ) {
-                return 'orange';
-            }
-        }
-    };
-
     return (
         <View style={styles.cardView}>
             <MaterialCommunityIcons name="head" size={40} />
             <View style={styles.infoView}>
-                <Text style={styles.title}>{artist.artist}</Text>
+                <Text style={{...styles.title, color: getFoundColor(artist, searched)}}>{artist.artist}</Text>
                 <Text style={styles.subtitle}>{`${artist.albums.length} album${
                     artist.albums.length === 1 ? '' : 's'
                 }`}</Text>

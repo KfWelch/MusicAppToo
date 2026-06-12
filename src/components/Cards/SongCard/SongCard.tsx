@@ -7,7 +7,7 @@ import Animated, {
     interpolate,
     SharedValue,
     useAnimatedStyle,
-    useDerivedValue,
+    useDerivedValue
 } from 'react-native-reanimated';
 import colorScheme from '../../../constant/Color';
 import {Song} from '../../../models/MusicModel';
@@ -27,6 +27,12 @@ interface SongCardAnimatedProps {
 const height = Dimensions.get('window').height * 0.5;
 const CARD_HEIGHT = SongCardHeight + 2 * MARGIN;
 
+export const getFoundColor = (song: Song, searched?: string) => {
+    if (searched && song.title.toLowerCase().includes(searched.toLowerCase())) {
+        return 'yellow';
+    }
+};
+
 const SongCard = (props: SongCardAnimatedProps) => {
     const {song, onAdd, onRemove, onWeightChange, isPlaying, animated, searched} = props;
 
@@ -45,7 +51,7 @@ const SongCard = (props: SongCardAnimatedProps) => {
             const translateY =
                 yOffset.value +
                 interpolate(yOffset.value, [0, 0.0001 + index * CARD_HEIGHT], [0, -index * CARD_HEIGHT], {
-                    extrapolateRight: Extrapolation.CLAMP,
+                    extrapolateRight: Extrapolation.CLAMP
                 }) +
                 interpolate(position.value, [bottomHeight, appearHeight], [0, -CARD_HEIGHT / 4], Extrapolation.CLAMP);
 
@@ -53,17 +59,17 @@ const SongCard = (props: SongCardAnimatedProps) => {
                 position.value,
                 [disappearHeight, topHeight, bottomHeight, appearHeight],
                 [0.5, 1, 1, 0.5],
-                Extrapolation.CLAMP,
+                Extrapolation.CLAMP
             );
             const opacity = interpolate(
                 position.value,
                 [disappearHeight, topHeight, bottomHeight, appearHeight],
-                [0.5, 1, 1, 0.5],
+                [0.5, 1, 1, 0.5]
             );
 
             return {
                 opacity,
-                transform: [{translateY}, {scale}],
+                transform: [{translateY}, {scale}]
             };
         });
     }
@@ -96,12 +102,6 @@ const SongCard = (props: SongCardAnimatedProps) => {
             </Pressable>
         );
 
-    const getFoundColor = () => {
-        if (searched && song.title.includes(searched)) {
-            return 'yellow';
-        }
-    };
-
     const cardView = () => (
         <>
             <MaterialCommunityIcons
@@ -111,7 +111,7 @@ const SongCard = (props: SongCardAnimatedProps) => {
             />
             {/* <Text style={styles.indexNumber}>{`${song.position || song.numberInAlbum || ''})`}</Text> */}
             <View style={{...styles.infoView, flex: 1}}>
-                <Text style={{...styles.title, color: getFoundColor()}}>{song.title}</Text>
+                <Text style={{...styles.title, color: getFoundColor(song, searched)}}>{song.title}</Text>
                 <Text style={styles.subtitle}>{song.albumName}</Text>
             </View>
             {weightView()}

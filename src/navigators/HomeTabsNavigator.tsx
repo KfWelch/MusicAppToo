@@ -1,13 +1,13 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
-import { usePlaybackState } from 'react-native-track-player';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {useNavigation} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {usePlaybackState} from 'react-native-track-player';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Home from '../screens/Home/Home';
 import Playback from '../screens/PlaybackScreen/Playback';
 import PlaylistList from '../screens/PlaylistList/PlaylistList';
-import { SearchType } from './HomeStackNavigator';
-import { TextInput } from 'react-native';
+import {SearchType} from './HomeStackNavigator';
+import {TextInput} from 'react-native';
 
 export type HomeTabNavParams = {
     Home: undefined;
@@ -24,7 +24,7 @@ interface TabNavProps {
 }
 
 const HomeTabs = (props: TabNavProps) => {
-    const { searchType, resetSearch, currentTab, setCurrentTab } = props;
+    const {searchType, resetSearch, currentTab, setCurrentTab} = props;
     const [searched, setSearched] = useState('');
     const playbackState = usePlaybackState();
     const navigation = useNavigation();
@@ -41,12 +41,22 @@ const HomeTabs = (props: TabNavProps) => {
         <MaterialCommunityIcons name="playlist-play" size={size} color={color} />
     );
 
+    useEffect(() => {
+        if (searchType === 'none') {
+            setSearched('');
+        }
+    }, [searchType]);
+
     const searchBarView = () => (
-        <TextInput value={searched} onChangeText={setSearched} onEndEditing={() => {
-            if (!searched) {
-                resetSearch();
-            }
-        }}/>
+        <TextInput
+            value={searched}
+            onChangeText={setSearched}
+            onEndEditing={() => {
+                if (!searched) {
+                    resetSearch();
+                }
+            }}
+        />
     );
 
     return (
@@ -55,8 +65,7 @@ const HomeTabs = (props: TabNavProps) => {
             screenOptions={{
                 headerShown: currentTab === 'Home' && searchType !== 'none',
                 header: searchBarView
-            }}
-        >
+            }}>
             <Tab.Screen
                 name="Home"
                 listeners={{
@@ -64,8 +73,9 @@ const HomeTabs = (props: TabNavProps) => {
                 }}
                 options={{
                     tabBarIcon: props => homeIcon(props.size, props.color)
-                }}
-            >{props => <Home searched={searched} />}</Tab.Screen>
+                }}>
+                {props => <Home searched={searched} isFilteredSearch={searchType === 'filter'} />}
+            </Tab.Screen>
             <Tab.Screen
                 name="PlaylistList"
                 component={PlaylistList}

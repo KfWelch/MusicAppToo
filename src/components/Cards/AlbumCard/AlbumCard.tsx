@@ -3,7 +3,6 @@ import {Pressable, Switch, Text, View} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Album} from '../../../models/MusicModel';
 import styles from './AlbumCard.style';
-import colorScheme from '../../../constant/Color';
 
 interface AlbumCardProps {
     album: Album;
@@ -13,6 +12,16 @@ interface AlbumCardProps {
     onPlay?: () => void;
     searched?: string;
 }
+
+export const getFoundColor = (album: Album, searched?: string) => {
+    if (searched) {
+        if (album.albumName.toLowerCase().includes(searched.toLowerCase())) {
+            return 'yellow';
+        } else if (album.songs.some(song => song.title.toLowerCase().includes(searched.toLowerCase()))) {
+            return 'orange';
+        }
+    }
+};
 
 const AlbumCard = (props: AlbumCardProps) => {
     const {album, setAlbumOrdered, onAdd, onRemove, onPlay, searched} = props;
@@ -46,16 +55,6 @@ const AlbumCard = (props: AlbumCardProps) => {
             </Pressable>
         );
 
-    const getFoundColor = () => {
-        if (searched) {
-            if (album.albumName.includes(searched)) {
-                return 'yellow';
-            } else if (album.songs.some(song => song.title.includes(searched))) {
-                return 'orange';
-            }
-        }
-    };
-
     return (
         <View style={styles.cardView}>
             <MaterialCommunityIcons name="music-box-multiple-outline" size={40} />
@@ -63,7 +62,7 @@ const AlbumCard = (props: AlbumCardProps) => {
                 <Text
                     style={{
                         ...styles.title,
-                        color: getFoundColor(),
+                        color: getFoundColor(album, searched)
                     }}>
                     {album.albumName}
                 </Text>

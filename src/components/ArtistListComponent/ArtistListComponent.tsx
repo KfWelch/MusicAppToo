@@ -11,19 +11,20 @@ import {useTypedSelector} from '../../state/reducers';
 import {PlaybackMode} from '../../state/reducers/Playlist';
 import {convertSongListToTracks, getAlbumId, getPlayArray, getSongId} from '../../utils/musicUtils';
 import {getRandomizedSongs} from '../../utils/PlaylistRandomization';
-import AlbumCard from '../Cards/AlbumCard/AlbumCard';
-import ArtistCard from '../Cards/ArtistCard/ArtistCard';
-import ComponentDropDown from '../Cards/ComponentDropDown/ComponentDropDown';
+import ArtistCard, {getFoundColor as getArtistFound} from '../Cards/ArtistCard/ArtistCard';
+import AlbumCard, {getFoundColor as getAlbumFound} from '../Cards/AlbumCard/AlbumCard';
 import SongCard from '../Cards/SongCard/SongCard';
+import ComponentDropDown from '../Cards/ComponentDropDown/ComponentDropDown';
 import styles from './ArtistListComponent.style';
 import {titleSort} from '../../utils/stringUtils';
 
 interface ArtistListProps {
+    isFilteredSearch: boolean;
     searched: string;
 }
 
 const ArtistList = (props: ArtistListProps) => {
-    const {searched} = props;
+    const {searched, isFilteredSearch} = props;
     const albumsState = useTypedSelector(state => state.Albums);
     const {playingPlaylist: currentPlaylist, playbackOptions} = useTypedSelector(state => state.Playlist);
     const {artists} = albumsState;
@@ -35,7 +36,11 @@ const ArtistList = (props: ArtistListProps) => {
     const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
     const [startPlayback, setStartPlayback] = useState(false);
 
-    const sortedArtists = useMemo(() => [...artists].sort((a, b) => titleSort(a.artist, b.artist)), [artists]);
+    const sortedArtists = useMemo(() => {
+        const filtered =
+            searched && isFilteredSearch ? artists.filter(artist => getArtistFound(artist, searched)) : [...artists];
+        return filtered.sort((a, b) => titleSort(a.artist, b.artist));
+    }, [artists, isFilteredSearch]);
 
     useEffect(() => {
         if (navigation.isFocused() && currentPlaylist && startPlayback) {
@@ -84,7 +89,11 @@ const ArtistList = (props: ArtistListProps) => {
     }, []);
 
     const renderArtist = ({item}: {item: Artist}) => {
-        const sortedAlbums = [...item.albums].sort((a, b) => titleSort(a.albumName, b.albumName));
+        const filtered =
+            searched && isFilteredSearch
+                ? item.albums.filter(album => getAlbumFound(album, searched))
+                : [...item.albums];
+        const sortedAlbums = filtered.sort((a, b) => titleSort(a.albumName, b.albumName));
         return (
             <ComponentDropDown
                 mainItemCard={<ArtistCard artist={item} searched={searched || undefined} />}

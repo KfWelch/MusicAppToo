@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Pressable, View} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationProp} from '@react-navigation/native';
@@ -74,25 +74,35 @@ const HomeStack = () => {
         </Pressable>
     );
 
+    const icon = useMemo(() => {
+        switch (searchType) {
+            case 'filter':
+                return 'magnify-close';
+            case 'find':
+                return 'magnify-plus';
+            default:
+                return 'magnify';
+        }
+    }, [searchType]);
     const searchButton = () => {
         if (currentTab !== 'Home') {
             return;
         }
-        let icon: string;
-        let next: SearchType;
-        switch (searchType) {
-            case 'filter':
-                icon = 'magnify-close';
-                next = 'none';
-            case 'find':
-                icon = 'magnify-plus';
-                next = 'filter';
-            default:
-                icon = 'magnify';
-                next = 'find';
-        }
         return (
-            <Pressable style={styles.optionButton} onPress={() => setSearchType(next)}>
+            <Pressable
+                style={styles.optionButton}
+                onPress={() =>
+                    setSearchType(current => {
+                        switch (current) {
+                            case 'filter':
+                                return 'none';
+                            case 'find':
+                                return 'filter';
+                            default:
+                                return 'find';
+                        }
+                    })
+                }>
                 <MaterialCommunityIcons name={icon} size={30} />
             </Pressable>
         );
