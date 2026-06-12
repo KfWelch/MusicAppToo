@@ -310,12 +310,12 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
             }
         }
         case SET_RANDOM_NEXT_SONG: {
-            if (state.viewingPlaylist) {
+            if (state.playingPlaylist) {
                 return {
                     ...state,
-                    viewingPlaylist: {
-                        ...state.viewingPlaylist,
-                        playArray: [...state.viewingPlaylist.playArray, ...action.payload]
+                    playingPlaylist: {
+                        ...state.playingPlaylist,
+                        playArray: [...state.playingPlaylist.playArray, ...action.payload]
                     }
                 }
             } else {
