@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Pressable, useColorScheme, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import TrackPlayer, {Event, RepeatMode, State, usePlaybackState, useTrackPlayerEvents} from 'react-native-track-player';
@@ -187,7 +187,7 @@ const Playback = () => {
         }
     });
 
-    const renderSongCard = ({item, index}: {item: Song; index: number}) => (
+    const renderSongCard = useMemo(() => ({item, index}: {item: Song; index: number}) => (
         <Pressable onPress={async () => await TrackPlayer.skip(index)}>
             <SongCard
                 song={item}
@@ -196,7 +196,7 @@ const Playback = () => {
                 animated={{index, yOffset: translationY}}
             />
         </Pressable>
-    );
+    ), [!!currentSong, currentTrack]);
 
     const songView = () =>
         !!(playingPlaylist && currentSong) && (
