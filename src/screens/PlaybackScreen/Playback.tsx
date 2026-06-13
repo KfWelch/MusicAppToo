@@ -1,37 +1,32 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Pressable, useColorScheme, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import TrackPlayer, {
-    Event,
-    RepeatMode,
-    usePlaybackState,
-    useTrackPlayerEvents
-} from 'react-native-track-player';
+import React, {useEffect, useRef, useState} from 'react';
+import {Pressable, useColorScheme, View} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import TrackPlayer, {Event, RepeatMode, State, usePlaybackState, useTrackPlayerEvents} from 'react-native-track-player';
 import BackgroundTimer from 'react-native-background-timer';
-import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
-import { useFocusEffect } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
+import Animated, {useAnimatedScrollHandler, useSharedValue} from 'react-native-reanimated';
+import {useFocusEffect} from '@react-navigation/native';
+import {useDispatch} from 'react-redux';
 import SongCard from '../../components/Cards/SongCard/SongCard';
 import PlaybackControl from '../../components/PlaybackControl/PlaybackControl';
-import { Song } from '../../models/MusicModel';
-import { convertSongListToTracks, getSongId } from '../../utils/musicUtils';
-import { getRandomizedNextSong, getRandomizedSongs } from '../../utils/PlaylistRandomization';
-import { playable } from '../../utils/trackPlayUtils';
-import { useTypedSelector } from '../../state/reducers';
+import {Song} from '../../models/MusicModel';
+import {convertSongListToTracks, getSongId} from '../../utils/musicUtils';
+import {getRandomizedNextSong, getRandomizedSongs} from '../../utils/PlaylistRandomization';
+import {playable} from '../../utils/trackPlayUtils';
+import {useTypedSelector} from '../../state/reducers';
 import {
     removeOldestRandomSongs,
     setViewingPlayArray,
     setLastSongPlayed,
     setRandomNextSongs
 } from '../../state/actions/Playlist';
-import { PlaybackMode } from '../../state/reducers/Playlist';
-import { MARGIN, SongCardHeight } from '../../components/Cards/SongCard/SongCard.style';
+import {PlaybackMode} from '../../state/reducers/Playlist';
+import {MARGIN, SongCardHeight} from '../../components/Cards/SongCard/SongCard.style';
 import styles from './Playback.style';
 
 const CARD_HEIGHT = SongCardHeight + MARGIN * 2;
 
 const Playback = () => {
-    const { playingPlaylist, playbackOptions } = useTypedSelector(state => state.Playlist);
+    const {playingPlaylist, playbackOptions, viewingPlaylist} = useTypedSelector(state => state.Playlist);
     const options = useTypedSelector(state => state.Options);
     const dispatch = useDispatch();
     const playbackState = usePlaybackState();
@@ -44,7 +39,7 @@ const Playback = () => {
     const isDarkMode = options.generalOverrideSystemAppearance ? options.generalDarkmode : systemColorScheme === 'dark';
 
     const translationY = useSharedValue(0);
-    const scrollHandler = useAnimatedScrollHandler((event) => {
+    const scrollHandler = useAnimatedScrollHandler(event => {
         translationY.value = event.contentOffset.y;
     });
 
@@ -82,23 +77,27 @@ const Playback = () => {
             TrackPlayer.getCurrentTrack().then(currentIndex => {
                 if (currentIndex) {
                     if (playbackOptions.mode === PlaybackMode.RANDOMIZE && playingPlaylist) {
-                        const { randomizationForwardBuffer, randomizationBackwardBuffer } = options;
+                        const {randomizationForwardBuffer, randomizationBackwardBuffer} = options;
                         const totalBuffer = randomizationBackwardBuffer + randomizationForwardBuffer;
                         const totalCurrentSongs = playingPlaylist && playingPlaylist.playArray.length;
                         const currentForwardBuffer = totalCurrentSongs - currentIndex;
-    
+
                         // We need to add when the forward buffer is smaller than we need
                         if (currentForwardBuffer < randomizationForwardBuffer) {
                             const bufferNeeded = randomizationForwardBuffer - currentForwardBuffer;
                             const songsToAdd: Song[] = [];
                             if (options.randomizationShouldNotRepeatSongs) {
-                                songsToAdd.push(getRandomizedNextSong(
-                                    playingPlaylist,
-                                    playbackOptions.randomizeOptions.weighted,
-                                    playingPlaylist.playArray[playingPlaylist.playArray.length - 1]
-                                ));
+                                songsToAdd.push(
+                                    getRandomizedNextSong(
+                                        playingPlaylist,
+                                        playbackOptions.randomizeOptions.weighted,
+                                        playingPlaylist.playArray[playingPlaylist.playArray.length - 1]
+                                    )
+                                );
                             } else {
-                                songsToAdd.push(getRandomizedNextSong(playingPlaylist, playbackOptions.randomizeOptions.weighted));
+                                songsToAdd.push(
+                                    getRandomizedNextSong(playingPlaylist, playbackOptions.randomizeOptions.weighted)
+                                );
                             }
                             for (let i = 1; i < bufferNeeded; i++) {
                                 let nextSong: Song;
@@ -118,7 +117,7 @@ const Playback = () => {
                             }
                             dispatch(setRandomNextSongs(songsToAdd));
                             TrackPlayer.add(convertSongListToTracks(songsToAdd));
-    
+
                             // We need to remove when we have more than the total buffer
                             if (totalCurrentSongs > totalBuffer) {
                                 const songsToRemove = totalCurrentSongs - totalBuffer;
@@ -126,6 +125,11 @@ const Playback = () => {
                                 dispatch(removeOldestRandomSongs(songsToRemove));
                                 // We need to subtract here however many songs we removed
                                 currentIndex = currentIndex - songsToRemove;
+                            }
+
+                            // Trackplayer appears to be pausing on current track
+                            if (playbackState !== State.Playing) {
+                                TrackPlayer.play();
                             }
                         }
                     }
@@ -162,8 +166,8 @@ const Playback = () => {
             }
             TrackPlayer.play();
         }
-    }
-    
+    };
+
     const scrollToCurrent = () => {
         setCurrentSong(playingPlaylist?.playArray[currentTrack]);
         // @ts-ignore
@@ -178,38 +182,37 @@ const Playback = () => {
         scrollToCurrent();
     }, [currentTrack]);
     useFocusEffect(() => {
-        scrollToCurrent();
+        if (viewingPlaylist?.lastSongPlayed ?? -1 >= 0) {
+            setCurrentTrack(viewingPlaylist?.lastSongPlayed || 0);
+        }
     });
 
-    const renderSongCard = ({ item, index }: { item: Song, index: number }) => (
+    const renderSongCard = ({item, index}: {item: Song; index: number}) => (
         <Pressable onPress={async () => await TrackPlayer.skip(index)}>
             <SongCard
                 song={item}
                 colorScheme={isDarkMode ? 'dark' : 'light'}
                 isPlaying={currentSong && currentTrack === index}
-                animated={{ index, yOffset: translationY }}
+                animated={{index, yOffset: translationY}}
             />
         </Pressable>
     );
 
-    const songView = () => !!(playingPlaylist && currentSong) && (
-        <View style={styles.scrollView}>
-            <Animated.FlatList
-                data={playingPlaylist.playArray}
-                renderItem={renderSongCard}
-                keyExtractor={(item, index) => getSongId(item) + index}
-                onScroll={scrollHandler}
-                scrollEventThrottle={16}
-                ref={pickerRef}
-                getItemLayout={(_data, index) => (
-                    {length: CARD_HEIGHT, offset: CARD_HEIGHT * index, index}
-                )}
-                ListFooterComponent={(
-                    <View style={{ height: 1.5 * CARD_HEIGHT }} />
-                )}
-            />
-        </View>
-    );
+    const songView = () =>
+        !!(playingPlaylist && currentSong) && (
+            <View style={styles.scrollView}>
+                <Animated.FlatList
+                    data={playingPlaylist.playArray}
+                    renderItem={renderSongCard}
+                    keyExtractor={(item, index) => getSongId(item) + index}
+                    onScroll={scrollHandler}
+                    scrollEventThrottle={16}
+                    ref={pickerRef}
+                    getItemLayout={(_data, index) => ({length: CARD_HEIGHT, offset: CARD_HEIGHT * index, index})}
+                    ListFooterComponent={<View style={{height: 1.5 * CARD_HEIGHT}} />}
+                />
+            </View>
+        );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -226,7 +229,7 @@ const Playback = () => {
                 setRepeatMode={setRepeatMode}
             />
         </SafeAreaView>
-    )
+    );
 };
 
 export default Playback;
