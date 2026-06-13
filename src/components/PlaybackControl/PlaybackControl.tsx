@@ -111,6 +111,7 @@ const PlaybackControl = (props: PlaybackControlProps) => {
                         seek(Math.floor(value));
                         setSeeking(false);
                     }}
+                    thumbTouchSize={{ height: 60, width: 60}}
                 />
                 <View style={styles.progressRow}>
                     <Text>{getMinSec(progress.position || 0)}</Text>

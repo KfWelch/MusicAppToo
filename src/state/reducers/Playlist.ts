@@ -192,9 +192,14 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
             };
         case SET_CURRENT_AS_PLAYING: {
             const toPlay = _.cloneDeep(state.viewingPlaylist);
+            let viewing: PlaylistModel | null = null;
+            if (toPlay) {
+                viewing = {...toPlay, lastSongPlayed: 0};
+            }
             return {
                 ...state,
-                playingPlaylist: toPlay
+                playingPlaylist: toPlay,
+                viewingPlaylist: viewing
             }
         }
         case SET_ALBUM_ORDERED: {
@@ -310,12 +315,12 @@ export const Playlist = (state = initialState, action: Actions): PlaylistState =
             }
         }
         case SET_RANDOM_NEXT_SONG: {
-            if (state.viewingPlaylist) {
+            if (state.playingPlaylist) {
                 return {
                     ...state,
-                    viewingPlaylist: {
-                        ...state.viewingPlaylist,
-                        playArray: [...state.viewingPlaylist.playArray, ...action.payload]
+                    playingPlaylist: {
+                        ...state.playingPlaylist,
+                        playArray: [...state.playingPlaylist.playArray, ...action.payload]
                     }
                 }
             } else {

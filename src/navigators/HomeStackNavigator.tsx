@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { Pressable, View } from 'react-native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationProp } from '@react-navigation/native';
-import TrackPlayer, { State, usePlaybackState } from 'react-native-track-player';
+import React, {useMemo, useState} from 'react';
+import {Pressable, View} from 'react-native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {NavigationProp} from '@react-navigation/native';
+import TrackPlayer, {State, usePlaybackState} from 'react-native-track-player';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import styles from './HomeNavigator.style';
 import ArtistScreen from '../screens/ArtistScreen/ArtistScreen';
 import NewPlaylist from '../screens/NewPlaylist/NewPlaylist';
 import Playlist from '../screens/Playlist/Playlist';
-import { useTypedSelector } from '../state/reducers';
+import {useTypedSelector} from '../state/reducers';
 import HomeTabs from './HomeTabsNavigator';
-import { playable } from '../utils/trackPlayUtils';
-import { useDispatch } from 'react-redux';
-import { setPlaylistToEdit } from '../state/actions/Playlist';
+import {playable} from '../utils/trackPlayUtils';
+import {useDispatch} from 'react-redux';
+import {setPlaylistToEdit} from '../state/actions/Playlist';
 
 export type HomeStackNavigatorParams = {
     HomeTabs: undefined;
@@ -23,29 +23,36 @@ export type HomeStackNavigatorParams = {
 };
 const Stack = createNativeStackNavigator<HomeStackNavigatorParams>();
 
+export type SearchType = 'none' | 'find' | 'filter';
+
 const HomeStack = () => {
     const currentArtist = useTypedSelector(state => state.Albums.selectedArtist);
-    const { savedPlaylists } = useTypedSelector(state => state.Playlist);
-    const { newPlaylist } = useTypedSelector(state => state.Playlist);
-    const { viewingPlaylist }  = useTypedSelector(state => state.Playlist);
+    const {savedPlaylists} = useTypedSelector(state => state.Playlist);
+    const {newPlaylist} = useTypedSelector(state => state.Playlist);
+    const {viewingPlaylist} = useTypedSelector(state => state.Playlist);
     const viewingPlaylistName = viewingPlaylist?.name;
     const dispatch = useDispatch();
     const playbackState = usePlaybackState();
     const [currentTab, setCurrentTab] = useState('Home');
+    const [searchType, setSearchType] = useState<SearchType>('none');
     const playing = playbackState === State.Playing;
 
-    const playbackButton = () => playable(playbackState) && (playing ? (
-        <Pressable style={styles.optionButton} onPress={TrackPlayer.pause}>
-            <Icon name="caretright" size={20} />
-        </Pressable>
-    ) : (
-        <Pressable style={styles.optionButton} onPress={TrackPlayer.play}>
-            <Icon name="pause" size={20} />
-        </Pressable>
-    ));
+    const playbackButton = () =>
+        playable(playbackState) &&
+        (playing ? (
+            <Pressable style={styles.optionButton} onPress={TrackPlayer.pause}>
+                <Icon name="caretright" size={20} />
+            </Pressable>
+        ) : (
+            <Pressable style={styles.optionButton} onPress={TrackPlayer.play}>
+                <Icon name="pause" size={20} />
+            </Pressable>
+        ));
 
     const playlistButton = (navigation: NavigationProp<any>) => (
-        <Pressable style={styles.optionButton} onPress={() => navigation.navigate(savedPlaylists.length ? 'PlaylistList' : 'NewPlaylist')}>
+        <Pressable
+            style={styles.optionButton}
+            onPress={() => navigation.navigate(savedPlaylists.length ? 'PlaylistList' : 'NewPlaylist')}>
             <MaterialCommunityIcons name={savedPlaylists.length ? 'playlist-music' : 'playlist-plus'} size={25} />
         </Pressable>
     );
@@ -57,33 +64,79 @@ const HomeStack = () => {
     );
 
     const editPlaylistButton = (navigation: NavigationProp<any>) => (
-        <Pressable style={styles.optionButton} onPress={() => {
-            dispatch(setPlaylistToEdit());
-            navigation.navigate('NewPlaylist')
-        }}>
+        <Pressable
+            style={styles.optionButton}
+            onPress={() => {
+                dispatch(setPlaylistToEdit());
+                navigation.navigate('NewPlaylist');
+            }}>
             <MaterialCommunityIcons name="playlist-edit" size={30} />
         </Pressable>
-    );    
+    );
+
+    const icon = useMemo(() => {
+        switch (searchType) {
+            case 'filter':
+                return 'magnify-close';
+            case 'find':
+                return 'magnify-plus';
+            default:
+                return 'magnify';
+        }
+    }, [searchType]);
+    const searchButton = () => {
+        if (currentTab !== 'Home') {
+            return;
+        }
+        return (
+            <Pressable
+                style={styles.optionButton}
+                onPress={() =>
+                    setSearchType(current => {
+                        switch (current) {
+                            case 'filter':
+                                return 'none';
+                            case 'find':
+                                return 'filter';
+                            default:
+                                return 'find';
+                        }
+                    })
+                }>
+                <MaterialCommunityIcons name={icon} size={30} />
+            </Pressable>
+        );
+    };
+    const resetSearch = () => setSearchType('none');
 
     return (
         <Stack.Navigator>
             <Stack.Screen
                 name="HomeTabs"
-                options={({ navigation }: { navigation: NavigationProp<any> }) => ({
+                options={({navigation}: {navigation: NavigationProp<any>}) => ({
                     headerTitle: 'Home',
                     headerRight: () => (
                         <View style={styles.headerContainer}>
                             {currentTab === 'PlaylistList' ? addPlaylistButton(navigation) : playlistButton(navigation)}
                             {playbackButton()}
+                            {searchButton()}
                         </View>
                     )
-                })}
-            >{props => <HomeTabs currentTab={currentTab} setCurrentTab={setCurrentTab} />}</Stack.Screen>
+                })}>
+                {props => (
+                    <HomeTabs
+                        currentTab={currentTab}
+                        setCurrentTab={setCurrentTab}
+                        searchType={searchType}
+                        resetSearch={resetSearch}
+                    />
+                )}
+            </Stack.Screen>
             <Stack.Screen
                 name="ArtistScreen"
                 component={ArtistScreen}
                 options={{
-                    headerTitle: `${currentArtist && currentArtist.artist || 'Artist'}`
+                    headerTitle: `${(currentArtist && currentArtist.artist) || 'Artist'}`
                 }}
             />
             <Stack.Screen
@@ -96,11 +149,9 @@ const HomeStack = () => {
             <Stack.Screen
                 name="Playlist"
                 component={Playlist}
-                options={({ navigation }: { navigation: NavigationProp<any> }) => ({
+                options={({navigation}: {navigation: NavigationProp<any>}) => ({
                     headerTitle: `Playlist${viewingPlaylist ? ' - ' + viewingPlaylistName : ''}`,
-                    headerRight: () => (
-                        editPlaylistButton(navigation)
-                    )
+                    headerRight: () => editPlaylistButton(navigation)
                 })}
             />
         </Stack.Navigator>
